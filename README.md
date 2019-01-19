@@ -1,4 +1,4 @@
-## Web Server & App for Beer Brewing
+## Web Server & App for Augmented Music Generation
 
 Init Dev
 ```

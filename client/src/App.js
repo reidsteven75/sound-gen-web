@@ -1,40 +1,20 @@
 import React, { Component } from 'react'
-import openSocket from 'socket.io-client'
-import { MoonLoader } from 'react-spinners'
+// import openSocket from 'socket.io-client'
 // import axios from 'axios'
 // import _ from 'lodash'
 // import * as moment from 'moment'
 
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
-import cyan from '@material-ui/core/colors/cyan'
-import red from '@material-ui/core/colors/red'
+import MusicGenerator from './components/music-generator'
 
 import './App.css';
 
-const serverUrl = process.env.REACT_APP_SERVER_URL
+// const serverUrl = process.env.REACT_APP_SERVER_URL
 
-const theme = createMuiTheme({
-  palette: {
-    primary: {
-      light: cyan[300],
-      main: cyan[500],
-      dark: cyan[700],
-    },
-    secondary: {
-      light: red[300],
-      main: red[500],
-      dark: red[700],
-    },
-  },
-  typography: {
-    useNextVariants: true,
-  }
-})
+// const socket = openSocket(serverUrl)
+// socket.on('connect', function () { 
+//   console.log('[socket]: connected')
+// })
 
-const socket = openSocket(serverUrl)
-socket.on('connect', function () { 
-  // console.log('[socket]: connected')
-})
 const style = {
   content: {
     width: '80%',
@@ -64,11 +44,7 @@ class App extends Component {
   render() {
     let content
     if (this.state.loading === true) {
-      content = <div>
-                  <MoonLoader
-                    color={'#36D7B7'}
-                    />
-                </div>
+      content = <div className="loader medium fast"></div>
     }
     else if (this.state.serverError === true) {
       content = <div>
@@ -81,17 +57,18 @@ class App extends Component {
     else {
       content = <div style={style.content}>
         <h2>Augmented Music Generation</h2>
+        <MusicGenerator
+        
+        />
       </div>
     }
 
     return (
-      <MuiThemeProvider theme={theme}>
-        <div className="App">
-          <main className="App-main">
-            {content}
-          </main>
-        </div> 
-      </MuiThemeProvider>
+      <div className="App">
+        <main className="App-main">
+          {content}
+        </main>
+      </div> 
     )
   }
 }

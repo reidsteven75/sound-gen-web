@@ -9,7 +9,7 @@ import { MDBBtn } from 'mdbreact'
 
 import VisualizerLines from './visualizer-lines'
 
-const model = new mm.MusicVAE('https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/trio_4bar')
+const model = new mm.MusicVAE('https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_2bar_small')
 const player = new mm.Player()
 
 const style = {
@@ -69,7 +69,10 @@ class Blender extends Component {
         this.setState({samples:blendedSamples})
         this.setState({isBlendCreated:true})
         
-        this.props.observable.selectedBlendSampleId = this.config.defaultSampleSelected
+        if (!this.props.observable.selectedBlendSampleId) {
+          this.props.observable.selectedBlendSampleId = this.config.defaultSampleSelected
+        }
+        
 			})
 		}, 200)
   }
@@ -80,7 +83,7 @@ class Blender extends Component {
   }
 
   playTrack() {
-    const sample = this.state.samples[this.props.observable.selectedBlendSampleId]
+    const sample = this.state.samples[this.props.observable.selectedBlendSampleId - 1]
     this.setState({isPlaying: true})
     player.start(sample).then(() => {
       this.setState({isPlaying: false})

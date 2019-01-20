@@ -59,7 +59,7 @@ class Blender extends Component {
 			model.interpolate(inputSequences, numInterps, temperature)
 			.then(blendedSamples => {
 				this.setState({isBlending:false})
-				this.setState({sample:blendedSamples[0]})
+				this.setState({sample:blendedSamples[1]})
 				this.setState({isBlendCreated:true})
 			})
 		}, 200)
@@ -93,9 +93,9 @@ class Blender extends Component {
               outline={this.state.isBlending || !canBlend}
 							disabled={this.state.isBlending || !canBlend}
               onClick={this.blendSamples.bind(this)} 
-              color="secondary"
+              color="indigo"
             >
-              Blend Samples
+              { this.state.isBlending ? 'Blending...' : 'Blend Samples' }	
             </MDBBtn>
           </MDBCol>
         </MDBRow>

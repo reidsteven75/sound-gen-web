@@ -35,9 +35,10 @@ class SampleGenerator extends Component {
 	}
 
   generateSample() {
+		const numSamples = 1
 		this.setState({isSampleGenerating:true})
 		setTimeout(() => {
-			model.sample(1)
+			model.sample(numSamples)
 			.then(samples => {
 				this.setState({isSampleGenerating:false})
 				this.setState({sample:samples})
@@ -91,7 +92,7 @@ class SampleGenerator extends Component {
 						outline={this.state.isSampleGenerating}
 						onClick={this.generateSample.bind(this)} 
 					>
-						Generate Sample
+					{ this.state.isSampleGenerating ? 'Generating...' : 'Generate Sample'  }		
 					</MDBBtn>
 				</MDBCol>
 			</MDBRow>

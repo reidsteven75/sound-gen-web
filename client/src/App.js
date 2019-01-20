@@ -41,9 +41,9 @@ class App extends Component {
 
   componentDidMount() {
     // App loading animation
-    // setTimeout(() => {
-    //   this.setState({loading:false})
-    // }, 1000)
+    setTimeout(() => {
+      this.setState({loading:false})
+    }, 1000)
   }
 
   render() {

@@ -7,13 +7,15 @@ import { MDBIcon } from 'mdbreact'
 import { MDBContainer, MDBRow, MDBCol } from 'mdbreact'
 import { MDBBtn } from 'mdbreact'
 
+import VisualizerLines from './visualizer-lines'
+
 const model = new mm.MusicVAE('https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/trio_4bar')
 const player = new mm.Player()
 
 const style = {
   wrapper: {
     border: '1px solid black',
-    height: '200px',
+    height: '250px',
     width: 'auto',
     padding: '15px',
     display: 'flex',
@@ -27,6 +29,8 @@ class Blender extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      samples: [],
+      sampleSelected: null,
       isPlaying: false,
       isBlending: false,
       isBlendCreated: false,
@@ -59,7 +63,8 @@ class Blender extends Component {
 			model.interpolate(inputSequences, numInterps, temperature)
 			.then(blendedSamples => {
 				this.setState({isBlending:false})
-				this.setState({sample:blendedSamples[1]})
+        this.setState({samples:blendedSamples})
+        this.setState({sampleSelected:blendedSamples[1]})
 				this.setState({isBlendCreated:true})
 			})
 		}, 200)
@@ -71,7 +76,7 @@ class Blender extends Component {
   }
 
   playTrack() {
-    const sample = this.state.sample
+    const sample = this.state.sampleSelected
     this.setState({isPlaying: true})
     player.start(sample).then(() => {
       this.setState({isPlaying: false})
@@ -97,6 +102,28 @@ class Blender extends Component {
             >
               { this.state.isBlending ? 'Blending...' : 'Blend Samples' }	
             </MDBBtn>
+          </MDBCol>
+        </MDBRow>
+        <MDBRow className='mt-3'>
+          <MDBCol sm="3">
+            <VisualizerLines 
+              sample={this.state.samples[0]}
+            />
+          </MDBCol>
+          <MDBCol sm="3">
+            <VisualizerLines 
+              sample={this.state.samples[1]}
+            />
+          </MDBCol>
+          <MDBCol sm="3">
+            <VisualizerLines 
+              sample={this.state.samples[2]}
+            />
+          </MDBCol>
+          <MDBCol sm="3">
+            <VisualizerLines 
+              sample={this.state.samples[3]}
+            />
           </MDBCol>
         </MDBRow>
         <MDBRow className='mt-3'>

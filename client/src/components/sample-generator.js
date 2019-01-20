@@ -1,23 +1,26 @@
 import React, { Component } from 'react'
+import { observer } from 'mobx-react'
 import * as mm from '@magenta/music'
 
 import { MDBIcon } from 'mdbreact'
 import { MDBContainer, MDBRow, MDBCol } from 'mdbreact'
 import { MDBBtn } from 'mdbreact'
 
+import VisualizerLines from './visualizer-lines'
+
 const model = new mm.MusicVAE('https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/trio_4bar')
 const player = new mm.Player()
 
 const style = {
   wrapper: {
-	border: '1px solid black',
-	height: '200px',
-	width: 'auto',
-	padding: '15px',
-	display: 'flex',
-	justifyContent: 'center',
-	alignItems: 'center',
-	marginBottom: '30px'
+		border: '1px solid black',
+		height: '250px',
+		width: 'auto',
+		padding: '15px',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginBottom: '30px'
   }
 }
 
@@ -26,6 +29,7 @@ class SampleGenerator extends Component {
   constructor(props) {
 		super(props)
 		this.state = {
+			sampleVisualizationData: null,
 			sample: null,
 			isPlaying: false,
 			isSampleCreated: false,
@@ -37,12 +41,14 @@ class SampleGenerator extends Component {
   generateSample() {
 		const numSamples = 1
 		this.setState({isSampleGenerating:true})
+		this.stopTrack()
 		setTimeout(() => {
 			model.sample(numSamples)
 			.then(samples => {
+				const chosenSample = samples[0]
 				this.setState({isSampleGenerating:false})
-				this.setState({sample:samples})
-				this.props.observable.samples[this.props.id] = samples[0]
+				this.setState({sample:chosenSample})
+				this.props.observable.samples[this.props.id] = chosenSample
 				this.setState({isSampleCreated:true})
 			})
 		}, 200)
@@ -71,10 +77,9 @@ class SampleGenerator extends Component {
   }
 
   playTrack() {
-    const samples = this.state.sample
+		const sample = this.state.sample
     this.setState({isPlaying: true})
-    player.start(samples[0]).then(() => {
-			console.log('stop')
+    player.start(sample).then(() => {
       this.setState({isPlaying: false})
     })
   }
@@ -84,6 +89,7 @@ class SampleGenerator extends Component {
 	let loading = <div className="loader fast small"></div>
 
 	let content = 
+
 	  <MDBContainer>
 			<MDBRow>
 				<MDBCol sm="12">
@@ -94,6 +100,13 @@ class SampleGenerator extends Component {
 					>
 					{ this.state.isSampleGenerating ? 'Generating...' : 'Generate Sample'  }		
 					</MDBBtn>
+				</MDBCol>
+			</MDBRow>
+			<MDBRow className='mt-3'>
+				<MDBCol sm="12">
+					<VisualizerLines 
+						sample={this.state.sample}
+					/>
 				</MDBCol>
 			</MDBRow>
 			<MDBRow className='mt-3'>
@@ -162,4 +175,4 @@ class SampleGenerator extends Component {
   }
 }
 
-export default SampleGenerator;
+export default observer(SampleGenerator)

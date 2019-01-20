@@ -26,6 +26,10 @@ const style = {
 
 class SampleGenerator extends Component {
 
+	config = {
+		generateOnLoad: false
+	}
+
   constructor(props) {
 		super(props)
 		this.state = {
@@ -59,7 +63,9 @@ class SampleGenerator extends Component {
 			.initialize()
 			.then(() => {
 				this.setState({loading:false})
-				this.generateSample()
+				if (this.config.generateOnLoad === true) {
+					this.generateSample()
+				}
 			})
 	}
 
@@ -72,13 +78,14 @@ class SampleGenerator extends Component {
   }
 	
 	stopTrack() {
-    player.stop()
+		player.stop()
     this.setState({isPlaying: false})
   }
 
   playTrack() {
 		const sample = this.state.sample
-    this.setState({isPlaying: true})
+		this.setState({isPlaying: true})
+
     player.start(sample).then(() => {
       this.setState({isPlaying: false})
     })
@@ -86,7 +93,7 @@ class SampleGenerator extends Component {
 
   render() {
 
-	let loading = <div className="loader fast small"></div>
+	let loading = <div className="loader border-top-default fast small"></div>
 
 	let content = 
 
@@ -94,8 +101,9 @@ class SampleGenerator extends Component {
 			<MDBRow>
 				<MDBCol sm="12">
 					<MDBBtn 
+						color={ this.state.isSampleGenerating ? 'mdb-color' : 'primary'} 
 						disabled={this.state.isSampleGenerating}
-						outline={this.state.isSampleGenerating}
+						outline
 						onClick={this.generateSample.bind(this)} 
 					>
 					{ this.state.isSampleGenerating ? 'Generating...' : 'Generate Sample'  }		
@@ -106,14 +114,15 @@ class SampleGenerator extends Component {
 				<MDBCol sm="12">
 					<VisualizerLines 
 						sample={this.state.sample}
+						observable={this.props.observable}
 					/>
 				</MDBCol>
 			</MDBRow>
 			<MDBRow className='mt-3'>
 				<MDBCol sm="4">
 					<MDBBtn 
-							color="danger"
-							outline={!this.state.isSampleCreated}
+							color={ !this.state.isSampleCreated ? 'mdb-color' : 'danger'} 
+							outline
 							disabled={!this.state.isSampleCreated}
 							onClick={this.dislikeTrack.bind(this)} 
 						>
@@ -125,8 +134,8 @@ class SampleGenerator extends Component {
 					this.state.isPlaying
 					? (
 						<MDBBtn 
-							color="secondary"
-							outline={!this.state.isSampleCreated}
+							color={ !this.state.isSampleCreated ? 'mdb-color' : 'secondary'} 
+							outline
 							disabled={!this.state.isSampleCreated}
 							onClick={this.stopTrack.bind(this)} 
 						>
@@ -136,8 +145,8 @@ class SampleGenerator extends Component {
 					// not playing
 					: (
 						<MDBBtn 
-							color="primary"
-							outline={!this.state.isSampleCreated}
+							color={ !this.state.isSampleCreated ? 'mdb-color' : 'primary'} 
+							outline
 							disabled={!this.state.isSampleCreated}
 							onClick={this.playTrack.bind(this)} 
 						>
@@ -148,8 +157,8 @@ class SampleGenerator extends Component {
 				</MDBCol>
 				<MDBCol sm="4">
             <MDBBtn 
-							color="success"
-							outline={!this.state.isSampleCreated}
+							color={ !this.state.isSampleCreated ? 'mdb-color' : 'success'} 
+							outline
 							disabled={!this.state.isSampleCreated}
               onClick={this.likeTrack.bind(this)} 
             >

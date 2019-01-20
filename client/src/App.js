@@ -28,7 +28,8 @@ const style = {
 class App extends Component {
 
   appState = observable.object({
-    samples: []
+    samples: [],
+    selectedBlendSampleId: null
   })
 
   constructor(props) {
@@ -49,7 +50,7 @@ class App extends Component {
   render() {
     let content
     if (this.state.loading === true) {
-      content = <div className="loader medium fast"></div>
+      content = <div className="loader border-top-default medium fast"></div>
     }
     else if (this.state.serverError === true) {
       content = <div>

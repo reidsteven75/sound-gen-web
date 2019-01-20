@@ -1,12 +1,15 @@
 import React, { Component } from 'react'
+import { observable } from 'mobx'
 // import openSocket from 'socket.io-client'
 // import axios from 'axios'
 // import _ from 'lodash'
 // import * as moment from 'moment'
 
-import MusicGenerator from './components/music-generator'
+import { MDBContainer, MDBRow, MDBCol } from 'mdbreact'
+import Blender from './components/blender'
+import SampleGenerator from './components/sample-generator'
 
-import './App.css';
+import './App.css'
 
 // const serverUrl = process.env.REACT_APP_SERVER_URL
 
@@ -24,21 +27,23 @@ const style = {
 
 class App extends Component {
 
+  appState = observable.object({
+    samples: []
+  })
+
   constructor(props) {
     super(props)
     this.state = {
-      loading: true,
+      loading: false,
       serverError: false
     }
   }
 
   componentDidMount() {
-    const _this = this
-
     // App loading animation
-    setTimeout(function() {
-      _this.setState({loading:false})
-    }, 1000)
+    // setTimeout(() => {
+    //   this.setState({loading:false})
+    // }, 1000)
   }
 
   render() {
@@ -56,10 +61,29 @@ class App extends Component {
     }
     else {
       content = <div style={style.content}>
-        <h2>Augmented Music Generation</h2>
-        <MusicGenerator
-        
-        />
+        <MDBContainer>
+          <MDBRow>
+            <MDBCol sm="6">
+              <SampleGenerator 
+                id={0}
+                observable={this.appState}
+              />
+            </MDBCol>
+            <MDBCol sm="6">
+              <SampleGenerator 
+                id={1}
+                observable={this.appState}
+              />
+            </MDBCol>
+          </MDBRow>
+          <MDBRow>
+            <MDBCol sm="12">
+              <Blender 
+                observable={this.appState}
+              />
+            </MDBCol>
+          </MDBRow>
+        </MDBContainer>
       </div>
     }
 

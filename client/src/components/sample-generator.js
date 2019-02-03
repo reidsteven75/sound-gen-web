@@ -8,7 +8,7 @@ import { MDBBtn } from 'mdbreact'
 
 import VisualizerLines from './visualizer-lines'
 
-const model = new mm.MusicVAE('https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/trio_4bar')
+var model
 const player = new mm.Player()
 
 const style = {
@@ -59,6 +59,10 @@ class SampleGenerator extends Component {
   }
 
   componentDidMount() {
+
+		const modelUrl = this.props.modelUrl
+
+    model = new mm.MusicVAE(modelUrl)
 		model
 			.initialize()
 			.then(() => {

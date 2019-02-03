@@ -18,6 +18,16 @@ import './App.css'
 //   console.log('[socket]: connected')
 // })
 
+const models = {
+  generator: [
+    'https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_16bar_small_q2',
+    'https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/drums_2bar_hikl_small'
+  ],
+  blender: [
+    'https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/trio_4bar'
+  ]
+}
+
 const style = {
   content: {
     width: '80%',
@@ -67,12 +77,14 @@ class App extends Component {
             <MDBCol sm="6">
               <SampleGenerator 
                 id={0}
+                modelUrl={models.generator[0]}
                 observable={this.appState}
               />
             </MDBCol>
             <MDBCol sm="6">
               <SampleGenerator 
                 id={1}
+                modelUrl={models.generator[1]}
                 observable={this.appState}
               />
             </MDBCol>
@@ -81,6 +93,7 @@ class App extends Component {
             <MDBCol sm="12">
               <Blender 
                 observable={this.appState}
+                modelUrl={models.blender[0]}
               />
             </MDBCol>
           </MDBRow>

@@ -1,3 +1,9 @@
+# Generating
+
+'''
+paperspace login --apiKey 93f9d7b486b90044245b3d85aad4da
+'''
+
 # NSynth
 
 In a [blog post](https://magenta.tensorflow.org/nsynth-instrument), we describe the details of NSynth (Neural Audio Synthesis), a new approach to audio synthesis using neural networks.

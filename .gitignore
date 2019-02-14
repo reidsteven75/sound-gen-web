@@ -4,7 +4,10 @@
 # Log files.
 *.log
 
-# Don't push audio files
+# Keys
+keys.txt
+
+# Audio files
 audio_input
 
 #OSX hidden metadata file

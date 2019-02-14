@@ -9,8 +9,6 @@ COPY . /app
 
 # Install any needed packages
 RUN pip install pipenv
-# ONBUILD COPY Pipfile Pipfile
-# ONBUILD COPY Pipfile.lock Pipfile.lock
 RUN pipenv install --system
 
 # Make port 80 available to the world outside this container

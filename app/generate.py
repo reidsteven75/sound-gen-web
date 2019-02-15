@@ -25,6 +25,7 @@ from multiprocessing.dummy import Pool as ThreadPool
 import librosa
 import scipy.io
 import numpy as np
+import time
 from tqdm import tqdm
 from itertools import product
 
@@ -37,6 +38,15 @@ with open('config-'+env+'.json', 'r') as infile:
 
 #  preserve the working directory path
 source_dir = os.getcwd()
+print source_dir
+
+#  debug
+print "=================="
+print "ENV: " + env
+print "source_dir: " + source_dir
+print "=================="
+
+time.sleep(1)
 
 def compute_embeddings():
   #   convert all aif files to wav
@@ -46,7 +56,8 @@ def compute_embeddings():
     for fname in os.listdir('audio_input'):
       if 'aif' in fname:
         nfn = 'audio_input/'+fname.replace('aif', 'wav')
-        subprocess.call(["sox", 'audio_input/'+fname, "-b", "16", "-r", "16000", "-c", "1", nfn])
+        subprocess.check_call(["sox", 'audio_input/'+fname, "-b", "16", "-r", "16000", "-c", "1", nfn])
+        # subprocess.call(["sox", 'audio_input/'+fname, "-b", "16", "-r", "16000", "-c", "1", nfn])
         os.rename('audio_input/'+fname, 'aif_bkp/'+fname)
 
   subprocess.check_call(["nsynth_save_embeddings",

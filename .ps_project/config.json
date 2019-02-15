@@ -1,8 +1,8 @@
 {
   "project": "sound-gen",
   "container": "reidsteven75/sound-generation:latest",
-  "command": "Z2VuZXJhdGUucHk=",
+  "command": "cHl0aG9uIGdlbmVyYXRlLnB5",
   "workspace": "/Users/reidsteven75/projects/music-generation/sound-gen",
-  "lastJobId": "jpf05dqvuqp4z",
+  "lastJobId": "jsjfr8weugwp9h",
   "machineType": "GPU+"
 }

@@ -7,7 +7,13 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
-# Install any needed packages
+# Install libraries
+RUN apt-get update && apt-get install -y \
+  build-essential \
+  libasound2-dev \
+  libjack-dev   
+
+# Install packages
 RUN pip install magenta-gpu
 RUN pip install pipenv
 RUN pipenv install --system

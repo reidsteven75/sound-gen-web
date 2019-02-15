@@ -8,6 +8,7 @@ WORKDIR /app
 COPY . /app
 
 # Install any needed packages
+RUN pip install magenta-gpu
 RUN pip install pipenv
 RUN pipenv install --system
 

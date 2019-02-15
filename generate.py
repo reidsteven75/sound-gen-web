@@ -44,8 +44,7 @@ def compute_embeddings():
     for fname in os.listdir('audio_input'):
       if 'aif' in fname:
         nfn = 'audio_input/'+fname.replace('aif', 'wav')
-        print nfn
-        subprocess.call(["sox", 'audio_input/'+fname, "-b", "16", "-r", "16000", "-c", "1", nfn])
+        subprocess.call(["sox", source_dir+'/audio_input/'+fname, "-b", "16", "-r", "16000", "-c", "1", nfn])
         os.rename('audio_input/'+fname, 'aif_bkp/'+fname)
 
   subprocess.check_call(["nsynth_save_embeddings",

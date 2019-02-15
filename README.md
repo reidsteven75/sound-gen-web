@@ -10,6 +10,11 @@ Deploy Job
 ./deploy-job.sh
 '''
 
+Data Storage
+https://support.paperspace.com/hc/en-us/articles/360001480494-Gradient-Storage-Overview
+- use paperspace persistant storage
+- access this by using the jupiter notebook on paperspace and go to /storage dir
+
 # NSynth
 
 https://github.com/tensorflow/magenta-demos/tree/master/nsynth

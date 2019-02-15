@@ -18,6 +18,10 @@
 # MaxForLive device's epectations and so that the entire pipeline could be
 # run at once.
 
+## TODO
+# ignore local storage folder when deploying
+# use env variable to use proper config file
+
 import json, os, sys, re, subprocess, fnmatch, time
 from os.path import basename, isfile
 from math import floor, ceil
@@ -28,9 +32,11 @@ import numpy as np
 from tqdm import tqdm
 from itertools import product
 
+print(os.environ['ENV'])
+
 #  load the settings file
 settings = None
-with open('settings.json', 'r') as infile:
+with open('config.json', 'r') as infile:
   settings = json.load(infile)
 
 #  preserve the working directory path

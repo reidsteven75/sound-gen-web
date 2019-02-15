@@ -1,11 +1,18 @@
 # Generating
 
+Local Dev
+'''
+pipenv run python generate.py
 '''
 
-
+Deploy Job
+'''
+./deploy-job.sh
 '''
 
 # NSynth
+
+https://github.com/tensorflow/magenta-demos/tree/master/nsynth
 
 In a [blog post](https://magenta.tensorflow.org/nsynth-instrument), we describe the details of NSynth (Neural Audio Synthesis), a new approach to audio synthesis using neural networks.
 

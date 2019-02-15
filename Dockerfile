@@ -11,7 +11,9 @@ COPY . /app
 RUN apt-get update && apt-get install -y \
   build-essential \
   libasound2-dev \
-  libjack-dev   
+  libjack-dev \
+  sox \
+  lame
 
 # Install packages
 RUN pip install magenta-gpu

@@ -7,6 +7,9 @@
 # Keys
 keys.txt
 
+# Checkpoint
+wavenet-ckpt
+
 # Audio files
 aif_bkp
 audio_input

@@ -1,7 +1,8 @@
 # Generating
 
 '''
-paperspace login --apiKey 93f9d7b486b90044245b3d85aad4da
+
+
 '''
 
 # NSynth

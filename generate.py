@@ -32,11 +32,11 @@ import numpy as np
 from tqdm import tqdm
 from itertools import product
 
-print(os.environ['ENV'])
+env = os.environ['ENV']
 
 #  load the settings file
 settings = None
-with open('config.json', 'r') as infile:
+with open('config-'+env+'.json', 'r') as infile:
   settings = json.load(infile)
 
 #  preserve the working directory path

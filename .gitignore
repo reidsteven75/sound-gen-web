@@ -4,8 +4,8 @@
 # Log files.
 *.log
 
-# Keys
-keys.txt
+# Sensitive data
+local_only
 
 # Checkpoint
 storage

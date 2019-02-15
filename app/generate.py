@@ -18,10 +18,6 @@
 # MaxForLive device's epectations and so that the entire pipeline could be
 # run at once.
 
-## TODO
-# ignore local storage folder when deploying
-# use env variable to use proper config file
-
 import json, os, sys, re, subprocess, fnmatch, time
 from os.path import basename, isfile
 from math import floor, ceil

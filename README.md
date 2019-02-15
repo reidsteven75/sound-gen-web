@@ -15,6 +15,9 @@ https://support.paperspace.com/hc/en-us/articles/360001480494-Gradient-Storage-O
 - use paperspace persistant storage
 - access this by using the jupiter notebook on paperspace and go to /storage dir
 
+# Paperspace (cloud GPU on demand)
+https://docs.paperspace.com/gradient/
+
 # NSynth
 
 https://github.com/tensorflow/magenta-demos/tree/master/nsynth

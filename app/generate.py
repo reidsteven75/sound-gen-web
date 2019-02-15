@@ -40,14 +40,6 @@ with open('config-'+env+'.json', 'r') as infile:
 source_dir = os.getcwd()
 print source_dir
 
-#  debug
-print "=================="
-print "ENV: " + env
-print "source_dir: " + source_dir
-print "=================="
-
-time.sleep(1)
-
 def compute_embeddings():
   #   convert all aif files to wav
   if ['aif' in f for f in os.listdir('audio_input')]:
@@ -57,7 +49,6 @@ def compute_embeddings():
       if 'aif' in fname:
         nfn = 'audio_input/'+fname.replace('aif', 'wav')
         subprocess.check_call(["sox", 'audio_input/'+fname, "-b", "16", "-r", "16000", "-c", "1", nfn])
-        # subprocess.call(["sox", 'audio_input/'+fname, "-b", "16", "-r", "16000", "-c", "1", nfn])
         os.rename('audio_input/'+fname, 'aif_bkp/'+fname)
 
   subprocess.check_call(["nsynth_save_embeddings",
@@ -170,7 +161,7 @@ def batch_embeddings():
 #  format call to nsynth_generate
 def gen_call(gpu):
   print("Generating on GPU %i"%gpu)
-  return subprocess.call(["nsynth_generate",
+  return subprocess.check_call(["nsynth_generate",
     "--checkpoint_path=%s/model.ckpt-200000" % settings['checkpoint_dir'],
     "--source_path=%s/working_dir/embeddings/interp/batch%s" % (source_dir, gpu),
     "--save_path=%s/working_dir/audio/batch%s" % (source_dir, gpu),
@@ -203,13 +194,13 @@ def generate_audio():
   #  move files out of batch folders
   if not os.path.exists('working_dir/audio/raw_wav'):
     os.mkdir('working_dir/audio/raw_wav')
-  subprocess.call("find working_dir/audio -name \"*.wav\" | \
+  subprocess.check_call("find working_dir/audio -name \"*.wav\" | \
                    while read f; do mv $f working_dir/audio/raw_wav/${f##*/}; done", shell=True)
 
 
 def clean_files():
   original_path = os.path.join(source_dir, 'working_dir/audio/raw_wav/')
-  cleaned_path = os.path.join(source_dir, 'output_grids', settings['name'])
+  cleaned_path = os.path.join(source_dir, 'artifacts/output_grids', settings['name'])
 
   if not os.path.exists(cleaned_path):
     os.mkdir(cleaned_path)
@@ -251,7 +242,7 @@ def clean_files():
 
 
 def generate_options_file():
-  outut_file = os.path.join(source_dir, 'output_grids', settings['name'], 'options')
+  outut_file = os.path.join(source_dir, 'artifacts/output_grids', settings['name'], 'options')
 
   instrument_grid = settings['instruments']
   grid_size = len(instrument_grid) - 1
@@ -284,20 +275,37 @@ def generate_options_file():
 
 
 if __name__ == "__main__":
+
+  print "=================="
+  print "ENV: " + env
+  print "source_dir: " + source_dir
+  print "=================="  
+  time.sleep(1)
+
   print("\nComputing embeddings for each instrument at each pitch...\n")
+  print "=================="
+  time.sleep(1)
   compute_embeddings()
   correct_truncated_names()
 
   print("\nInterpolating embeddings between instruments at each pitch...")
+  print "=================="
+  time.sleep(1)
   interpolate_embeddings()
 
   print("\nBatchings embeddings for GPU(s)...")
+  print "=================="
+  time.sleep(1)
   batch_embeddings()
 
   print("Generating audio from embeddings (this may take a while!)\n")
+  print "=================="
+  time.sleep(1)
   generate_audio()
 
   print("\nCleaning up generated audio files...\n")
+  print "=================="
+  time.sleep(1)
   clean_files()
 
   generate_options_file()

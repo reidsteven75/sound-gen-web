@@ -1,6 +1,6 @@
 # Use an official Python runtime as a parent image
-# FROM tensorflow/tensorflow:1.12.0-gpu
-FROM tensorflow/magenta:0.3.11
+FROM tensorflow/tensorflow:1.12.0-gpu
+# FROM tensorflow/magenta:0.3.11
 
 # Set the working directory to /app
 WORKDIR /app

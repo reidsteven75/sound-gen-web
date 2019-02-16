@@ -1,14 +1,31 @@
-# Generating
+# Dev
 
-Local Dev
-'''
-pipenv run python generate.py
-'''
+Run scripts from root folder
 
-Deploy Job
-'''
-./deploy-job.sh
-'''
+Init locally
+```
+./scripts/init.sh
+```
+
+Run generation locally
+```
+./scripts/job-run-local.sh
+```
+
+Run generation on remote Paperspace GPU instance
+```
+./scripts/job-run-paperspace.sh
+```
+
+Test GPU on remote Paperspace GPU instance
+```
+./scripts/gpu-test-paperspace.sh
+```
+
+Re-build and deploy docker container (container is used in Paperspace GPU instance)
+```
+./scripts/docker-build-deploy.sh
+```
 
 Data Storage
 https://support.paperspace.com/hc/en-us/articles/360001480494-Gradient-Storage-Overview

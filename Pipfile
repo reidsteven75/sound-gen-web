@@ -7,8 +7,8 @@ name = "pypi"
 python_version = "2.7"
 
 [packages]
-tqdm = "*"
-librosa = "*"
+tqdm = "==4.31.1"
+librosa = "==0.6.3"
 
 [dev-packages]
 

@@ -210,7 +210,7 @@ def clean_files():
   for fpath in tqdm(files):
     audio, sr = librosa.core.load(os.path.join(original_path, fpath), sr=16000)
 
-    #   remove clicks
+    #  remove clicks
     d = audio[1:] - audio[:-1]
     d_thresh = np.where(np.abs(d) > 1.0)[0]
     clicks = [

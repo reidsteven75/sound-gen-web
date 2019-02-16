@@ -2,7 +2,7 @@
   "project": "sound-gen",
   "machineType": "GPU+",
   "container": "reidsteven75/sound-generation:latest",
-  "command": "RU5WPSdwYXBlcnNwYWNlJyBweXRob24gZ3B1LXRlc3QucHk=",
-  "workspace": "./gpu-test",
-  "lastJobId": "jcy1a0xkvlhr"
+  "command": "RU5WPSdwYXBlcnNwYWNlJyBweXRob24gZ2VuZXJhdGUucHk=",
+  "workspace": "./app",
+  "lastJobId": "jmms3djwefj9z"
 }

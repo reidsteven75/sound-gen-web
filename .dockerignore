@@ -1,0 +1,8 @@
+# whitelist
+
+*
+!app
+!gpu-test
+!Dockerfile
+!Pipfile
+!Pipfile.lock

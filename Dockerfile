@@ -1,6 +1,8 @@
+# NOTE: this doesn't invoke a run command as this is used
+# in paperspace jobs where the command is invoked in the job itself
+
 # Use an official Python runtime as a parent image
 FROM tensorflow/tensorflow:1.12.0-gpu
-# FROM tensorflow/magenta:0.3.11
 
 # Set the working directory to /app
 WORKDIR /app
@@ -18,11 +20,10 @@ RUN apt-get update && apt-get install -y \
 
 # Install packages
 RUN pip install magenta-gpu
-RUN pip install pipenv
-RUN pipenv install --system
+RUN pip install tqdm
+RUN pip install librosa
+# RUN pip install pipenv
+# RUN pipenv install --system --deploy
 
 # Make port 80 available to the world outside this container
 EXPOSE 80
-
-# Run when the container launches
-# CMD ["python", "generate.py"]

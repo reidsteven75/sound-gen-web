@@ -98,33 +98,54 @@ def interpolate_embeddings():
       #  load the saved embedding
       embeddings_lookup[reference] = np.load("working_dir/embeddings/input/%s" % filename)
 
+  # Multi-grid
+  # def get_embedding(instrument, pitch):
+  #   reference = '{}_{}'.format(instrument, pitch)
+  #   return embeddings_lookup[reference]
+
+  # def get_instruments(xy):
+  #   uv = (int(floor(xy[0])), int(floor(xy[1])))
+  #   return [instrument_grid[uv[0]][uv[1]],instrument_grid[uv[0]][uv[1]+1],
+  #       instrument_grid[uv[0]+1][uv[1]],instrument_grid[uv[0]+1][uv[1]+1]]
+
+  # def get_weights(xy):
+  #   uv = (int(floor(xy[0])), int(floor(xy[1])))
+  #   corners = np.array([[uv[0],uv[1]], [uv[0],uv[1]+1], [uv[0]+1,uv[1]], [uv[0]+1,uv[1]+1]])
+  #   distances = np.linalg.norm(xy - corners, axis=1)
+  #   distances = np.maximum(1 - distances, 0)
+  #   distances /= distances.sum()
+  #   return distances
+
+  # Single-grid
   def get_embedding(instrument, pitch):
     reference = '{}_{}'.format(instrument, pitch)
     return embeddings_lookup[reference]
 
   def get_instruments(xy):
-    uv = (int(floor(xy[0])), int(floor(xy[1])))
-    return [instrument_grid[uv[0]][uv[1]],instrument_grid[uv[0]][uv[1]+1],
-        instrument_grid[uv[0]+1][uv[1]],instrument_grid[uv[0]+1][uv[1]+1]]
-
-  def get_weights(xy):
-    uv = (int(floor(xy[0])), int(floor(xy[1])))
-    corners = np.array([[uv[0],uv[1]], [uv[0],uv[1]+1], [uv[0]+1,uv[1]], [uv[0]+1,uv[1]+1]])
-    distances = np.linalg.norm(xy - corners, axis=1)
-    distances = np.maximum(1 - distances, 0)
-    distances /= distances.sum()
-    return distances
+    return [instrument_grid[0],instrument_grid[1],
+        instrument_grid[2],instrument_grid[3]]
 
   done = set()
 
   if not os.path.exists('working_dir/embeddings/interp'):
     os.mkdir('working_dir/embeddings/interp')
+  
+  # Multi-grid
+  # for idx, xy in enumerate(xy_grid):
+  #   sub_grid, weights = get_instruments(xy), get_weights(xy)
+  #   for pitch in pitches:
+  #     embeddings = np.asarray([get_embedding(instrument, pitch) for instrument in sub_grid])
+  #     interp = (embeddings.T * weights).T.sum(axis=0)
 
+  #     name = "%s_%06d_x%.2f_y%.2f_pitch%s" % (settings['name'], idx, xy[0], xy[1], pitch)
+  #     np.save('working_dir/embeddings/interp/' + name + '.npy', interp.astype(np.float32))
+
+  # Single-grid
   for idx, xy in enumerate(xy_grid):
-    sub_grid, weights = get_instruments(xy), get_weights(xy)
+    sub_grid = get_instruments(xy)
     for pitch in pitches:
       embeddings = np.asarray([get_embedding(instrument, pitch) for instrument in sub_grid])
-      interp = (embeddings.T * weights).T.sum(axis=0)
+      interp = (embeddings.T).T.sum(axis=0)
 
       name = "%s_%06d_x%.2f_y%.2f_pitch%s" % (settings['name'], idx, xy[0], xy[1], pitch)
       np.save('working_dir/embeddings/interp/' + name + '.npy', interp.astype(np.float32))
@@ -160,7 +181,7 @@ def batch_embeddings():
 #  format call to nsynth_generate
 def gen_call(gpu):
   print("Generating on GPU %i"%gpu)
-  return subprocess.call(["nsynth_generate",
+  return subprocess.check_call(["nsynth_generate",
     "--checkpoint_path=%s/model.ckpt-200000" % settings['checkpoint_dir'],
     "--source_path=%s/working_dir/embeddings/interp/batch%s" % (source_dir, gpu),
     "--save_path=%s/working_dir/audio/batch%s" % (source_dir, gpu),
@@ -193,7 +214,7 @@ def generate_audio():
   #  move files out of batch folders
   if not os.path.exists('working_dir/audio/raw_wav'):
     os.mkdir('working_dir/audio/raw_wav')
-  subprocess.call("find working_dir/audio -name \"*.wav\" | \
+  subprocess.check_call("find working_dir/audio -name \"*.wav\" | \
                    while read f; do mv $f working_dir/audio/raw_wav/${f##*/}; done", shell=True)
 
 

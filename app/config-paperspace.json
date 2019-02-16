@@ -4,11 +4,11 @@
                     ["synthbass","synthbass"],
                     ["voxhit","voxhit"]],
     "checkpoint_dir":"/storage/wavenet-ckpt",
-    "pitches":      [24, 52, 84],
-    "resolution":              3,
+    "pitches":      [24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 76, 80, 84],
+    "resolution":              6,
     "final_length":            64000,
-    "gpus":                    1,
-    "batch_size_embeddings":   4,
+    "gpus":                    2,
+    "batch_size_embeddings":   32,
     "batch_size_generate":     64,
     "name":         "funk_grid"
 }

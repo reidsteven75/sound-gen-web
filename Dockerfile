@@ -1,5 +1,6 @@
 # Use an official Python runtime as a parent image
-FROM tensorflow/tensorflow:1.12.0-gpu
+# FROM tensorflow/tensorflow:1.12.0-gpu
+FROM tensorflow/magenta:0.3.11
 
 # Set the working directory to /app
 WORKDIR /app
@@ -8,12 +9,12 @@ WORKDIR /app
 COPY . /app
 
 # Install libraries
-RUN apt-get update && apt-get install -y \
-  build-essential \
-  libasound2-dev \
-  libjack-dev \
-  sox \
-  lame
+# RUN apt-get update && apt-get install -y \
+#   build-essential \
+#   libasound2-dev \
+#   libjack-dev \
+#   sox \
+#   lame
 
 # Install packages
 RUN pip install magenta-gpu

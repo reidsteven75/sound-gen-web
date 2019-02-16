@@ -38,7 +38,6 @@ with open('config-'+env+'.json', 'r') as infile:
 
 #  preserve the working directory path
 source_dir = os.getcwd()
-print source_dir
 
 def compute_embeddings():
   #   convert all aif files to wav
@@ -161,7 +160,7 @@ def batch_embeddings():
 #  format call to nsynth_generate
 def gen_call(gpu):
   print("Generating on GPU %i"%gpu)
-  return subprocess.check_call(["nsynth_generate",
+  return subprocess.call(["nsynth_generate",
     "--checkpoint_path=%s/model.ckpt-200000" % settings['checkpoint_dir'],
     "--source_path=%s/working_dir/embeddings/interp/batch%s" % (source_dir, gpu),
     "--save_path=%s/working_dir/audio/batch%s" % (source_dir, gpu),
@@ -194,7 +193,7 @@ def generate_audio():
   #  move files out of batch folders
   if not os.path.exists('working_dir/audio/raw_wav'):
     os.mkdir('working_dir/audio/raw_wav')
-  subprocess.check_call("find working_dir/audio -name \"*.wav\" | \
+  subprocess.call("find working_dir/audio -name \"*.wav\" | \
                    while read f; do mv $f working_dir/audio/raw_wav/${f##*/}; done", shell=True)
 
 

@@ -7,8 +7,8 @@
     "pitches":      [24, 48, 64, 84],
     "resolution":              3,
     "final_length":            64000,
-    "gpus":                    2,
+    "gpus":                    1,
     "batch_size_embeddings":   32,
-    "batch_size_generate":     64,
+    "batch_size_generate":     500,
     "name":         "funk_grid"
 }

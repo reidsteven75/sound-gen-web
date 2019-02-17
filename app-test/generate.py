@@ -78,62 +78,62 @@ def compute_new_embeddings():
 
 				np.save('embeddings_output/' + name + '.npy', interpolated.astype(np.float32))
 
-# def batch_embeddings():
-# 	num_embeddings = len(os.listdir('embeddings_output'))
-# 	batch_size = num_embeddings / settings['gpus']
-# 	#	split the embeddings per gpu in folders
-# 	for i in range(0, settings['gpus']):
-# 		foldername = 'embeddings_batched/batch%i' % i
-# 		if not os.path.exists(foldername):
-# 			os.mkdir(foldername)
-# 		# output_foldername = '/artifact/batch%i' % i
-# 		output_foldername = '/artifact'
-# 		if not os.path.exists(output_foldername):
-# 			os.mkdir(output_foldername)
+def batch_embeddings():
+	num_embeddings = len(os.listdir('embeddings_output'))
+	batch_size = num_embeddings / settings['gpus']
+	#	split the embeddings per gpu in folders
+	for i in range(0, settings['gpus']):
+		foldername = 'embeddings_batched/batch%i' % i
+		if not os.path.exists(foldername):
+			os.mkdir(foldername)
+		output_foldername = 'audio_output/batch%i' % i
+		if not os.path.exists(output_foldername):
+			os.mkdir(output_foldername)
 
-# 	#	shuffle to the folders
-# 	batch = 0
-# 	for filename in os.listdir('embeddings_output'):
-# 		target_folder = 'embeddings_batched/batch%i' % batch
-# 		batch += 1
-# 		if batch >= settings['gpus']:
-# 			batch = 0
-# 		os.rename('embeddings_output/' + filename, target_folder + filename)
+	#	shuffle to the folders
+	batch = 0
+	for filename in os.listdir('embeddings_output'):
+		target_folder = 'embeddings_batched/batch%i/' % batch
+		batch += 1
+		if batch >= settings['gpus']:
+			batch = 0
+
+		os.rename('embeddings_output/' + filename, target_folder + filename)
 
 def gen_call(gpu):
+	print os.listdir("embeddings_batched")
+	print os.listdir("embeddings_batched/batch%i" % gpu)
 	return subprocess.call(["nsynth_generate",
 		"--checkpoint_path=%s/model.ckpt-200000" % settings['checkpoint_dir'],
-		"--source_path=embeddings_output",
-		# "--save_path=/artifact/batch%s" & gpu,
-		"--save_path=audio_output",
+		"--source_path=embeddings_batched/batch%i" % gpu,
+		"--save_path=audio_output/batch%i" % gpu,
 		"--sample_length=64000",
 		"--log=INFO",
-		"--batch_size=256"])
+		"--batch_size=512"])
 
 def generate_audio():
 	#  map calls to gpu threads
 	pool = ThreadPool(settings['gpus'])
 	results = pool.map_async(gen_call, range(settings['gpus']))
 	time.sleep(5)
-	# pbar = tqdm(total=sum([len(os.listdir('embeddings_batched/batch%s'%(i))) for i in range(settings['gpus'])]))
-	pbar = tqdm(len(os.listdir('embeddings_output')))
+	pbar = tqdm(total=sum([len(os.listdir('embeddings_batched/batch%s'%(i))) for i in range(settings['gpus'])]))
+	# pbar = tqdm(len(os.listdir('embeddings_output')))
 	pbar.set_description("Number of files for which processing has started")
 	while not results.ready():
-		# num_files = sum([len(os.listdir('/artifact/batch%s' %(i))) for i in range(settings['gpus'])])
-		num_files = len(os.listdir('audio_output'))
+		num_files = sum([len(os.listdir('audio_output/batch%s' %(i))) for i in range(settings['gpus'])])
+		# num_files = len(os.listdir('audio_output'))
 		pbar.update(num_files - pbar.n)
 		time.sleep(1)
 	pbar.close()
 	pool.close()
 	pool.join()
 
-	source = 'audio_output'
-	dest = '/artifacts'
-
-	files = os.listdir(source)
-
-	for f in files:
-		shutil.move(source+f, dest)
+	for i in range(0, settings['gpus']):
+		source = 'audio_output/batch%i/' % i
+		dest = '/artifacts/audio_output/'
+		files = os.listdir(source)
+		for f in files:
+			shutil.move(source, dest)
 	
 
 if __name__ == "__main__":
@@ -151,9 +151,9 @@ if __name__ == "__main__":
 	print "==================" 
 	compute_new_embeddings()
 
-	# print "Batch embeddings"
-	# print "==================" 
-	# batch_embeddings()
+	print "Batch embeddings"
+	print "==================" 
+	batch_embeddings()
 
 	print "Generate Audio"
 	print "==================" 

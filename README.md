@@ -36,8 +36,8 @@ https://support.paperspace.com/hc/en-us/articles/360001480494-Gradient-Storage-O
 CLI
 https://docs.paperspace.com/gradient/
 
-GPU Pricing
-https://www.paperspace.com/pricing
+GPU & CPU Types
+https://support.paperspace.com/hc/en-us/articles/360007742114-Gradient-Instance-Types
 
 # NSynthx
 

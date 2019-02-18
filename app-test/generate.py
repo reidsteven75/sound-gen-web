@@ -101,13 +101,11 @@ def batch_embeddings():
 		os.rename('embeddings_output/' + filename, target_folder + filename)
 
 def gen_call(gpu):
-	print os.listdir("embeddings_batched")
-	print os.listdir("embeddings_batched/batch%i" % gpu)
 	return subprocess.call(["nsynth_generate",
 		"--checkpoint_path=%s/model.ckpt-200000" % settings['checkpoint_dir'],
 		"--source_path=embeddings_batched/batch%i" % gpu,
 		"--save_path=audio_output/batch%i" % gpu,
-		"--sample_length=64000",
+		"--sample_length=100",
 		"--log=INFO",
 		"--batch_size=512"])
 
@@ -128,12 +126,15 @@ def generate_audio():
 	pool.close()
 	pool.join()
 
+	dest = '/artifacts/audio_output/'
+	if not os.path.exists(dest):
+		os.mkdir(dest)
+
 	for i in range(0, settings['gpus']):
 		source = 'audio_output/batch%i/' % i
-		dest = '/artifacts/audio_output/'
 		files = os.listdir(source)
 		for f in files:
-			shutil.move(source, dest)
+			shutil.move(source + f, dest)
 	
 
 if __name__ == "__main__":
@@ -157,6 +158,7 @@ if __name__ == "__main__":
 
 	print "Generate Audio"
 	print "==================" 
+	# generate_audio()
 	generate_audio()
 
 	print "Done"

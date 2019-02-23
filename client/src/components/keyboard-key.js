@@ -62,7 +62,7 @@ class KeyboardKey extends Component {
   }
   componentWillUnmount(){
 		document.removeEventListener("keydown", this.handleKeyDown.bind(this), false)
-		document.removeEventListener("keyup", this.handleKeyUp.bind(this), false)
+		document.removeEventListener("key", this.handleKeyUp.bind(this), false)
   }
 
   render() {

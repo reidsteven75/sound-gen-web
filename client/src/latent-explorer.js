@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { observable } from 'mobx'
-
+import Tone from 'tone'
 
 import Keyboard from './components/keyboard'
 
@@ -23,8 +23,10 @@ class LatentExplorer extends Component {
       loading: false,
 			serverError: false
 		}
-		
-		this.testRef = React.createRef();
+
+		this.synth = new Tone.Synth().toMaster()
+	
+
   }
 
   componentDidMount() {
@@ -49,7 +51,9 @@ class LatentExplorer extends Component {
                 </div>
     }
     else {
-      content = <Keyboard/>
+      content = <Keyboard 
+									synth={this.synth}
+								/>
     }
 
     return (

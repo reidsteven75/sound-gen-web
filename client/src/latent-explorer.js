@@ -1,20 +1,13 @@
 import React, { Component } from 'react'
 import { observable } from 'mobx'
-import { MDBContainer, MDBRow, MDBCol, MDBBtn } from 'mdbreact'
 
-import KeyboardKey from './components/keyboard-key'
+
+import Keyboard from './components/keyboard'
 
 const style = {
   content: {
 		padding: 20,
 		width: '100%'
-	},
-	keyboardTop: {
-		position: 'relative',
-		left: 40
-	},
-	keyboardBottom: {
-		position: 'relative'
 	}
 }
 
@@ -56,32 +49,7 @@ class LatentExplorer extends Component {
                 </div>
     }
     else {
-      content = <div>
-        <MDBContainer>
-					<MDBRow style={style.keyboardTop}>
-						<MDBCol xs="2"></MDBCol>
-            <MDBCol sm="1"><KeyboardKey label='W'/></MDBCol>
-						<MDBCol sm="1"><KeyboardKey label='E'/></MDBCol>
-						<MDBCol sm="1"></MDBCol>
-						<MDBCol sm="1"><KeyboardKey label='T'/></MDBCol>
-						<MDBCol sm="1"><KeyboardKey label='Y'/></MDBCol>
-						<MDBCol xs="1"><KeyboardKey label='J'/></MDBCol>
-            <MDBCol xs="2"></MDBCol>
-          </MDBRow>
-
-					<MDBRow style={style.keyboardBottom}>
-						<MDBCol xs="2"></MDBCol>
-						<MDBCol xs="1"><KeyboardKey label='A'/></MDBCol>
-						<MDBCol xs="1"><KeyboardKey label='S'/></MDBCol>
-						<MDBCol xs="1"><KeyboardKey label='D'/></MDBCol>
-						<MDBCol xs="1"><KeyboardKey label='F'/></MDBCol>
-						<MDBCol xs="1"><KeyboardKey label='G'/></MDBCol>
-						<MDBCol xs="1"><KeyboardKey label='H'/></MDBCol>
-						<MDBCol xs="1"><KeyboardKey label='K'/></MDBCol>
-						<MDBCol xs="2"></MDBCol>
-					</MDBRow>
-        </MDBContainer>
-      </div>
+      content = <Keyboard/>
     }
 
     return (

@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { observable } from 'mobx'
 import { MDBContainer, MDBRow, MDBCol, MDBBtn } from 'mdbreact'
 
+import KeyboardKey from './components/keyboard-key'
+
 const style = {
   content: {
 		padding: 20,
@@ -26,8 +28,7 @@ class LatentExplorer extends Component {
     super(props)
     this.state = {
       loading: false,
-			serverError: false,
-			testAction: false
+			serverError: false
 		}
 		
 		this.testRef = React.createRef();
@@ -39,10 +40,6 @@ class LatentExplorer extends Component {
       this.setState({loading:false})
 		}, 1000)
 		
-		setInterval(() => {
-			this.setState({testAction: !this.state.testAction})
-			console.log(this.state.testAction)
-    }, 1000)
   }
 
   render() {
@@ -63,24 +60,24 @@ class LatentExplorer extends Component {
         <MDBContainer>
 					<MDBRow style={style.keyboardTop}>
 						<MDBCol xs="2"></MDBCol>
-            <MDBCol sm="1"><MDBBtn action={this.state.testAction} size='sm' outline>W</MDBBtn></MDBCol>
-						<MDBCol sm="1"><MDBBtn size='sm' outline>E</MDBBtn></MDBCol>
+            <MDBCol sm="1"><KeyboardKey label='W'/></MDBCol>
+						<MDBCol sm="1"><KeyboardKey label='E'/></MDBCol>
 						<MDBCol sm="1"></MDBCol>
-						<MDBCol sm="1"><MDBBtn size='sm' outline>T</MDBBtn></MDBCol>
-						<MDBCol sm="1"><MDBBtn size='sm' outline>Y</MDBBtn></MDBCol>
-						<MDBCol xs="1"><MDBBtn size='sm' outline>J</MDBBtn></MDBCol>
+						<MDBCol sm="1"><KeyboardKey label='T'/></MDBCol>
+						<MDBCol sm="1"><KeyboardKey label='Y'/></MDBCol>
+						<MDBCol xs="1"><KeyboardKey label='J'/></MDBCol>
             <MDBCol xs="2"></MDBCol>
           </MDBRow>
 
 					<MDBRow style={style.keyboardBottom}>
 						<MDBCol xs="2"></MDBCol>
-						<MDBCol xs="1"><MDBBtn size='sm' outline>A</MDBBtn></MDBCol>
-						<MDBCol xs="1"><MDBBtn size='sm' outline>S</MDBBtn></MDBCol>
-						<MDBCol xs="1"><MDBBtn size='sm' >D</MDBBtn></MDBCol>
-						<MDBCol xs="1"><MDBBtn size='sm' outline>F</MDBBtn></MDBCol>
-						<MDBCol xs="1"><MDBBtn size='sm' outline>G</MDBBtn></MDBCol>
-						<MDBCol xs="1"><MDBBtn size='sm' outline>H</MDBBtn></MDBCol>
-						<MDBCol xs="1"><MDBBtn size='sm' outline>K</MDBBtn></MDBCol>
+						<MDBCol xs="1"><KeyboardKey label='A'/></MDBCol>
+						<MDBCol xs="1"><KeyboardKey label='S'/></MDBCol>
+						<MDBCol xs="1"><KeyboardKey label='D'/></MDBCol>
+						<MDBCol xs="1"><KeyboardKey label='F'/></MDBCol>
+						<MDBCol xs="1"><KeyboardKey label='G'/></MDBCol>
+						<MDBCol xs="1"><KeyboardKey label='H'/></MDBCol>
+						<MDBCol xs="1"><KeyboardKey label='K'/></MDBCol>
 						<MDBCol xs="2"></MDBCol>
 					</MDBRow>
         </MDBContainer>

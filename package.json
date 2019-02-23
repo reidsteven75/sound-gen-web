@@ -5,8 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.js --ignore node_modules",
-    "dev-mock-data": "MOCK_DATA=true nodemon server.js --ignore node_modules"
+    "local": "nodemon server.js --ignore node_modules",
+    "local-mock-data": "MOCK_DATA=true nodemon server.js --ignore node_modules"
   },
   "author": "",
   "license": "ISC",

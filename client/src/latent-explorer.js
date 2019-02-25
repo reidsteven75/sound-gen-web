@@ -3,6 +3,7 @@ import { observable } from 'mobx'
 import Tone from 'tone'
 
 import Keyboard from './components/keyboard'
+import LatentSelector from './components/latent-selector'
 
 const style = {
   content: {
@@ -51,9 +52,11 @@ class LatentExplorer extends Component {
                 </div>
     }
     else {
-      content = <Keyboard 
-									synth={this.synth}
-								/>
+      content = <div>
+									<LatentSelector />
+									<br/>
+									<Keyboard />
+								</div>
     }
 
     return (

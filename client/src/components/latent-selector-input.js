@@ -4,32 +4,33 @@ import { MDBBtn } from 'mdbreact'
 const style = {
 	wrapper: {
 
-	},
-	key: {
-		width:'100%'
+  },
+  input: {
+		width:'100%',
+		height: '60px'
 	}
 }
 
-class KeyboardKey extends Component {
+class LatentSelectorInput extends Component {
 
   config = {
-    
+
   }
 
   constructor(props) {
     super(props)
     this.state = {
 			isActive: false,
-			color: 'default'
+			color: 'secondary'
     }
 	}
 	
 	handleMouseEnter() {
-		this.setState({color: 'info'})
+		this.setState({color: 'danger'})
 	}
 
 	handleMouseOut() {
-		this.setState({color: 'default'})
+		this.setState({color: 'secondary'})
 		this.setState({isActive: false})
 	}
 
@@ -41,33 +42,15 @@ class KeyboardKey extends Component {
 		this.setState({isActive: false})
 	}
 
-	handleKeyDown(e) {
-		if (e.key.toLowerCase() === this.props.label.toLowerCase()) {
-			this.setState({isActive: true})
-			this.setState({color: 'info'})
-		}
-	}
 
-	handleKeyUp(e) {
-		if (e.key.toLowerCase() === this.props.label.toLowerCase()) {
-			this.setState({isActive: false})
-			this.setState({color: 'default'})
-		}
-	}
+  componentDidMount() {
 
-  componentDidMount(){
-		document.addEventListener("keydown", this.handleKeyDown.bind(this), false)
-		document.addEventListener("keyup", this.handleKeyUp.bind(this), false)
-  }
-  componentWillUnmount(){
-		document.removeEventListener("keydown", this.handleKeyDown.bind(this), false)
-		document.removeEventListener("key", this.handleKeyUp.bind(this), false)
   }
 
   render() {
 
 		let content = <MDBBtn 
-										style={style.key}
+										style={style.input}
 										outline={!this.state.isActive} 
 										color={this.state.color}
 										onMouseDown={this.handleMouseDown.bind(this)}
@@ -86,4 +69,4 @@ class KeyboardKey extends Component {
   }
 }
 
-export default KeyboardKey
+export default LatentSelectorInput

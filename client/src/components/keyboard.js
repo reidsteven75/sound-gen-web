@@ -8,10 +8,11 @@ const style = {
 	},
 	keyboardTop: {
 		position: 'relative',
-		left: 48
+		left: 48 + 40
 	},
 	keyboardBottom: {
-		position: 'relative'
+		position: 'relative',
+		left: 40
 	}
 }
 
@@ -57,7 +58,7 @@ class Keyboard extends Component {
 											<MDBCol xs="1"><KeyboardKey label='G'/></MDBCol>
 											<MDBCol xs="1"><KeyboardKey label='H'/></MDBCol>
 											<MDBCol xs="1"><KeyboardKey label='J'/></MDBCol>
-											<MDBCol xs="2s"></MDBCol>
+											<MDBCol xs="2"></MDBCol>
 										</MDBRow>
 									</MDBContainer>
       

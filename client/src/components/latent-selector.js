@@ -25,7 +25,9 @@ class LatentSelector extends Component {
 			currentPercentX: 0,
 			currentPercentY: 0,
 			canvasWidth: 0,
-			canvasHeight: 0
+			canvasHeight: 0,
+			easing: 0.05,
+			circleRadius: 30
 		}
 
 		this.sketchRef = React.createRef()
@@ -74,44 +76,35 @@ class LatentSelector extends Component {
 			targetY: this.state.targetY + diffY
 		})
 
-		this.sk.resizeCanvas(this.state.canvasWidth, this.state.canvasHeight)
-		this.sk.redraw()
+		this.p5.resizeCanvas(this.state.canvasWidth, this.state.canvasHeight)
+		this.p5.redraw()
 	}
 
   componentDidMount() {
 
+		window.addEventListener("resize", this.redrawCanvas.bind(this))
+
 		this.s = (sk) => {  
 
 			this.sk = sk
-
-			window.addEventListener("resize", this.redrawCanvas.bind(this))
 			this.updateCanvasSize()
-			
-			var height = this.sketchRef.current.offsetHeight
-			var width = this.sketchRef.current.offsetWidth
 
-			var	easing = 0.05
-			var circleRadius = 30
 			var	dx
 			var dy
 
 			this.setState({
-				targetX: width/2,
-				targetY: height/2
+				targetX: this.sketchRef.current.offsetWidth/2,
+				targetY: this.sketchRef.current.offsetHeight/2
 			})
 
 			this.sk.setup = () => {
-
 				var canvas = this.sk.createCanvas(this.state.canvasWidth, this.state.canvasHeight)
 				sk.noStroke()
-
 				canvas.parent(this.sketchRef.current.id)
 			}
 	
 			this.sk.draw = () => {
-
 				this.sk.clear()
-
 				if (
 					this.sk.mouseIsPressed &&
 					this.sk.mouseX >=0 && this.sk.mouseX <=this.state.canvasWidth &&
@@ -122,28 +115,31 @@ class LatentSelector extends Component {
 						targetX: this.sk.mouseX,
 						targetY: this.sk.mouseY
 					})
-					
 				}
-
 				dy = this.state.targetY - this.state.currentPosY
 				dx = this.state.targetX - this.state.currentPosX
 				this.setState({
-					currentPosX: this.state.currentPosX + dx * easing,
-					currentPosY: this.state.currentPosY + dy * easing
+					currentPosX: this.state.currentPosX + dx * this.state.easing,
+					currentPosY: this.state.currentPosY + dy * this.state.easing
 				})
-				this.sk.ellipse(this.state.currentPosX,this.state.currentPosY,circleRadius,circleRadius)
-
+				this.sk.ellipse(
+					this.state.currentPosX,
+					this.state.currentPosY,
+					this.state.circleRadius,
+					this.state.circleRadius
+				)
 				if (Math.abs(dy) > 0.5 || Math.abs(dx) > 0.5) {
 					this.calcPercent()
 				}			
-						
 			}
 		}
+
 		this.p5 = new p5(this.s)
+
 	}
 	
 	componentWillUnmount() {
-		// window.removeEventListener("resize", this.redrawCanvas);
+		window.removeEventListener("resize", this.redrawCanvas)
 	}	
 
   render() {

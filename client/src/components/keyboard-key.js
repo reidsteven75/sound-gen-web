@@ -23,6 +23,14 @@ class KeyboardKey extends Component {
 			color: 'default'
     }
 	}
+
+	updateKeyPressed(active) {
+		this.props.updateKeyPressed({
+			key: this.props.label,
+			pitch: this.props.pitch,
+			active: active
+		})
+	}
 	
 	handleMouseEnter() {
 		this.setState({color: 'info'})
@@ -35,16 +43,21 @@ class KeyboardKey extends Component {
 
 	handleMouseDown() {
 		this.setState({isActive: true})
+		this.updateKeyPressed(true)
 	}
 
 	handleMouseUp() {
 		this.setState({isActive: false})
+		this.updateKeyPressed(false)
 	}
 
 	handleKeyDown(e) {
 		if (e.key.toLowerCase() === this.props.label.toLowerCase()) {
+			if (this.state.isActive !== true) {
+				this.updateKeyPressed(true)
+			}
 			this.setState({isActive: true})
-			this.setState({color: 'info'})
+			this.setState({color: 'info'})	
 		}
 	}
 
@@ -52,6 +65,7 @@ class KeyboardKey extends Component {
 		if (e.key.toLowerCase() === this.props.label.toLowerCase()) {
 			this.setState({isActive: false})
 			this.setState({color: 'default'})
+			this.updateKeyPressed(false)
 		}
 	}
 

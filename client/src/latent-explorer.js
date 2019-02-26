@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { observable } from 'mobx'
 import Tone from 'tone'
 
 import Keyboard from './components/keyboard'
@@ -13,10 +12,6 @@ const style = {
 }
 
 class LatentExplorer extends Component {
-
-  appState = observable.object({
-
-  })
 
   constructor(props) {
     super(props)
@@ -53,9 +48,14 @@ class LatentExplorer extends Component {
     }
     else {
       content = <div>
-									<LatentSelector />
+									<LatentSelector 
+										updateLatentSelector={this.props.updateLatentSelector}
+										sounds={this.props.data.sounds}
+									/>
 									<br/>
-									<Keyboard />
+									<Keyboard 
+										updateKeyPressed={this.props.updateKeyPressed}
+									/>
 								</div>
     }
 

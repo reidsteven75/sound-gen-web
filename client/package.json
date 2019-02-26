@@ -3,7 +3,6 @@
   "dependencies": {
     "axios": "^0.18.0",
     "bootstrap-material-design": "^4.1.1",
-    "lodash": "^4.17.11",
     "mdbreact": "^4.8.7",
     "mobx": "^5.8.0",
     "mobx-react": "^5.4.3",

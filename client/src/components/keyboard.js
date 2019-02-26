@@ -40,24 +40,24 @@ class Keyboard extends Component {
 		let content = <MDBContainer>
 										<MDBRow style={style.keyboardTop}>
 											<MDBCol xs="2"></MDBCol>
-											<MDBCol sm="1"><KeyboardKey label='W'/></MDBCol>
-											<MDBCol sm="1"><KeyboardKey label='E'/></MDBCol>
+											<MDBCol sm="1"><KeyboardKey label='W' pitch={30} updateKeyPressed={this.props.updateKeyPressed}/></MDBCol>
+											<MDBCol sm="1"><KeyboardKey label='E' pitch={31} updateKeyPressed={this.props.updateKeyPressed}/></MDBCol>
 											<MDBCol sm="1"></MDBCol>
-											<MDBCol sm="1"><KeyboardKey label='T'/></MDBCol>
-											<MDBCol sm="1"><KeyboardKey label='Y'/></MDBCol>
-											<MDBCol xs="1"><KeyboardKey label='U'/></MDBCol>
+											<MDBCol sm="1"><KeyboardKey label='T' pitch={32} updateKeyPressed={this.props.updateKeyPressed}/></MDBCol>
+											<MDBCol sm="1"><KeyboardKey label='Y' pitch={33} updateKeyPressed={this.props.updateKeyPressed}/></MDBCol>
+											<MDBCol xs="1"><KeyboardKey label='U' pitch={34} updateKeyPressed={this.props.updateKeyPressed}/></MDBCol>
 											<MDBCol xs="2"></MDBCol>
 										</MDBRow>
 
 										<MDBRow style={style.keyboardBottom}>
 											<MDBCol xs="2"></MDBCol>
-											<MDBCol xs="1"><KeyboardKey label='A'/></MDBCol>
-											<MDBCol xs="1"><KeyboardKey label='S'/></MDBCol>
-											<MDBCol xs="1"><KeyboardKey label='D'/></MDBCol>
-											<MDBCol xs="1"><KeyboardKey label='F'/></MDBCol>
-											<MDBCol xs="1"><KeyboardKey label='G'/></MDBCol>
-											<MDBCol xs="1"><KeyboardKey label='H'/></MDBCol>
-											<MDBCol xs="1"><KeyboardKey label='J'/></MDBCol>
+											<MDBCol xs="1"><KeyboardKey label='A' pitch={34} updateKeyPressed={this.props.updateKeyPressed}/></MDBCol>
+											<MDBCol xs="1"><KeyboardKey label='S' pitch={35} updateKeyPressed={this.props.updateKeyPressed}/></MDBCol>
+											<MDBCol xs="1"><KeyboardKey label='D' pitch={36} updateKeyPressed={this.props.updateKeyPressed}/></MDBCol>
+											<MDBCol xs="1"><KeyboardKey label='F' pitch={37} updateKeyPressed={this.props.updateKeyPressed}/></MDBCol>
+											<MDBCol xs="1"><KeyboardKey label='G' pitch={38} updateKeyPressed={this.props.updateKeyPressed}/></MDBCol>
+											<MDBCol xs="1"><KeyboardKey label='H' pitch={39} updateKeyPressed={this.props.updateKeyPressed}/></MDBCol>
+											<MDBCol xs="1"><KeyboardKey label='J' pitch={40} updateKeyPressed={this.props.updateKeyPressed}/></MDBCol>
 											<MDBCol xs="2"></MDBCol>
 										</MDBRow>
 									</MDBContainer>

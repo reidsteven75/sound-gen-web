@@ -49,26 +49,20 @@ class LatentExplorer extends Component {
     const x = data.x
 		const y = data.y
 
-		console.log(x, y)
-		
-		// this.setState({
-		// 	latentRatioNW: Math.round( 10 * Math.sqrt(Math.pow((1-x), 2) + Math.pow((1-y), 2))) / 10,
-		// 	latentRatioNE: Math.round( 10 * Math.sqrt(Math.pow((x), 2) + Math.pow((1-y), 2))) / 10,
-		// 	latentRatioSW: Math.round( 10 * Math.sqrt(Math.pow((1-x), 2) + Math.pow((y), 2))) / 10,
-		// 	latentRatioSE: Math.round( 10 * Math.sqrt(Math.pow((x), 2) + Math.pow((y), 2))) / 10
-		// })
-
 		this.setState({
 			latentRatioNW: Math.round( 10 * (1-x)*(1-y) ) / 10,
 			latentRatioNE: Math.round( 10 * (x)*(1-y) ) / 10,
 			latentRatioSW: Math.round( 10 * (1-x)*(y) ) / 10,
 			latentRatioSE: Math.round( 10 * (x)*(y) ) / 10
 		})
+
+		console.log(x, y)
+		console.log(this.state.latentRatioNW, this.state.latentRatioNE, this.state.latentRatioSW, this.state.latentRatioSE)
     
   }
 
   render() {
-		console.log(this.state.latentRatioNW, this.state.latentRatioNE, this.state.latentRatioSW, this.state.latentRatioSE)
+		
     let content
     if (this.state.loading === true) {
       content = <div className="loader border-top-default medium fast"></div>

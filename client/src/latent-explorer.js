@@ -17,7 +17,11 @@ class LatentExplorer extends Component {
     super(props)
     this.state = {
       loading: false,
-			serverError: false
+			serverError: false,
+			latentRatioNW: 0,
+			latentRatioNE: 0,
+			latentRatioSW: 0,
+			latentRatioSE: 0
 		}
 
 		this.synth = new Tone.Synth().toMaster()
@@ -31,9 +35,40 @@ class LatentExplorer extends Component {
       this.setState({loading:false})
 		}, 1000)
 		
+	}
+	
+	updateKeyPressed(data) {
+    const key = data.key
+    const pitch = data.pitch
+    const active = data.active
+
+    console.log(key, pitch, active)
+  }
+
+  updateLatentSelector(data) {
+    const x = data.x
+		const y = data.y
+
+		console.log(x, y)
+		
+		// this.setState({
+		// 	latentRatioNW: Math.round( 10 * Math.sqrt(Math.pow((1-x), 2) + Math.pow((1-y), 2))) / 10,
+		// 	latentRatioNE: Math.round( 10 * Math.sqrt(Math.pow((x), 2) + Math.pow((1-y), 2))) / 10,
+		// 	latentRatioSW: Math.round( 10 * Math.sqrt(Math.pow((1-x), 2) + Math.pow((y), 2))) / 10,
+		// 	latentRatioSE: Math.round( 10 * Math.sqrt(Math.pow((x), 2) + Math.pow((y), 2))) / 10
+		// })
+
+		this.setState({
+			latentRatioNW: Math.round( 10 * (1-x)*(1-y) ) / 10,
+			latentRatioNE: Math.round( 10 * (x)*(1-y) ) / 10,
+			latentRatioSW: Math.round( 10 * (1-x)*(y) ) / 10,
+			latentRatioSE: Math.round( 10 * (x)*(y) ) / 10
+		})
+    
   }
 
   render() {
+		console.log(this.state.latentRatioNW, this.state.latentRatioNE, this.state.latentRatioSW, this.state.latentRatioSE)
     let content
     if (this.state.loading === true) {
       content = <div className="loader border-top-default medium fast"></div>
@@ -49,12 +84,12 @@ class LatentExplorer extends Component {
     else {
       content = <div>
 									<LatentSelector 
-										updateLatentSelector={this.props.updateLatentSelector}
+										updateLatentSelector={this.updateLatentSelector.bind(this)}
 										sounds={this.props.data.sounds}
 									/>
 									<br/>
 									<Keyboard 
-										updateKeyPressed={this.props.updateKeyPressed}
+										updateKeyPressed={this.updateKeyPressed.bind(this)}
 									/>
 								</div>
     }

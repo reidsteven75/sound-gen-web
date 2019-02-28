@@ -32,21 +32,6 @@ class App extends Component {
  
   })
 
-  updateKeyPressed(data) {
-    const key = data.key
-    const pitch = data.pitch
-    const active = data.active
-
-    console.log(key, pitch, active)
-  }
-
-  updateLatentSelector(data) {
-    const x = data.x
-    const y = data.y
-
-    console.log(x, y)
-  }
-
   componentDidMount(){
 		// document.addEventListener("keydown", this.handleKeyDown.bind(this), false)
 		// document.addEventListener("keyup", this.handleKeyUp.bind(this), false)
@@ -61,8 +46,6 @@ class App extends Component {
       <div className="App">
         <main className="App-main">
           <LatentExplorer
-            updateKeyPressed={this.updateKeyPressed}
-            updateLatentSelector={this.updateLatentSelector}
             data={data}
           />
         </main>

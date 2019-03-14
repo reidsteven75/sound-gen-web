@@ -45,6 +45,10 @@ class LatentExplorer extends Component {
 		console.log('sampler ready')
 	}
 
+	handleBuffersReady() {
+		console.log('buffer ready')
+	}
+
   constructor(props) {
     super(props)
     this.state = {
@@ -56,64 +60,36 @@ class LatentExplorer extends Component {
 			latentRatioSE: 0
 		}
 
-		var latentSpaces = []
-		var space = [1.0, 0.0, 0.0, 0.0]
-		var backup = 0
-		var n = 1
-		var x = 0
-		var dim = 4
-		while (x < dim - 1) {
-			if (backup === 1500) { return x = dim }
-			backup ++
+		this.handleSamplerReady = this.handleSamplerReady.bind(this) 
+		this.handleBuffersReady = this.handleBuffersReady.bind(this) 
 
-			space[x] -= 0.1
-			space[n] += 0.1
-			space[x] = Math.round(space[x]*10) / 10
-			space[n] = Math.round(space[n]*10) / 10
-
-			// console.log(x, n)
-			latentSpaces.push(space)
-			// console.log(latentSpaces)
-
-			if (space[n] === 1) {
-				space[x] = 0.0
-				space[n] = 0.0
-				if (n === dim - 1) {
-					x ++
-					n = x + 1
-				}
-				else {
-					n ++
-				}
-				space[x] = 1.0
-				space[n] = 0.0
-			}
-		}
-		console.log(latentSpaces)
-
-		this.handleSamplerReady = this.handleSamplerReady.bind(this)  
-
+		const latentSpaces = this.props.data.latentSpaces
 		const baseUrl = `${this.config.fileUrl.storagePath}/${this.config.fileUrl.bucket}`
-		var soundUrls = {}
+		
+		this.sampler = {}
 
-		latentSpaces.forEach((ls) => {
-			// console.log(ls)
+		latentSpaces.forEach((latentSpace) => {
+			this.soundUrls = {}
+			// get urls for each sound
 			this.config.pitches.forEach((pitch) => {
-				const sound = `${ls[0]}_${ls[1]}_${ls[2]}_${ls[3]}_pitch_${pitch.value}`
+				const sound = `${latentSpace}_pitch_${pitch.value}`
 				const fileUrl = `${this.config.fileUrl.folderPath}/${this.config.fileUrl.gridName}_${sound}_vel_${this.config.velocity}.mp3`
-				soundUrls[sound] = fileUrl
+				const note = new Tone.Frequency(pitch.value, 'midi').toNote()
+				this.soundUrls[note] = fileUrl
 				// console.log(sound)
 				// console.log(baseUrl + fileUrl)
 			})
+			// create samplers that play sounds for each latent space
+			this.sampler[latentSpace] = new Tone.Sampler(this.soundUrls, {
+				release: 1,
+				volume: 15,
+				baseUrl: baseUrl,
+				onload: this.handleSamplerReady()
+			}).toMaster()
 		})
 
-		this.sampler = new Tone.Sampler(soundUrls, {
-			release: 1,
-			volume: 15,
-			baseUrl: baseUrl,
-			onload: this.handleSamplerReady()
-		}).toMaster()
-	
+		// Tone.Buffer.on('load', this.handleBuffersReady())
+
 	}
 
   componentDidMount() {
@@ -124,34 +100,77 @@ class LatentExplorer extends Component {
 
 	}
 
-	playSound(pitch) {
+	playSound(latentSpace, pitch) {
 		const note = new Tone.Frequency(pitch, 'midi').toNote()
-		this.sampler.triggerAttack(note) 
+		if (latentSpace + '_pitch_' + pitch in this.soundUrls) { console.log('exists') }
+		if (this.sampler[latentSpace]) {
+			try {
+				this.sampler[latentSpace].triggerAttack(note) 
+			}
+			catch(err) {
+				console.log('error playing sound: ' + latentSpace + '_pitch_' + pitch)
+			}
+		}
+		else {
+			console.log('does not exist: ' + latentSpace + '_pitch_' + pitch)
+		}
 	}
 	
 	updateKeyPressed(data) {
-    const key = data.key
     const pitch = data.pitch
     const active = data.active
-
-		// console.log("key:"+key, "pitch:"+pitch, active)
+		// console.log("key:"+data.key, "pitch:"+pitch, active)
 
 		if (active === true) { 
-			const sound = `${this.state.latentRatioNW}_${this.state.latentRatioNE}_${this.state.latentRatioSW}_${this.state.latentRatioSE}_pitch_${pitch}`
-			console.log(sound)
-			this.playSound(sound)
+			const latentSpace = `${this.state.latentRatioNW}`
+													+ `_${this.state.latentRatioNE}`
+													+ `_${this.state.latentRatioSW}`
+													+ `_${this.state.latentRatioSE}`
+			this.playSound(latentSpace, pitch)
 		}
   }
 
   updateLatentSelector(data) {
-    const x = data.x
-		const y = data.y
+    const x = parseFloat(data.x).toFixed(1)
+		const y = parseFloat(data.y).toFixed(1)
+
+		var latentSpace = [
+			Math.round( 10 * (1-x)*(1-y) ) / 10,
+			Math.round( 10 * (x)*(1-y) ) / 10,
+			Math.round( 10 * (1-x)*(y) ) / 10,
+			Math.round( 10 * (x)*(y) ) / 10
+		]
+
+		// latentSpace = latentSpace.map(function(value) { 
+		// 	return parseFloat(value).toFixed(1)
+		// })
+		console.log(latentSpace)
+
+		// latent space should add up to 1
+		var sum = latentSpace.reduce((partial_sum, a) => partial_sum + a)
+		console.log(sum)
+		var iterCurrent = 0
+		var iterMax = 10
+		while (sum !== 1 && iterMax !== iterCurrent) {
+			if (sum < 1) {
+				const indexOfMaxValue = latentSpace.indexOf(Math.max(...latentSpace))
+				latentSpace[indexOfMaxValue] += 0.1
+			}
+			if (sum > 1) {
+				const indexOfMaxValue = latentSpace.indexOf(Math.max(...latentSpace))
+				latentSpace[indexOfMaxValue] -= 0.1
+			}
+			sum = latentSpace.reduce((partial_sum, a) => partial_sum + a)
+			iterCurrent ++
+			console.log(sum)
+		}
+		
 
 		this.setState({
-			latentRatioNW: Math.round( 10 * (1-x)*(1-y) ) / 10,
-			latentRatioNE: Math.round( 10 * (x)*(1-y) ) / 10,
-			latentRatioSW: Math.round( 10 * (1-x)*(y) ) / 10,
-			latentRatioSE: Math.round( 10 * (x)*(y) ) / 10
+			latentRatioNW: latentSpace[0],
+			latentRatioNE: latentSpace[1],
+			latentRatioSW: latentSpace[2],
+			latentRatioSE: latentSpace[3]
 		})
 
 		// console.log(

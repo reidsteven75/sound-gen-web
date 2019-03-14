@@ -2,10 +2,12 @@ import React, { Component } from 'react'
 // import GenerateBlend from './generate-blend'
 import LatentExplorer from './latent-explorer'
 import { observable } from 'mobx'
+import latentSpaces from './data/latent-spaces.json'
 
 import './App.css'
 
 var data = {
+  latentSpaces: latentSpaces,
   sounds: [
     {
       name: 'Strings Ensemble',

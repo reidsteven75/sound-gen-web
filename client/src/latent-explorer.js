@@ -45,6 +45,10 @@ class LatentExplorer extends Component {
 		console.log('sampler ready')
 	}
 
+	handleSamplerError(err) {
+		// console.log('sampler error')
+	}
+
 	handleBuffersReady() {
 		console.log('buffer ready')
 	}
@@ -57,9 +61,11 @@ class LatentExplorer extends Component {
 			latentRatioNW: 0,
 			latentRatioNE: 0,
 			latentRatioSW: 0,
-			latentRatioSE: 0
+			latentRatioSE: 0,
+			pitch: 52
 		}
 
+		this.handleSamplerError = this.handleSamplerError.bind(this) 
 		this.handleSamplerReady = this.handleSamplerReady.bind(this) 
 		this.handleBuffersReady = this.handleBuffersReady.bind(this) 
 
@@ -84,7 +90,8 @@ class LatentExplorer extends Component {
 				release: 1,
 				volume: 15,
 				baseUrl: baseUrl,
-				onload: this.handleSamplerReady()
+				onload: this.handleSamplerReady(),
+				onError: this.handleSamplerError()
 			}).toMaster()
 		})
 
@@ -100,7 +107,12 @@ class LatentExplorer extends Component {
 
 	}
 
-	playSound(latentSpace, pitch) {
+	playSound() {
+		const pitch = this.state.pitch
+		const latentSpace = `${this.state.latentRatioNW}`
+													+ `_${this.state.latentRatioNE}`
+													+ `_${this.state.latentRatioSW}`
+													+ `_${this.state.latentRatioSE}`
 		const note = new Tone.Frequency(pitch, 'midi').toNote()
 		if (latentSpace + '_pitch_' + pitch in this.soundUrls) { console.log('exists') }
 		if (this.sampler[latentSpace]) {
@@ -122,11 +134,8 @@ class LatentExplorer extends Component {
 		// console.log("key:"+data.key, "pitch:"+pitch, active)
 
 		if (active === true) { 
-			const latentSpace = `${this.state.latentRatioNW}`
-													+ `_${this.state.latentRatioNE}`
-													+ `_${this.state.latentRatioSW}`
-													+ `_${this.state.latentRatioSE}`
-			this.playSound(latentSpace, pitch)
+			this.setState({pitch: pitch})
+			this.playSound()
 		}
   }
 
@@ -141,14 +150,8 @@ class LatentExplorer extends Component {
 			Math.round( 10 * (x)*(y) ) / 10
 		]
 
-		// latentSpace = latentSpace.map(function(value) { 
-		// 	return parseFloat(value).toFixed(1)
-		// })
-		console.log(latentSpace)
-
 		// latent space should add up to 1
 		var sum = latentSpace.reduce((partial_sum, a) => partial_sum + a)
-		console.log(sum)
 		var iterCurrent = 0
 		var iterMax = 10
 		while (sum !== 1 && iterMax !== iterCurrent) {
@@ -162,9 +165,12 @@ class LatentExplorer extends Component {
 			}
 			sum = latentSpace.reduce((partial_sum, a) => partial_sum + a)
 			iterCurrent ++
-			console.log(sum)
 		}
-		
+
+		// ensure values can be mapped to names of sound files
+		latentSpace = latentSpace.map(function(value) { 
+			return parseFloat(value).toFixed(1)
+		})
 
 		this.setState({
 			latentRatioNW: latentSpace[0],
@@ -172,6 +178,8 @@ class LatentExplorer extends Component {
 			latentRatioSW: latentSpace[2],
 			latentRatioSE: latentSpace[3]
 		})
+
+		this.playSound()
 
 		// console.log(
 		// 		"NW:"+this.state.latentRatioNW, 

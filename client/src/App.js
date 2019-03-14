@@ -8,19 +8,19 @@ import './App.css'
 var data = {
   sounds: [
     {
-      name: 'Distorted Guitar',
+      name: 'Strings Ensemble',
       position: 'NW'
     },
     {
-      name: 'Electro Kick',
+      name: 'Bells',
       position: 'NE'
     },
     {
-      name: 'Synth Bass',
+      name: 'Synth',
       position: 'SW'
     },
     {
-      name: 'Voxhit',
+      name: 'Electric Guitar',
       position: 'SE'
     }
   ]

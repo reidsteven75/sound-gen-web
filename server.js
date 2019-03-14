@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
+const {Storage} = require('@google-cloud/storage')
 
 const bodyParser = require('body-parser')
 const path = require('path')
@@ -13,6 +14,16 @@ const size = require('object-sizeof')
 
 const PORT = process.env.PORT || 3001
 const MOCK_DATA = process.env.MOCK_DATA || false
+
+const config = {
+	storage: {
+		projectId: '304734781370'
+	}
+}
+
+const storage = new Storage({
+  projectId: config.storage.projectId,
+})
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))

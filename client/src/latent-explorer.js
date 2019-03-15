@@ -47,18 +47,6 @@ class LatentExplorer extends Component {
 	handlePlayerError(err) {
 		console.log('player error')
 	}
-	
-	handleSamplerReady() {
-		console.log('sampler ready')
-	}
-
-	handleSamplerError(err) {
-		// console.log('sampler error')
-	}
-
-	handleBuffersReady() {
-		console.log('buffer ready')
-	}
 
   constructor(props) {
     super(props)
@@ -76,40 +64,13 @@ class LatentExplorer extends Component {
 		this.handlePlayerError = this.handlePlayerError.bind(this) 
 		this.handlePlayerReady = this.handlePlayerReady.bind(this)
 
-		this.handleSamplerError = this.handleSamplerError.bind(this) 
-		this.handleSamplerReady = this.handleSamplerReady.bind(this) 
-		this.handleBuffersReady = this.handleBuffersReady.bind(this) 
+		this.soundUrls = {}
 
 	}
 
   componentDidMount() {
 		const latentSpaces = this.props.data.latentSpaces
 		const baseUrl = `${this.config.fileUrl.storagePath}/${this.config.fileUrl.bucket}`
-		
-		// this.sampler = {}
-
-		// latentSpaces.forEach((latentSpace) => {
-		// 	this.soundUrls = {}
-		// 	// get urls for each sound
-		// 	this.config.pitches.forEach((pitch) => {
-		// 		const sound = `${latentSpace}_pitch_${pitch.value}`
-		// 		const fileUrl = `${this.config.fileUrl.folderPath}/${this.config.fileUrl.gridName}_${sound}_vel_127.mp3`
-		// 		const note = new Tone.Frequency(pitch.value, 'midi').toNote()
-		// 		this.soundUrls[note] = fileUrl
-		// 		// console.log(sound)
-		// 		// console.log(baseUrl + fileUrl)
-		// 	})
-		// 	// create samplers that play sounds for each latent space
-		// 	this.sampler[latentSpace] = new Tone.Sampler(this.soundUrls, {
-		// 		release: 1,
-		// 		volume: 15,
-		// 		baseUrl: baseUrl,
-		// 		onload: this.handleSamplerReady(),
-		// 		onError: this.handleSamplerError()
-		// 	}).toMaster()
-		// })
-
-		this.soundUrls = {}
 
 		latentSpaces.forEach((latentSpace) => {
 			// get urls for each sound
@@ -122,10 +83,11 @@ class LatentExplorer extends Component {
 				// console.log(baseUrl + fileUrl)
 			})	
 		})
-		this.players = new Tone.Players(this.soundUrls, {
-			onload: this.handlePlayerReady(),
-			onError: this.handlePlayerError()
-		}).toMaster()
+		// this.players = new Tone.Players(this.soundUrls, {
+		// 	onload: this.handlePlayerReady(),
+		// 	onError: this.handlePlayerError()
+		// }).toMaster()
+		this.setState({loading:false})
 
 		// Tone.Buffer.on('load', this.handleBuffersReady())s
 	}
@@ -154,34 +116,20 @@ class LatentExplorer extends Component {
 													+ `_${this.state.latentRatioSW}`
 													+ `_${this.state.latentRatioSE}`
 
-		// console.log(latentSpace + '_pitch_' + pitch)
-		// const note = new Tone.Frequency(pitch, 'midi').toNote()
-		// if (latentSpace + '_pitch_' + pitch in this.soundUrls) { console.log('exists') }
-		// if (this.sampler[latentSpace]) {
-		// 	try {
-		// 		// this.sampler[latentSpace].triggerAttackRelease(note, 3, 1, velocity) 
-		// 		this.sampler[latentSpace].triggerAttack(note) 
-		// 	}
-		// 	catch(err) {
-		// 		console.log('error playing sound: ' + latentSpace + '_pitch_' + pitch)
-		// 	}
-		// }
-		// else {
-		// 	console.log('does not exist: ' + latentSpace + '_pitch_' + pitch)
-		// }
-
-		const playerName = latentSpace + '_pitch_' + pitch
-		const player = this.players.get(playerName)
-		if (player) {
-			try {
-				player.start()
+		if (this.players) {
+			const playerName = latentSpace + '_pitch_' + pitch
+			const player = this.players.get(playerName)
+			if (player) {
+				try {
+					player.start()
+				}
+				catch(err) {
+					console.log('error playing sound: ' + playerName)
+				}
 			}
-			catch(err) {
-				console.log('error playing sound: ' + playerName)
+			else {
+				console.log('does not exist: ' + playerName)
 			}
-		}
-		else {
-			console.log('does not exist: ' + playerName)
 		}
 	}
 	

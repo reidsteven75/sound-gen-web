@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import CssBaseline from '@material-ui/core/CssBaseline'
+
 // import GenerateBlend from './generate-blend'
 import LatentExplorer from './latent-explorer'
 import { observable } from 'mobx'
@@ -10,7 +12,7 @@ var data = {
   latentSpaces: latentSpaces,
   sounds: [
     {
-      name: 'Strings Ensemble',
+      name: 'Strings',
       position: 'NW'
     },
     {
@@ -22,7 +24,7 @@ var data = {
       position: 'SW'
     },
     {
-      name: 'Electric Guitar',
+      name: 'Guitar',
       position: 'SE'
     }
   ]
@@ -35,23 +37,24 @@ class App extends Component {
   })
 
   componentDidMount(){
-		// document.addEventListener("keydown", this.handleKeyDown.bind(this), false)
-		// document.addEventListener("keyup", this.handleKeyUp.bind(this), false)
+
   }
   componentWillUnmount(){
-		// document.removeEventListener("keydown", this.handleKeyDown.bind(this), false)
-		// document.removeEventListener("key", this.handleKeyUp.bind(this), false)
+
   }
 
   render() {
     return (
-      <div className="App">
-        <main className="App-main">
-          <LatentExplorer
-            data={data}
-          />
-        </main>
-      </div> 
+      <React.Fragment>
+        <CssBaseline />
+        <div className="App">
+          <main className="App-main">
+            <LatentExplorer
+              data={data}
+            />
+          </main>
+        </div> 
+      </React.Fragment>
     )
   }
 }

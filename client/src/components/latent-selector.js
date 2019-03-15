@@ -47,7 +47,8 @@ class LatentSelector extends Component {
 			soundNW: '',
 			soundNE: '',
 			soundSW: '',
-			soundSE: ''
+			soundSE: '',
+			isActive: false
 		}
 
 		this.sketchRef = React.createRef()
@@ -56,7 +57,7 @@ class LatentSelector extends Component {
 
 	updateLatentSelector() {
 		// only send if moving, and also send last position upon stopping
-		if (this.state.isMoving === true) {
+		if (this.state.isMoving === true || this.state.isActive === true) {
 			this.setState({
 				sentLastPos: false
 			})
@@ -206,9 +207,27 @@ class LatentSelector extends Component {
 		}
 	}
 
+	handleMouseDown() {
+		this.setState({isActive: true})
+	}
+
+	handleMouseUp() {
+		this.setState({isActive: false})
+	}
+
+	handleTouchStart() {
+		this.setState({isActive: true})
+	}
+
+	handleMouseEnd() {
+		this.setState({isActive: false})
+	}
+
   componentDidMount() {
 
 		window.addEventListener("resize", this.redrawCanvas.bind(this))
+		window.addEventListener("touchend", this.handleMouseUp.bind(this))
+		window.addEventListener("mouseup", this.handleMouseUp.bind(this))
 
 		setInterval(this.updateLatentSelector.bind(this), this.state.updateInterval)
 
@@ -224,6 +243,8 @@ class LatentSelector extends Component {
 	
 	componentWillUnmount() {
 		window.removeEventListener("resize", this.redrawCanvas)
+		window.addEveremoveEventListenerntListener("touchend", this.handleMouseUp)
+		window.removeEventListener("mouseup", this.handleMouseUp)
 	}	
 
   render() {
@@ -238,7 +259,10 @@ class LatentSelector extends Component {
 												<div 
 													id='sketch-area' 
 													ref={this.sketchRef}
-													style={style.sketchArea}>
+													style={style.sketchArea}
+													onMouseDown={this.handleMouseDown.bind(this)}
+													onMouseUp={this.handleMouseUp.bind(this)}
+												>
 												</div>
 											</MDBCol>	
 										</MDBRow>

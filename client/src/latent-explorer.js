@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import Tone from 'tone'
 
-import Keyboard from './components/keyboard'
+import PitchSlider from './components/pitch-slider'
+// import Keyboard from './components/keyboard'
 import LatentSelector from './components/latent-selector'
 
 const style = {
@@ -107,12 +108,19 @@ class LatentExplorer extends Component {
 
 	}
 
+	updatePitch(data) {
+		this.setState({pitch: data.pitch})
+		this.playSound()
+	}
+
 	playSound() {
 		const pitch = this.state.pitch
 		const latentSpace = `${this.state.latentRatioNW}`
 													+ `_${this.state.latentRatioNE}`
 													+ `_${this.state.latentRatioSW}`
 													+ `_${this.state.latentRatioSE}`
+
+		// console.log(latentSpace + '_pitch_' + pitch)
 		const note = new Tone.Frequency(pitch, 'midi').toNote()
 		if (latentSpace + '_pitch_' + pitch in this.soundUrls) { console.log('exists') }
 		if (this.sampler[latentSpace]) {
@@ -211,9 +219,16 @@ class LatentExplorer extends Component {
 										sounds={this.props.data.sounds}
 									/>
 									<br/>
+									<PitchSlider
+										min={36}
+										max={84}
+										step={4}
+										handleChange={this.updatePitch.bind(this)}
+									/>
+									{/* <br/>
 									<Keyboard 
 										updateKeyPressed={this.updateKeyPressed.bind(this)}
-									/>
+									/> */}
 								</div>
     }
 

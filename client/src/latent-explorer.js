@@ -16,7 +16,7 @@ class LatentExplorer extends Component {
 
 	config = {
 		fileUrl: {
-			storagePath: 'http://storage.googleapis.com',
+			storagePath: 'https://storage.googleapis.com',
 			bucket: 'augmented-music-generation-dev',
 			folderPath: '/latent_grids/test',
 			gridName: 'cleaned_grid_v3'

@@ -90,10 +90,11 @@ class LatentExplorer extends Component {
 		// this.setState({loading:false})
 		this.buffers = new Tone.Buffers(this.soundUrls, () => {
 			console.log('buffers:done')
-			this.players = new Tone.Players(this.soundUrls, () => {
-				console.log('players:done')
-				this.setState({loading:false})
-			}).toMaster()
+			this.setState({loading:false})
+			// this.players = new Tone.Players(this.soundUrls, () => {
+			// 	console.log('players:done')
+				
+			// }).toMaster()
 		})
 
 		// Tone.Buffer.on('load', this.handleBuffersReady())s

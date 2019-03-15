@@ -2,7 +2,8 @@ import React, { Component } from 'react'
 import Tone from 'tone'
 
 import PitchSlider from './components/pitch-slider'
-// import Keyboard from './components/keyboard'
+import VelocitySlider from './components/velocity-slider'
+import Keyboard from './components/keyboard'
 import LatentSelector from './components/latent-selector'
 
 const style = {
@@ -35,11 +36,7 @@ class LatentExplorer extends Component {
 			{key:"H", value:76},
 			{key:"U", value:80},
 			{key:"J", value:84}
-		],
-		latentSpaces: [
-			[1.0, 0.0, 0.0, 0.0],
-		],
-		velocity: 127
+		]
 	}
 	
 	handleSamplerReady() {
@@ -63,7 +60,8 @@ class LatentExplorer extends Component {
 			latentRatioNE: 0,
 			latentRatioSW: 0,
 			latentRatioSE: 0,
-			pitch: 52
+			pitch: 60,
+			velocity: 0.5
 		}
 
 		this.handleSamplerError = this.handleSamplerError.bind(this) 
@@ -80,7 +78,7 @@ class LatentExplorer extends Component {
 			// get urls for each sound
 			this.config.pitches.forEach((pitch) => {
 				const sound = `${latentSpace}_pitch_${pitch.value}`
-				const fileUrl = `${this.config.fileUrl.folderPath}/${this.config.fileUrl.gridName}_${sound}_vel_${this.config.velocity}.mp3`
+				const fileUrl = `${this.config.fileUrl.folderPath}/${this.config.fileUrl.gridName}_${sound}_vel_127.mp3`
 				const note = new Tone.Frequency(pitch.value, 'midi').toNote()
 				this.soundUrls[note] = fileUrl
 				// console.log(sound)
@@ -105,16 +103,27 @@ class LatentExplorer extends Component {
     setTimeout(() => {
 			this.setState({loading:false})
 		}, 1000)
-
 	}
 
 	updatePitch(data) {
-		this.setState({pitch: data.pitch})
-		this.playSound()
+		this.setState(
+			{ pitch: data.pitch }, 
+		() => {
+			this.playSound()
+		})
+	}
+
+	updateVelocity(data) {
+		this.setState(
+			{ velocity: data.velocity / 100 }, 
+		() => {
+			this.playSound()
+		})
 	}
 
 	playSound() {
 		const pitch = this.state.pitch
+		const velocity = this.state.velocity
 		const latentSpace = `${this.state.latentRatioNW}`
 													+ `_${this.state.latentRatioNE}`
 													+ `_${this.state.latentRatioSW}`
@@ -125,6 +134,7 @@ class LatentExplorer extends Component {
 		if (latentSpace + '_pitch_' + pitch in this.soundUrls) { console.log('exists') }
 		if (this.sampler[latentSpace]) {
 			try {
+				// this.sampler[latentSpace].triggerAttackRelease(note, 3, 1, velocity) 
 				this.sampler[latentSpace].triggerAttack(note) 
 			}
 			catch(err) {
@@ -142,8 +152,11 @@ class LatentExplorer extends Component {
 		// console.log("key:"+data.key, "pitch:"+pitch, active)
 
 		if (active === true) { 
-			this.setState({pitch: pitch})
-			this.playSound()
+			this.setState(
+				{ pitch: pitch }, 
+			() => {
+				this.playSound()
+			})
 		}
   }
 
@@ -226,9 +239,15 @@ class LatentExplorer extends Component {
 										handleChange={this.updatePitch.bind(this)}
 									/>
 									{/* <br/>
+									<VelocitySlider
+										min={0}
+										max={100}
+										handleChange={this.updateVelocity.bind(this)}
+									/> */}
+									<br/>
 									<Keyboard 
 										updateKeyPressed={this.updateKeyPressed.bind(this)}
-									/> */}
+									/>
 								</div>
     }
 

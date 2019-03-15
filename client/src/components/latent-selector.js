@@ -48,7 +48,8 @@ class LatentSelector extends Component {
 			soundNE: '',
 			soundSW: '',
 			soundSE: '',
-			isActive: false
+			isActive: false,								// when mouse is down or touch is happening
+			hasBeenActivated: false 				// prevents initial sounds until user initiates sound 
 		}
 
 		this.sketchRef = React.createRef()
@@ -65,7 +66,8 @@ class LatentSelector extends Component {
 	  if (this.state.sentLastPos !== true) {
 			this.props.updateLatentSelector({
 				x: this.state.currentPercentX,
-				y: this.state.currentPercentY
+				y: this.state.currentPercentY,
+				hasBeenActivated: this.state.hasBeenActivated
 			})
 			this.setState({
 				sentLastPos: true
@@ -209,6 +211,7 @@ class LatentSelector extends Component {
 
 	handleMouseDown() {
 		this.setState({isActive: true})
+		this.setState({hasBeenActivated: true})
 	}
 
 	handleMouseUp() {
@@ -217,6 +220,7 @@ class LatentSelector extends Component {
 
 	handleTouchStart() {
 		this.setState({isActive: true})
+		this.setState({hasBeenActivated: true})
 	}
 
 	handleMouseEnd() {

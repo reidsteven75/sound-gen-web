@@ -6,7 +6,9 @@ const style = {
 
 	},
 	key: {
-		width:'100%'
+		width:'100%',
+		paddingLeft: 0,
+    paddingRight: 0
 	}
 }
 

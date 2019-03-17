@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 import Tone from 'tone'
+import chunk from 'lodash/chunk'
 
 import PitchSlider from './components/pitch-slider'
-import VelocitySlider from './components/velocity-slider'
+// import VelocitySlider from './components/velocity-slider'
 import Keyboard from './components/keyboard'
 import LatentSelector from './components/latent-selector'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 const style = {
   content: {
@@ -16,6 +18,9 @@ const style = {
 class LatentExplorer extends Component {
 
 	config = {
+		loadBatchSize: {
+			player: 100
+		},
 		fileUrl: {
 			storagePath: 'https://storage.googleapis.com',
 			bucket: 'augmented-music-generation-dev',
@@ -48,6 +53,39 @@ class LatentExplorer extends Component {
 		console.log('player error')
 	}
 
+	initPlayer() {
+		console.log('init player')
+		const batchSize = this.config.loadBatchSize.player
+		const chunkedSounds = chunk(this.soundUrls, batchSize)
+
+		chunkedSounds.forEach((sounds) => {
+
+			var soundUrlsChunk = {}
+
+			sounds.forEach((sound) => {
+				soundUrlsChunk[sound.name] = sound.fileUrl
+				// const buffer = this.buffers.get(sound.name)
+				// console.log(buffer)
+				// this.players.add(sound.name, sound.fileUrl, () => {
+				// 	console.log('player initialized')
+				// })
+			})
+
+			// console.log('chunk init')
+			// console.log(soundUrlsChunk)
+			// const test = new Tone.Players(soundUrlsChunk, () => {
+			// 	console.log('chunk done')
+			// })
+
+		})
+
+		console.log('done')
+
+		// const player = new Tone.Players(this.soundUrls, () => {
+		// 	console.log('players:done')
+		// }).toMaster()
+	}
+
   constructor(props) {
     super(props)
     this.state = {
@@ -63,39 +101,55 @@ class LatentExplorer extends Component {
 
 		this.handlePlayerError = this.handlePlayerError.bind(this) 
 		this.handlePlayerReady = this.handlePlayerReady.bind(this)
+		this.initPlayer = this.initPlayer.bind(this)
 
-		this.soundUrls = {}
+		this.soundUrls = []
+		this.buffers = new Tone.Buffers()
+		this.players = new Tone.Players().toMaster()
 
 	}
+	
 
   componentDidMount() {
 		const latentSpaces = this.props.data.latentSpaces
 		const baseUrl = `${this.config.fileUrl.storagePath}/${this.config.fileUrl.bucket}`
+		const numSounds = latentSpaces.length * this.config.pitches.length
+		var numSoundsBuffered = 0
+
+		console.log('num sounds: ', numSounds)
 
 		latentSpaces.forEach((latentSpace) => {
 			// get urls for each sound
 			this.config.pitches.forEach((pitch) => {
-				const sound = `${latentSpace}_pitch_${pitch.value}`
-				const fileUrl = `${baseUrl}${this.config.fileUrl.folderPath}/${this.config.fileUrl.gridName}_${sound}_vel_127.mp3`
+				const name = `${latentSpace}_pitch_${pitch.value}`
+				const fileUrl = `${baseUrl}${this.config.fileUrl.folderPath}/${this.config.fileUrl.gridName}_${name}_vel_127.mp3`
 				// const note = new Tone.Frequency(pitch.value, 'midi').toNote()
-				this.soundUrls[sound] = fileUrl
+				this.soundUrls.push({
+					name: name,
+					fileUrl: fileUrl	
+				})
 				// console.log(sound)
 				// console.log(baseUrl + fileUrl)
+				this.initPlayer()
+				// const buffer = new Tone.Buffer(fileUrl, () => {
+				// 	this.buffers.add(name, buffer, () => {
+				// 		numSoundsBuffered ++
+				// 		if (numSoundsBuffered === numSounds) {
+				// 			this.initPlayer()
+				// 		}
+				// 	})
+				// })
 			})	
 		})
+
+		
+
+		this.setState({loading:false})
 		// this.players = new Tone.Players(this.soundUrls, {
 		// 	onload: this.handlePlayerReady(),
 		// 	onError: this.handlePlayerError()
 		// }).toMaster()
 		// this.setState({loading:false})
-		this.buffers = new Tone.Buffers(this.soundUrls, () => {
-			console.log('buffers:done')
-			this.setState({loading:false})
-			// this.players = new Tone.Players(this.soundUrls, () => {
-			// 	console.log('players:done')
-				
-			// }).toMaster()
-		})
 
 		// Tone.Buffer.on('load', this.handleBuffersReady())s
 	}
@@ -212,7 +266,7 @@ class LatentExplorer extends Component {
 		
     let content
     if (this.state.loading === true) {
-      content = <div className="loader border-top-default medium fast"></div>
+			content = <CircularProgress/>
     }
     else if (this.state.serverError === true) {
       content = <div>

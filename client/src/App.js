@@ -17,12 +17,12 @@ import './App.css'
 var data = {
   latentSpaces: latentSpaces,
   pitches: pitches,
-  sounds: sounds,
+  sounds: sounds[1],
   fileUrl: {
     storagePath: 'https://storage.googleapis.com',
     bucket: 'augmented-music-generation-dev',
-    folderPath: '/latent_grids/test',
-    gridName: 'cleaned_grid_v3'
+    folderPath: '/latent_grids/grid_4',
+    gridName: 'cleaned_grid_v4'
   },
   default: {
     pitch: {

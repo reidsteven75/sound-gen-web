@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import * as p5 from 'p5'
-import { MDBContainer, MDBRow, MDBCol } from 'mdbreact'
+import PropTypes from 'prop-types'
+import { withStyles } from '@material-ui/core/styles'
+import Grid from '@material-ui/core/Grid'
 
 const style = {
 	wrapper: {
@@ -232,14 +234,17 @@ class LatentSelector extends Component {
 
 		setInterval(this.updateLatentSelector.bind(this), this.state.updateInterval)
 
-		this.s = (sk) => {  
-			this.sk = sk
-			this.updateSounds()
-			this.updateCanvasSize()
-			this.initP5()
-		}
-		this.p5 = new p5(this.s)
-
+		// timeout needed to ensure ref canvas mounted
+		setTimeout(() => {
+			this.s = (sk) => {  
+				this.sk = sk
+				this.updateSounds()
+				this.updateCanvasSize()
+				this.initP5()
+			}
+			this.p5 = new p5(this.s)
+		}, 500)
+		
 	}
 	
 	componentWillUnmount() {
@@ -251,13 +256,13 @@ class LatentSelector extends Component {
   render() {
 
 		let content = 
-			<MDBContainer>
-				<MDBRow>
-					<MDBCol xs="6" style={style.soundLeft}>{this.state.soundNW.name}</MDBCol>
-					<MDBCol xs="6" style={style.soundRight}>{this.state.soundNE.name}</MDBCol>
-				</MDBRow>
-				<MDBRow>
-					<MDBCol xs="12">
+			<div>
+				<Grid container spacing={24} >
+					<Grid item xs={6} style={style.soundLeft}>{this.state.soundNW.name}</Grid>
+					<Grid item xs={6} style={style.soundRight}>{this.state.soundNE.name}</Grid>
+				</Grid>
+				<Grid container spacing={24} >
+					<Grid item xs={12}>
 						<div 
 							id='sketch-area' 
 							ref={this.sketchRef}
@@ -266,13 +271,13 @@ class LatentSelector extends Component {
 							onMouseUp={this.handleMouseUp.bind(this)}
 						>
 						</div>
-					</MDBCol>	
-				</MDBRow>
-				<MDBRow>
-					<MDBCol xs="6" style={style.soundLeft}>{this.state.soundSW.name}</MDBCol>
-					<MDBCol xs="6" style={style.soundRight}>{this.state.soundSE.name}</MDBCol>
-				</MDBRow>
-			</MDBContainer>
+					</Grid>	
+				</Grid>
+				<Grid container spacing={24} >
+					<Grid item xs={6} style={style.soundLeft}>{this.state.soundSW.name}</Grid>
+					<Grid item xs={6} style={style.soundRight}>{this.state.soundSE.name}</Grid>
+				</Grid>
+			</div>
 
       
     return (
@@ -283,4 +288,8 @@ class LatentSelector extends Component {
   }
 }
 
-export default LatentSelector
+LatentSelector.propTypes = {
+  classes: PropTypes.object.isRequired,
+}
+
+export default withStyles(style)(LatentSelector)

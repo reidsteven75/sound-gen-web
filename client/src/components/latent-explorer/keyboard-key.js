@@ -1,5 +1,8 @@
 import React, { Component } from 'react'
-import { MDBBtn } from 'mdbreact'
+import PropTypes from 'prop-types'
+import { withStyles } from '@material-ui/core/styles'
+import Button from '@material-ui/core/Button'
+import teal from '@material-ui/core/colors/teal'
 
 const style = {
 	wrapper: {
@@ -8,8 +11,16 @@ const style = {
 	key: {
 		width:'100%',
 		paddingLeft: 0,
-    paddingRight: 0
-	}
+		paddingRight: 0,
+		border: '1px solid ' + teal['A400']
+	},
+	keyActive: {
+		width:'100%',
+		paddingLeft: 0,
+		paddingRight: 0,
+		background: teal['A700'],
+		border: '1px solid ' + teal['A400']
+	},
 }
 
 class KeyboardKey extends Component {
@@ -19,7 +30,7 @@ class KeyboardKey extends Component {
     this.state = {
 			isActive: false,
 			color: 'default'
-    }
+		}
 	}
 
 	updateKeyPressed(active) {
@@ -31,11 +42,10 @@ class KeyboardKey extends Component {
 	}
 	
 	handleMouseEnter() {
-		this.setState({color: 'info'})
+
 	}
 
 	handleMouseOut() {
-		this.setState({color: 'default'})
 		this.setState({isActive: false})
 	}
 
@@ -54,15 +64,13 @@ class KeyboardKey extends Component {
 			if (this.state.isActive !== true) {
 				this.updateKeyPressed(true)
 			}
-			this.setState({isActive: true})
-			this.setState({color: 'info'})	
+			this.setState({isActive: true})	
 		}
 	}
 
 	handleKeyUp(e) {
 		if (e.key.toLowerCase() === this.props.label.toLowerCase()) {
 			this.setState({isActive: false})
-			this.setState({color: 'default'})
 			this.updateKeyPressed(false)
 		}
 	}
@@ -70,6 +78,7 @@ class KeyboardKey extends Component {
   componentDidMount(){
 		document.addEventListener("keydown", this.handleKeyDown.bind(this), false)
 		document.addEventListener("keyup", this.handleKeyUp.bind(this), false)
+
   }
   componentWillUnmount(){
 		document.removeEventListener("keydown", this.handleKeyDown.bind(this), false)
@@ -79,17 +88,17 @@ class KeyboardKey extends Component {
   render() {
 
 		let content = 
-			<MDBBtn 
-				style={style.key}
-				outline={!this.state.isActive} 
-				color={this.state.color}
+			<Button 
+				style={this.state.isActive ? style.keyActive : style.key}
+				color={"secondary"}
+				size={"small"}
 				onMouseDown={this.handleMouseDown.bind(this)}
 				onMouseUp={this.handleMouseUp.bind(this)}
 				onMouseEnter={this.handleMouseEnter.bind(this)}
 				onMouseOut={this.handleMouseOut.bind(this)}
-				size='sm'>
+			>
 					{this.props.label}
-			</MDBBtn>
+			</Button>
 
     return (
         <div style={style.wrapper}>
@@ -99,4 +108,8 @@ class KeyboardKey extends Component {
   }
 }
 
-export default KeyboardKey
+KeyboardKey.propTypes = {
+  classes: PropTypes.object.isRequired,
+}
+
+export default withStyles(style)(KeyboardKey)

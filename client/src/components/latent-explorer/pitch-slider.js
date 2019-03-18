@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography'
 const style = {
 	wrapper: {
     margin: 'auto',
-    maxWidth: 700
+    maxWidth: 440
 	},
   slider: {
     padding: '22px 0px',

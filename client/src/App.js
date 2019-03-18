@@ -1,7 +1,11 @@
 import React, { Component } from 'react'
-import CssBaseline from '@material-ui/core/CssBaseline'
 
-import LatentExplorer from './latent-explorer'
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import blue from '@material-ui/core/colors/blue'
+import teal from '@material-ui/core/colors/teal'
+
+import LatentExplorer from './components/latent-explorer/index'
 
 // data
 import latentSpaces from './data/latent-spaces.json'
@@ -22,7 +26,7 @@ var data = {
   },
   default: {
     pitch: {
-      value: 72,
+      value: 40,
       min: 36,
       max: 84,
       stepSize: 4
@@ -30,11 +34,31 @@ var data = {
   }
 }
 
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      light: blue[300],
+      main: blue[500],
+      dark: blue[700],
+    },
+    secondary: {
+      light: teal['A200'],
+      main: teal['A400'],
+      dark: teal['A700'],
+    },
+  },
+  typography: {
+    useNextVariants: true,
+  },
+})
+
+
+
 class App extends Component {
 
   render() {
     return (
-      <React.Fragment>
+      <MuiThemeProvider theme={theme}>
         <CssBaseline />
         <div className="App">
           <main className="App-main">
@@ -43,7 +67,7 @@ class App extends Component {
             />
           </main>
         </div> 
-      </React.Fragment>
+      </MuiThemeProvider>
     )
   }
 }

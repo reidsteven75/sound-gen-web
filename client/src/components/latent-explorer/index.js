@@ -1,10 +1,14 @@
 import React, { Component } from 'react'
 import Tone from 'tone'
-
-import PitchSlider from './components/pitch-slider'
-import Keyboard from './components/keyboard'
-import LatentSelector from './components/latent-selector'
 import CircularProgress from '@material-ui/core/CircularProgress'
+import compose from 'recompose/compose'
+import { withStyles } from '@material-ui/core/styles'
+import Hidden from '@material-ui/core/Hidden'
+import withWidth from '@material-ui/core/withWidth'
+
+import PitchSlider from './pitch-slider'
+import Keyboard from './keyboard'
+import LatentSelector from './latent-selector'
 
 const style = {
   content: {
@@ -16,9 +20,12 @@ const style = {
 class LatentExplorer extends Component {
 
 	initPlayer() {
-		this.players = new Tone.Players(this.soundUrls, () => {
-			this.setState({loading:false})
-		}).toMaster()	
+		// timeout makes initial loading animation smoother
+		setTimeout(() => {
+			this.players = new Tone.Players(this.soundUrls, () => {
+				this.setState({loading:false})
+			}).toMaster()	
+		}, 500)
 	}
 
   constructor(props) {
@@ -180,11 +187,11 @@ class LatentExplorer extends Component {
 						handleChange={this.updatePitch.bind(this)}
 					/>
 					<br/>
-					<div className={'d-none d-lg-block'}>
-					<Keyboard 
-						updateKeyPressed={this.updateKeyPressed.bind(this)}
-					/>
-					</div>
+					<Hidden xsDown>
+						<Keyboard 
+							updateKeyPressed={this.updateKeyPressed.bind(this)}
+						/>
+					</Hidden>
 				</div>
     }
 
@@ -196,4 +203,7 @@ class LatentExplorer extends Component {
   }
 }
 
-export default LatentExplorer;
+export default compose(
+  withStyles(style),
+  withWidth(),
+)(LatentExplorer)

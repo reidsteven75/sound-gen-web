@@ -202,10 +202,7 @@ class LatentSelector extends Component {
 					i,
 					i
 				)
-				
-			}
-			
-					
+			}		
 		}
 	}
 
@@ -253,34 +250,33 @@ class LatentSelector extends Component {
 
   render() {
 
-		let content = <MDBContainer>
-										<MDBRow>
-											<MDBCol xs="6" style={style.soundLeft}>{this.state.soundNW.name}</MDBCol>
-											<MDBCol xs="6" style={style.soundRight}>{this.state.soundNE.name}</MDBCol>
-										</MDBRow>
-										<MDBRow>
-											<MDBCol xs="12">
-												<div 
-													id='sketch-area' 
-													ref={this.sketchRef}
-													style={style.sketchArea}
-													onMouseDown={this.handleMouseDown.bind(this)}
-													onMouseUp={this.handleMouseUp.bind(this)}
-												>
-												</div>
-											</MDBCol>	
-										</MDBRow>
-										<MDBRow>
-											<MDBCol xs="6" style={style.soundLeft}>{this.state.soundSW.name}</MDBCol>
-											<MDBCol xs="6" style={style.soundRight}>{this.state.soundSE.name}</MDBCol>
-										</MDBRow>
-									</MDBContainer>
+		let content = 
+			<MDBContainer>
+				<MDBRow>
+					<MDBCol xs="6" style={style.soundLeft}>{this.state.soundNW.name}</MDBCol>
+					<MDBCol xs="6" style={style.soundRight}>{this.state.soundNE.name}</MDBCol>
+				</MDBRow>
+				<MDBRow>
+					<MDBCol xs="12">
+						<div 
+							id='sketch-area' 
+							ref={this.sketchRef}
+							style={style.sketchArea}
+							onMouseDown={this.handleMouseDown.bind(this)}
+							onMouseUp={this.handleMouseUp.bind(this)}
+						>
+						</div>
+					</MDBCol>	
+				</MDBRow>
+				<MDBRow>
+					<MDBCol xs="6" style={style.soundLeft}>{this.state.soundSW.name}</MDBCol>
+					<MDBCol xs="6" style={style.soundRight}>{this.state.soundSE.name}</MDBCol>
+				</MDBRow>
+			</MDBContainer>
 
       
     return (
         <div style={style.wrapper}>
-					{/* {Math.round(this.state.currentPercentX * 100) / 100 },
-					{Math.round(this.state.currentPercentY * 100) / 100 } */}
           {content}
         </div>
     )

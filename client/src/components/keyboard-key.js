@@ -14,10 +14,6 @@ const style = {
 
 class KeyboardKey extends Component {
 
-  config = {
-    
-  }
-
   constructor(props) {
     super(props)
     this.state = {
@@ -82,18 +78,19 @@ class KeyboardKey extends Component {
 
   render() {
 
-		let content = <MDBBtn 
-										style={style.key}
-										outline={!this.state.isActive} 
-										color={this.state.color}
-										onMouseDown={this.handleMouseDown.bind(this)}
-										onMouseUp={this.handleMouseUp.bind(this)}
-										onMouseEnter={this.handleMouseEnter.bind(this)}
-										onMouseOut={this.handleMouseOut.bind(this)}
-										size='sm'>
-											{this.props.label}
-									</MDBBtn>
-      
+		let content = 
+			<MDBBtn 
+				style={style.key}
+				outline={!this.state.isActive} 
+				color={this.state.color}
+				onMouseDown={this.handleMouseDown.bind(this)}
+				onMouseUp={this.handleMouseUp.bind(this)}
+				onMouseEnter={this.handleMouseEnter.bind(this)}
+				onMouseOut={this.handleMouseOut.bind(this)}
+				size='sm'>
+					{this.props.label}
+			</MDBBtn>
+
     return (
         <div style={style.wrapper}>
           {content}

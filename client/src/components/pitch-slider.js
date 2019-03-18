@@ -25,9 +25,14 @@ class PitchSlider extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      value: 60, // TODO: set this from parent component
+      value: 0 // can override by setting 'defaultValue'
     }
-	}
+  }
+  
+  componentDidMount() {
+    const defaultValue = this.props.defaultValue
+    this.setState({value: defaultValue})
+  }
 
 	handleChange = (event, value) => {
     this.setState({value:value})
@@ -36,22 +41,23 @@ class PitchSlider extends Component {
 	
   render() {
 
-		let content = <div>
-                    <Typography 
-                      id="label"
-                      style={style.label}
-                    >
-                      Pitch
-                    </Typography>
-                    <Slider
-                      style={style.slider}
-                      value={this.state.value}
-                      min={this.props.min}
-                      max={this.props.max}
-                      step={this.props.step}
-                      onChange={this.handleChange}
-                    />
-                  </div>
+		let content = 
+      <div>
+        <Typography 
+          id="label"
+          style={style.label}
+        >
+          Pitch
+        </Typography>
+        <Slider
+          style={style.slider}
+          value={this.state.value}
+          min={this.props.min}
+          max={this.props.max}
+          step={this.props.step}
+          onChange={this.handleChange}
+        />
+      </div>
 
     return (
         <div style={style.wrapper}>

@@ -1,9 +1,7 @@
 import React, { Component } from 'react'
 import Tone from 'tone'
-import chunk from 'lodash/chunk'
 
 import PitchSlider from './components/pitch-slider'
-// import VelocitySlider from './components/velocity-slider'
 import Keyboard from './components/keyboard'
 import LatentSelector from './components/latent-selector'
 import CircularProgress from '@material-ui/core/CircularProgress'
@@ -17,73 +15,10 @@ const style = {
 
 class LatentExplorer extends Component {
 
-	config = {
-		loadBatchSize: {
-			player: 100
-		},
-		fileUrl: {
-			storagePath: 'https://storage.googleapis.com',
-			bucket: 'augmented-music-generation-dev',
-			folderPath: '/latent_grids/test',
-			gridName: 'cleaned_grid_v3'
-		},
-		pitches: [
-			{key:"A", value:36},
-			{key:"W", value:40},
-			{key:"S", value:44},
-			{key:"E", value:48},
-			{key:"D", value:52},
-			{key:"R", value:56},
-			{key:"F", value:60},
-			{key:"T", value:64},
-			{key:"G", value:68},
-			{key:"Y", value:72},
-			{key:"H", value:76},
-			{key:"U", value:80},
-			{key:"J", value:84}
-		]
-	}
-
-	handlePlayerReady() {
-		console.log('player ready')
-		this.setState({loading:false})
-	}
-
-	handlePlayerError(err) {
-		console.log('player error')
-	}
-
 	initPlayer() {
-		console.log('init player')
-		const batchSize = this.config.loadBatchSize.player
-		const chunkedSounds = chunk(this.soundUrls, batchSize)
-
-		chunkedSounds.forEach((sounds) => {
-
-			var soundUrlsChunk = {}
-
-			sounds.forEach((sound) => {
-				soundUrlsChunk[sound.name] = sound.fileUrl
-				// const buffer = this.buffers.get(sound.name)
-				// console.log(buffer)
-				// this.players.add(sound.name, sound.fileUrl, () => {
-				// 	console.log('player initialized')
-				// })
-			})
-
-			// console.log('chunk init')
-			// console.log(soundUrlsChunk)
-			// const test = new Tone.Players(soundUrlsChunk, () => {
-			// 	console.log('chunk done')
-			// })
-
-		})
-
-		console.log('done')
-
-		// const player = new Tone.Players(this.soundUrls, () => {
-		// 	console.log('players:done')
-		// }).toMaster()
+		this.players = new Tone.Players(this.soundUrls, () => {
+			this.setState({loading:false})
+		}).toMaster()	
 	}
 
   constructor(props) {
@@ -95,63 +30,31 @@ class LatentExplorer extends Component {
 			latentRatioNE: 0,
 			latentRatioSW: 0,
 			latentRatioSE: 0,
-			pitch: 60,
-			velocity: 0.5
+			pitch: 0,
 		}
 
-		this.handlePlayerError = this.handlePlayerError.bind(this) 
-		this.handlePlayerReady = this.handlePlayerReady.bind(this)
 		this.initPlayer = this.initPlayer.bind(this)
 
-		this.soundUrls = []
-		this.buffers = new Tone.Buffers()
-		this.players = new Tone.Players().toMaster()
-
+		this.soundUrls = {}
 	}
 	
 
   componentDidMount() {
 		const latentSpaces = this.props.data.latentSpaces
-		const baseUrl = `${this.config.fileUrl.storagePath}/${this.config.fileUrl.bucket}`
-		const numSounds = latentSpaces.length * this.config.pitches.length
-		var numSoundsBuffered = 0
+		const baseUrl = `${this.props.data.fileUrl.storagePath}/${this.props.data.fileUrl.bucket}`
 
-		console.log('num sounds: ', numSounds)
+		this.setState({pitch: this.props.data.default.pitch.value})
 
 		latentSpaces.forEach((latentSpace) => {
 			// get urls for each sound
-			this.config.pitches.forEach((pitch) => {
+			this.props.data.pitches.forEach((pitch) => {
 				const name = `${latentSpace}_pitch_${pitch.value}`
-				const fileUrl = `${baseUrl}${this.config.fileUrl.folderPath}/${this.config.fileUrl.gridName}_${name}_vel_127.mp3`
-				// const note = new Tone.Frequency(pitch.value, 'midi').toNote()
-				this.soundUrls.push({
-					name: name,
-					fileUrl: fileUrl	
-				})
-				// console.log(sound)
-				// console.log(baseUrl + fileUrl)
-				this.initPlayer()
-				// const buffer = new Tone.Buffer(fileUrl, () => {
-				// 	this.buffers.add(name, buffer, () => {
-				// 		numSoundsBuffered ++
-				// 		if (numSoundsBuffered === numSounds) {
-				// 			this.initPlayer()
-				// 		}
-				// 	})
-				// })
+				const fileUrl = `${baseUrl}${this.props.data.fileUrl.folderPath}/${this.props.data.fileUrl.gridName}_${name}_vel_127.mp3`
+				this.soundUrls[name] = fileUrl	
 			})	
 		})
 
-		
-
-		this.setState({loading:false})
-		// this.players = new Tone.Players(this.soundUrls, {
-		// 	onload: this.handlePlayerReady(),
-		// 	onError: this.handlePlayerError()
-		// }).toMaster()
-		// this.setState({loading:false})
-
-		// Tone.Buffer.on('load', this.handleBuffersReady())s
+		this.initPlayer()
 	}
 
 	updatePitch(data) {
@@ -162,17 +65,8 @@ class LatentExplorer extends Component {
 		})
 	}
 
-	updateVelocity(data) {
-		this.setState(
-			{ velocity: data.velocity / 100 }, 
-		() => {
-			this.playSound()
-		})
-	}
-
 	playSound() {
 		const pitch = this.state.pitch
-		// const velocity = this.state.velocity
 		const latentSpace = `${this.state.latentRatioNW}`
 													+ `_${this.state.latentRatioNE}`
 													+ `_${this.state.latentRatioSW}`
@@ -182,16 +76,10 @@ class LatentExplorer extends Component {
 			const playerName = latentSpace + '_pitch_' + pitch
 			const player = this.players.get(playerName)
 			if (player) {
-				try {
-					player.start()
-				}
-				catch(err) {
-					console.log('error playing sound: ' + playerName)
-				}
+				try { player.start() }
+				catch(err) { console.log('error playing sound: ' + playerName) }
 			}
-			else {
-				console.log('does not exist: ' + playerName)
-			}
+			else { console.log('does not exist: ' + playerName) }
 		}
 	}
 	
@@ -277,31 +165,27 @@ class LatentExplorer extends Component {
                 </div>
     }
     else {
-      content = <div>
-									<LatentSelector 
-										updateLatentSelector={this.updateLatentSelector.bind(this)}
-										sounds={this.props.data.sounds}
-									/>
-									<br/>
-									<PitchSlider
-										min={36}
-										max={84}
-										step={4}
-										handleChange={this.updatePitch.bind(this)}
-									/>
-									{/* <br/>
-									<VelocitySlider
-										min={0}
-										max={100}
-										handleChange={this.updateVelocity.bind(this)}
-									/> */}
-									<br/>
-									<div className={'d-none d-lg-block'}>
-									<Keyboard 
-										updateKeyPressed={this.updateKeyPressed.bind(this)}
-									/>
-									</div>
-								</div>
+      content = 
+				<div>
+					<LatentSelector 
+						updateLatentSelector={this.updateLatentSelector.bind(this)}
+						sounds={this.props.data.sounds}
+					/>
+					<br/>
+					<PitchSlider
+						min={this.props.data.default.pitch.min}
+						max={this.props.data.default.pitch.max}
+						step={this.props.data.default.pitch.stepSize}
+						defaultValue={this.state.pitch}
+						handleChange={this.updatePitch.bind(this)}
+					/>
+					<br/>
+					<div className={'d-none d-lg-block'}>
+					<Keyboard 
+						updateKeyPressed={this.updateKeyPressed.bind(this)}
+					/>
+					</div>
+				</div>
     }
 
     return (

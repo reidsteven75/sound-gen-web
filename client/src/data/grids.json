@@ -1,0 +1,86 @@
+[
+  {
+    "id": "grid_1",
+    "name": "Grid 1",
+    "fileUrl": {
+      "storagePath": "https://storage.googleapis.com",
+      "bucket": "augmented-music-generation-dev",
+      "folderPath": "/latent_grids/test",
+      "gridName": "cleaned_grid_v3"
+    },
+    "labels": [
+        {
+          "name": "Strings",
+          "position": "NW"
+        },
+        {
+          "name": "Bells",
+          "position": "NE"
+        },
+        {
+          "name": "Synth",
+          "position": "SW"
+        },
+        {
+          "name": "Guitar",
+          "position": "SE"
+        }
+      ]
+  },
+  {
+    "id": "grid_4",
+    "name": "Grid 4",
+    "fileUrl": {
+      "storagePath": "https://storage.googleapis.com",
+      "bucket": "augmented-music-generation-dev",
+      "folderPath": "/latent_grids/grid_4",
+      "gridName": "cleaned_grid_v4"
+    },
+    "labels": [
+        {
+          "name": "Organ",
+          "position": "NW"
+        },
+        {
+          "name": "Mallet",
+          "position": "NE"
+        },
+        {
+          "name": "Balafon",
+          "position": "SW"
+        },
+        {
+          "name": "Synth",
+          "position": "SE"
+        }
+      ]
+  },
+  {
+    "id": "grid_2",
+    "name": "Grid 2",
+    "fileUrl": {
+      "storagePath": "https://storage.googleapis.com",
+      "bucket": "augmented-music-generation-dev",
+      "folderPath": "/latent_grids/grid_2",
+      "gridName": "cleaned_grid_v2"
+    },
+    "labels": [
+        {
+          "name": "Clarinet",
+          "position": "NW"
+        },
+        {
+          "name": "Bells",
+          "position": "NE"
+        },
+        {
+          "name": "Organ",
+          "position": "SW"
+        },
+        {
+          "name": "Strings",
+          "position": "SE"
+        }
+      ]
+  }
+]

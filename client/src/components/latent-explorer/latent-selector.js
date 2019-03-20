@@ -46,10 +46,6 @@ class LatentSelector extends Component {
 			circleRadius: 30,
 			isMoving: false,
 			sentLastPos: false,
-			soundNW: '',
-			soundNE: '',
-			soundSW: '',
-			soundSE: '',
 			isActive: false,								// when mouse is down or touch is happening
 			hasBeenActivated: false 				// prevents initial sounds until user initiates sound 
 		}
@@ -66,7 +62,7 @@ class LatentSelector extends Component {
 			})
 		}
 	  if (this.state.sentLastPos !== true) {
-			this.props.updateLatentSelector({
+			this.props.changeHandler({
 				x: this.state.currentPercentX,
 				y: this.state.currentPercentY,
 				hasBeenActivated: this.state.hasBeenActivated
@@ -121,16 +117,6 @@ class LatentSelector extends Component {
 
 		this.p5.resizeCanvas(this.state.canvasWidth, this.state.canvasHeight)
 		this.p5.redraw()
-	}
-
-	updateSounds() {
-		const sounds = this.props.sounds
-		this.setState({
-			soundNW: sounds.find(sound => sound.position === 'NW') || {name: this.state.notConfiguredText},
-			soundNE: sounds.find(sound => sound.position === 'NE') || {name: this.state.notConfiguredText},
-			soundSW: sounds.find(sound => sound.position === 'SW') || {name: this.state.notConfiguredText},
-			soundSE: sounds.find(sound => sound.position === 'SE') || {name: this.state.notConfiguredText},
-		})
 	}
 
 	initP5(sk) {
@@ -238,7 +224,6 @@ class LatentSelector extends Component {
 		setTimeout(() => {
 			this.s = (sk) => {  
 				this.sk = sk
-				this.updateSounds()
 				this.updateCanvasSize()
 				this.initP5()
 			}
@@ -258,8 +243,8 @@ class LatentSelector extends Component {
 		let content = 
 			<div>
 				<Grid container spacing={24} >
-					<Grid item xs={6} style={style.soundLeft}>{this.state.soundNW.name}</Grid>
-					<Grid item xs={6} style={style.soundRight}>{this.state.soundNE.name}</Grid>
+					<Grid item xs={6} style={style.soundLeft}>{this.props.labelNW.name}</Grid>
+					<Grid item xs={6} style={style.soundRight}>{this.props.labelNE.name}</Grid>
 				</Grid>
 				<Grid container spacing={24} >
 					<Grid item xs={12}>
@@ -274,8 +259,8 @@ class LatentSelector extends Component {
 					</Grid>	
 				</Grid>
 				<Grid container spacing={24} >
-					<Grid item xs={6} style={style.soundLeft}>{this.state.soundSW.name}</Grid>
-					<Grid item xs={6} style={style.soundRight}>{this.state.soundSE.name}</Grid>
+					<Grid item xs={6} style={style.soundLeft}>{this.props.labelSW.name}</Grid>
+					<Grid item xs={6} style={style.soundRight}>{this.props.labelSE.name}</Grid>
 				</Grid>
 			</div>
 

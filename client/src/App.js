@@ -10,21 +10,16 @@ import LatentExplorer from './components/latent-explorer/index'
 // data
 import latentSpaces from './data/latent-spaces.json'
 import pitches from './data/pitches.json'
-import sounds from './data/sounds.json'
+import grids from './data/grids.json'
 
 import './App.css'
 
 var data = {
   latentSpaces: latentSpaces,
   pitches: pitches,
-  sounds: sounds[1],
-  fileUrl: {
-    storagePath: 'https://storage.googleapis.com',
-    bucket: 'augmented-music-generation-dev',
-    folderPath: '/latent_grids/grid_4',
-    gridName: 'cleaned_grid_v4'
-  },
+  grids: grids,
   default: {
+    selectedGridId: 'grid_1',
     pitch: {
       value: 40,
       min: 36,
@@ -55,7 +50,6 @@ const theme = createMuiTheme({
 
 
 class App extends Component {
-
   render() {
     return (
       <MuiThemeProvider theme={theme}>

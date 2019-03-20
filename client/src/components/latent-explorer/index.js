@@ -8,6 +8,7 @@ import withWidth from '@material-ui/core/withWidth'
 
 import PitchSlider from './pitch-slider'
 import Keyboard from './keyboard'
+import GridSelector from './grid-selector'
 import LatentSelector from './latent-selector'
 
 const style = {
@@ -19,7 +20,7 @@ const style = {
 
 class LatentExplorer extends Component {
 
-	initPlayer() {
+	loadPlayer() {
 		// timeout makes initial loading animation smoother
 		setTimeout(() => {
 			this.players = new Tone.Players(this.soundUrls, () => {
@@ -37,31 +38,64 @@ class LatentExplorer extends Component {
 			latentRatioNE: 0,
 			latentRatioSW: 0,
 			latentRatioSE: 0,
-			pitch: 0,
+			labelNW: '',
+			labelNE: '',
+			labelSW: '',
+			labelSE: '',
+			pitch: null,
+			selectedGrid: null
 		}
 
-		this.initPlayer = this.initPlayer.bind(this)
+		this.loadPlayer = this.loadPlayer.bind(this)
+		this.soundUrls = {}
+
+	}
+
+	loadGrid() {
+		const selectedGridId = this.state.selectedGridId
+		const selectedGrid = this.props.data.grids.find(grid => selectedGridId === grid.id)
+
+		if (selectedGrid) {
+			this.setState({
+				selectedGrid: selectedGrid,
+				labelNW: selectedGrid.labels.find(label => label.position === 'NW') || {name: this.state.notConfiguredText},
+				labelNE: selectedGrid.labels.find(label => label.position === 'NE') || {name: this.state.notConfiguredText},
+				labelSW: selectedGrid.labels.find(label => label.position === 'SW') || {name: this.state.notConfiguredText},
+				labelSE: selectedGrid.labels.find(label => label.position === 'SE') || {name: this.state.notConfiguredText},
+			}, () => {
+				this.downloadSoundFiles()
+				this.loadPlayer()
+			})
+		}	
+	}
+
+	downloadSoundFiles() {
+
+		const selectedGrid = this.state.selectedGrid
+		const latentSpaces = this.props.data.latentSpaces
+		const baseUrl = `${selectedGrid.fileUrl.storagePath}/${selectedGrid.fileUrl.bucket}`
 
 		this.soundUrls = {}
-	}
-	
-
-  componentDidMount() {
-		const latentSpaces = this.props.data.latentSpaces
-		const baseUrl = `${this.props.data.fileUrl.storagePath}/${this.props.data.fileUrl.bucket}`
-
-		this.setState({pitch: this.props.data.default.pitch.value})
 
 		latentSpaces.forEach((latentSpace) => {
 			// get urls for each sound
 			this.props.data.pitches.forEach((pitch) => {
 				const name = `${latentSpace}_pitch_${pitch.value}`
-				const fileUrl = `${baseUrl}${this.props.data.fileUrl.folderPath}/${this.props.data.fileUrl.gridName}_${name}_vel_127.mp3`
+				const fileUrl = `${baseUrl}${selectedGrid.fileUrl.folderPath}/${selectedGrid.fileUrl.gridName}_${name}_vel_127.mp3`
 				this.soundUrls[name] = fileUrl	
 			})	
 		})
 
-		this.initPlayer()
+	}
+	
+
+  componentDidMount() {
+		this.setState({
+			pitch: this.props.data.default.pitch.value,
+			selectedGridId: this.props.data.default.selectedGridId
+		}, () => {
+			this.loadGrid()
+		})
 	}
 
 	updatePitch(data) {
@@ -72,8 +106,8 @@ class LatentExplorer extends Component {
 		})
 	}
 
-	playSound() {
-		const pitch = this.state.pitch
+	playSound(pitchValue) {
+		const pitch = pitchValue || this.state.pitch
 		const latentSpace = `${this.state.latentRatioNW}`
 													+ `_${this.state.latentRatioNE}`
 													+ `_${this.state.latentRatioSW}`
@@ -96,13 +130,17 @@ class LatentExplorer extends Component {
 		// console.log("key:"+data.key, "pitch:"+pitch, active)
 
 		if (active === true) { 
-			this.setState(
-				{ pitch: pitch }, 
-			() => {
-				this.playSound()
-			})
+			this.playSound(pitch)
 		}
-  }
+	}
+	
+	updateGridSelector(data) {
+		this.setState({
+			selectedGridId: data.value
+		}, () => {
+			this.loadGrid()
+		})
+	}
 
   updateLatentSelector(data) {
     const x = parseFloat(data.x).toFixed(1)
@@ -174,9 +212,17 @@ class LatentExplorer extends Component {
     else {
       content = 
 				<div>
+					<GridSelector 
+						changeHandler={this.updateGridSelector.bind(this)}
+						defaultValue={this.props.data.default.selectedGrid}
+						options={this.props.data.grids}
+					/>
 					<LatentSelector 
-						updateLatentSelector={this.updateLatentSelector.bind(this)}
-						sounds={this.props.data.sounds}
+						changeHandler={this.updateLatentSelector.bind(this)}
+						labelNW={this.state.labelNW}
+						labelNE={this.state.labelNE}
+						labelSE={this.state.labelSE}
+						labelSW={this.state.labelSW}
 					/>
 					<br/>
 					<PitchSlider

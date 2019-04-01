@@ -4,8 +4,10 @@
   "description": "",
   "main": "server.js",
   "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "client": "node start-client.js",
+    "server": "nodemon server.js --ignore node_modules --ignore client",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "local": "nodemon server.js --ignore node_modules",
     "local-mock-data": "MOCK_DATA=true nodemon server.js --ignore node_modules"
   },
   "author": "",
@@ -21,6 +23,7 @@
     "socket.io": "^2.2.0"
   },
   "devDependencies": {
+    "concurrently": "^4.1.0",
     "nodemon": "^1.18.9"
   }
 }

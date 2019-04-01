@@ -5,9 +5,9 @@ Init Local
 $ npm install --only=dev
 ```
 
-Run Local
+Dev Locally
 ```
-$ npm run local
+$ npm run dev
 ```
 
 Cloud Cors

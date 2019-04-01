@@ -1,7 +1,7 @@
 [
   {
     "id": "grid_1",
-    "name": "Grid 1",
+    "name": "#1: Strings, Bells, Synth, Guitar",
     "fileUrl": {
       "storagePath": "https://storage.googleapis.com",
       "bucket": "augmented-music-generation-dev",
@@ -29,7 +29,7 @@
   },
   {
     "id": "grid_4",
-    "name": "Grid 4",
+    "name": "#2: Organ, Mallet, Balafon, Synth",
     "fileUrl": {
       "storagePath": "https://storage.googleapis.com",
       "bucket": "augmented-music-generation-dev",
@@ -57,7 +57,7 @@
   },
   {
     "id": "grid_2",
-    "name": "Grid 2",
+    "name": "#3: Clarinet, Bells, Organ, Strings",
     "fileUrl": {
       "storagePath": "https://storage.googleapis.com",
       "bucket": "augmented-music-generation-dev",

@@ -20,19 +20,11 @@ const style = {
 
 class LatentExplorer extends Component {
 
-	loadPlayer() {
-		// timeout makes initial loading animation smoother
-		setTimeout(() => {
-			this.players = new Tone.Players(this.soundUrls, () => {
-				this.setState({loading:false})
-			}).toMaster()	
-		}, 500)
-	}
-
   constructor(props) {
     super(props)
     this.state = {
-      loading: true,
+			loading: true,
+			latentSpaceLoading: false, 
 			serverError: false,
 			latentRatioNW: 0,
 			latentRatioNE: 0,
@@ -54,6 +46,8 @@ class LatentExplorer extends Component {
 	loadGrid() {
 		const selectedGridId = this.state.selectedGridId
 		const selectedGrid = this.props.data.grids.find(grid => selectedGridId === grid.id)
+
+		this.setState({latentSpaceLoading: true})
 
 		if (selectedGrid) {
 			this.setState({
@@ -87,7 +81,16 @@ class LatentExplorer extends Component {
 		})
 
 	}
-	
+
+	loadPlayer() {
+		// timeout makes initial loading animation smoother
+		setTimeout(() => {
+			this.players = new Tone.Players(this.soundUrls, () => {
+				this.setState({loading:false})
+				this.setState({latentSpaceLoading: false})
+			}).toMaster()	
+		}, 500)
+	}
 
   componentDidMount() {
 		this.setState({
@@ -214,11 +217,13 @@ class LatentExplorer extends Component {
 				<div>
 					<GridSelector 
 						changeHandler={this.updateGridSelector.bind(this)}
-						defaultValue={this.props.data.default.selectedGrid}
+						defaultValue={this.props.data.default.selectedGridId}
 						options={this.props.data.grids}
 					/>
+					<br/>
 					<LatentSelector 
 						changeHandler={this.updateLatentSelector.bind(this)}
+						loading={this.state.latentSpaceLoading}
 						labelNW={this.state.labelNW}
 						labelNE={this.state.labelNE}
 						labelSE={this.state.labelSE}

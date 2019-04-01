@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import * as p5 from 'p5'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
+import CircularProgress from '@material-ui/core/CircularProgress'
 import Grid from '@material-ui/core/Grid'
 
 const style = {
@@ -9,8 +10,18 @@ const style = {
 		maxWidth: 700,
 		margin: 'auto'
 	},
+	loading: {
+		position: 'relative',
+		top: -220
+	},
 	sketchArea: {
 		border: '1px solid white',
+		maxWidth: 600,
+		height: 400,
+		margin: 'auto'
+	},
+	sketchAreaLoading: {
+		border: '1px dashed black',
 		maxWidth: 600,
 		height: 400,
 		margin: 'auto'
@@ -169,9 +180,7 @@ class LatentSelector extends Component {
 
 			// animate circle
 			for (var i = 0; i <this.state.circleRadius; i += colorIncrement ) {
-
 				if (this.state.isMoving === true) { 
-
 					colorIntensity = Math.floor(Math.random() * 5 * Math.max(Math.abs(dx),Math.abs(dy))) 
 					colorIncrement = 2
 					this.sk.stroke(37 + colorIntensity, 175 + colorIntensity, 180 + colorIntensity)
@@ -184,12 +193,15 @@ class LatentSelector extends Component {
 				}
 			
 				this.sk.noFill()
-				this.sk.ellipse(
-					this.state.currentPosX,
-					this.state.currentPosY,
-					i,
-					i
-				)
+				if (this.props.loading !== true) {
+					this.sk.ellipse(
+						this.state.currentPosX,
+						this.state.currentPosY,
+						i,
+						i
+					)
+				}
+			
 			}		
 		}
 	}
@@ -240,34 +252,40 @@ class LatentSelector extends Component {
 
   render() {
 
+		let loading
+    if (this.props.loading === true) {
+			loading = <CircularProgress style={style.loading} />
+    }
+
 		let content = 
 			<div>
 				<Grid container spacing={24} >
-					<Grid item xs={6} style={style.soundLeft}>{this.props.labelNW.name}</Grid>
-					<Grid item xs={6} style={style.soundRight}>{this.props.labelNE.name}</Grid>
+					<Grid item xs={6} style={style.soundLeft}>{this.props.loading ? '-' : this.props.labelNW.name}</Grid>
+					<Grid item xs={6} style={style.soundRight}>{this.props.loading ? '-' : this.props.labelNE.name}</Grid>
 				</Grid>
 				<Grid container spacing={24} >
 					<Grid item xs={12}>
 						<div 
 							id='sketch-area' 
 							ref={this.sketchRef}
-							style={style.sketchArea}
+							style={this.props.loading ? style.sketchAreaLoading : style.sketchArea}
 							onMouseDown={this.handleMouseDown.bind(this)}
 							onMouseUp={this.handleMouseUp.bind(this)}
 						>
+							{loading}
 						</div>
 					</Grid>	
 				</Grid>
 				<Grid container spacing={24} >
-					<Grid item xs={6} style={style.soundLeft}>{this.props.labelSW.name}</Grid>
-					<Grid item xs={6} style={style.soundRight}>{this.props.labelSE.name}</Grid>
+					<Grid item xs={6} style={style.soundLeft}>{this.props.loading ? '-' : this.props.labelSW.name}</Grid>
+					<Grid item xs={6} style={style.soundRight}>{this.props.loading ? '-' : this.props.labelSE.name}</Grid>
 				</Grid>
 			</div>
 
       
     return (
         <div style={style.wrapper}>
-          {content}
+					{content}
         </div>
     )
   }

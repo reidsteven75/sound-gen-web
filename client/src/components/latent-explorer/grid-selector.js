@@ -14,7 +14,7 @@ const style = {
   formControl: {
     margin: 'auto',
     padding: 5,
-    minWidth: 120,
+    width: 350,
   },
   select: {
     color:'white',

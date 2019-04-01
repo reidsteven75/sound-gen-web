@@ -31,6 +31,7 @@ var data = {
 
 const theme = createMuiTheme({
   palette: {
+    type: 'dark',
     primary: {
       light: blue[300],
       main: blue[500],

@@ -7,8 +7,7 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "client": "node start-client.js",
     "server": "nodemon server.js --ignore node_modules --ignore client",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "local-mock-data": "MOCK_DATA=true nodemon server.js --ignore node_modules"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",

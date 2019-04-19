@@ -10,6 +10,7 @@ import PitchSlider from './pitch-slider'
 import Keyboard from './keyboard'
 import GridSelector from './grid-selector'
 import LatentSelector from './latent-selector'
+import PlaySound from './play-sound'
 
 const style = {
   content: {
@@ -236,6 +237,11 @@ class LatentExplorer extends Component {
 						step={this.props.data.default.pitch.stepSize}
 						defaultValue={this.state.pitch}
 						handleChange={this.updatePitch.bind(this)}
+					/>
+					<br/>
+					<PlaySound 
+						playSound={this.playSound.bind(this)}
+						playTimeout={500}
 					/>
 					<br/>
 					<Hidden xsDown>

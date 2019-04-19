@@ -17,13 +17,13 @@ const style = {
 	sketchArea: {
 		border: '1px solid white',
 		maxWidth: 600,
-		height: 400,
+		height: 300,
 		margin: 'auto'
 	},
 	sketchAreaLoading: {
 		border: '1px dashed black',
 		maxWidth: 600,
-		height: 400,
+		height: 300,
 		margin: 'auto'
 	},
 	soundLeft: {

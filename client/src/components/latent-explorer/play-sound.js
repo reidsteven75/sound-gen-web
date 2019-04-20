@@ -10,17 +10,19 @@ const style = {
 
   },
   inactive: {
+    height: 60,
     minWidth: 300,
 		maxWidth: 600,
 		border: '1px solid ' + teal['A400']
 	},
 	active: {
+    height: 60,
     minWidth: 300,
     maxWidth: 600,
     color: 'white',
 		background: teal['A700'],
 		border: '1px solid ' + teal['A400']
-	}
+  }
 }
 
 class PlaySound extends Component {
@@ -52,7 +54,7 @@ class PlaySound extends Component {
 				size={"small"}
 				onClick={this.handlePlay.bind(this)}
 			>
-				{this.state.isActive ? <PlayArrow/> : <PlayArrow/> }
+				<PlayArrow/>
 			</Button>
 
     return (

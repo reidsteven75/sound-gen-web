@@ -13,7 +13,7 @@ const style = {
     height: 60,
     minWidth: 300,
 		maxWidth: 600,
-		border: '1px solid ' + teal['A400']
+    border: '1px solid ' + teal['A400']
 	},
 	active: {
     height: 60,

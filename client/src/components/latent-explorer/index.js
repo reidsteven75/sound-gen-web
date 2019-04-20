@@ -216,12 +216,14 @@ class LatentExplorer extends Component {
     else {
       content = 
 				<div>
-					<GridSelector 
-						changeHandler={this.updateGridSelector.bind(this)}
-						defaultValue={this.props.data.default.selectedGridId}
-						options={this.props.data.grids}
-					/>
-					<br/>
+					<Hidden xsDown>
+						<GridSelector 
+							changeHandler={this.updateGridSelector.bind(this)}
+							defaultValue={this.props.data.default.selectedGridId}
+							options={this.props.data.grids}
+						/>
+						<br/>
+					</Hidden>
 					<LatentSelector 
 						changeHandler={this.updateLatentSelector.bind(this)}
 						loading={this.state.latentSpaceLoading}

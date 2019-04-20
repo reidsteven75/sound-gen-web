@@ -11,14 +11,12 @@ const style = {
   },
   inactive: {
     height: 60,
-    minWidth: 300,
-		maxWidth: 600,
+    width: 300,
     border: '1px solid ' + teal['A400']
 	},
 	active: {
     height: 60,
-    minWidth: 300,
-    maxWidth: 600,
+    width: 300,
     color: 'white',
 		background: teal['A700'],
 		border: '1px solid ' + teal['A400']
@@ -43,7 +41,22 @@ class PlaySound extends Component {
         this.setState({isActive: false})
       }, this.props.playTimeout)
     }
+  }
+
+  handleKeyDown(e) {
+    // spacebar = 32
+		if (e.keyCode === 32) {
+			this.handlePlay()
+		}
 	}
+  
+  componentDidMount(){
+		document.addEventListener("keydown", this.handleKeyDown.bind(this), false)
+
+  }
+  componentWillUnmount(){
+		document.removeEventListener("keydown", this.handleKeyDown.bind(this), false)
+  }
 
   render() {
 

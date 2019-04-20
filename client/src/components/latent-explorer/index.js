@@ -145,7 +145,9 @@ class LatentExplorer extends Component {
   updateLatentSelector(data) {
     const x = parseFloat(data.x).toFixed(1)
 		const y = parseFloat(data.y).toFixed(1)
-		const hasBeenActivated = data.hasBeenActivated
+		// de-activated for now
+			// --------------------
+		// const hasBeenActivated = data.hasBeenActivated
 
 		var latentSpace = [
 			Math.round( 10 * (1-x)*(1-y) ) / 10,
@@ -183,7 +185,9 @@ class LatentExplorer extends Component {
 				latentRatioSW: latentSpace[2],
 				latentRatioSE: latentSpace[3]
 			}, () => {
-			if (hasBeenActivated === true) { this.playSound() }
+			// de-activated for now
+			// --------------------
+			// if (hasBeenActivated === true) { this.playSound() }
 		})
 
 		// console.log(

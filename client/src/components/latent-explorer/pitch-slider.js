@@ -12,7 +12,7 @@ const style = {
   slider: {
     padding: '22px 0px',
     margin: 'auto',
-    maxWidth: 600,
+    width: 300,
     touchAction: 'none'
   },
   label: {

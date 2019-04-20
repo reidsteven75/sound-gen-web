@@ -103,11 +103,7 @@ class LatentExplorer extends Component {
 	}
 
 	updatePitch(data) {
-		this.setState(
-			{ pitch: data.pitch }, 
-		() => {
-			this.playSound()
-		})
+		this.setState({ pitch: data.pitch })
 	}
 
 	playSound(pitchValue) {

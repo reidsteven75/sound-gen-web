@@ -23,7 +23,6 @@ with open('config.json', 'r') as infile:
 def compute_embeddings():
 	subprocess.check_call(["nsynth_save_embeddings", 
 		"--checkpoint_path=%s/model.ckpt-200000" % settings['checkpoint_dir'], 
-		"--sample_length=100",
 		"--source_path=audio_input", 
 		"--save_path=embeddings_input", 
 		"--batch_size=32"])
@@ -107,7 +106,7 @@ def gen_call(gpu):
 		"--source_path=embeddings_batched/batch%i" % gpu,
 		"--save_path=audio_output/batch%i" % gpu,
 		"--sample_length=100",
-		"--npy_only=true",
+		"--encodings=true",
 		"--log=INFO",
 		"--batch_size=512"])
 

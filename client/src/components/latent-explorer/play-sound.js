@@ -28,8 +28,7 @@ class PlaySound extends Component {
   constructor(props) {
     super(props)
     this.state = {
-			isActive: false,
-			color: 'default'
+			isActive: false
 		}
 	}
 

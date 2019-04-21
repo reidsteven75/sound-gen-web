@@ -11,6 +11,7 @@ import Keyboard from './keyboard'
 import GridSelector from './grid-selector'
 import LatentSelector from './latent-selector'
 import PlaySound from './play-sound'
+import DownloadSound from './download-sound'
 
 const style = {
   content: {
@@ -106,21 +107,33 @@ class LatentExplorer extends Component {
 		this.setState({ pitch: data.pitch })
 	}
 
-	playSound(pitchValue) {
+	getCurrentSound(pitchValue) {
 		const pitch = pitchValue || this.state.pitch
 		const latentSpace = `${this.state.latentRatioNW}`
-													+ `_${this.state.latentRatioNE}`
-													+ `_${this.state.latentRatioSW}`
-													+ `_${this.state.latentRatioSE}`
+												+ `_${this.state.latentRatioNE}`
+												+ `_${this.state.latentRatioSW}`
+												+ `_${this.state.latentRatioSE}`
+		const currentSound = latentSpace + '_pitch_' + pitch
+
+		return currentSound
+	}
+
+	downloadSound() {
+		const currentSound = this.getCurrentSound()
+		const soundUrl = this.soundUrls[currentSound]
+		window.open(soundUrl, '_blank')
+	}
+
+	playSound(pitchValue) {
+		const currentSound = this.getCurrentSound(pitchValue)
 
 		if (this.players) {
-			const playerName = latentSpace + '_pitch_' + pitch
-			const player = this.players.get(playerName)
+			const player = this.players.get(currentSound)
 			if (player) {
 				try { player.start() }
-				catch(err) { console.log('error playing sound: ' + playerName) }
+				catch(err) { console.log('error playing sound: ' + currentSound) }
 			}
-			else { console.log('does not exist: ' + playerName) }
+			else { console.log('does not exist: ' + currentSound) }
 		}
 	}
 	
@@ -216,6 +229,10 @@ class LatentExplorer extends Component {
     else {
       content = 
 				<div>
+					<DownloadSound 
+						downloadSound={this.downloadSound.bind(this)}
+					/>
+					<br/>
 					<Hidden xsDown>
 						<GridSelector 
 							changeHandler={this.updateGridSelector.bind(this)}

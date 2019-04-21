@@ -8,7 +8,7 @@
 
 	"checkpoint_dir":"/storage/wavenet-ckpt",
 	"pitches":   	[24],
-	"resolution": 	2,
+	"resolution": 	4,
 	"final_length": 640,
     "gpus": 		1,
     "name":         "funk_grid"

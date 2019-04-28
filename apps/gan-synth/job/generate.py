@@ -14,7 +14,7 @@ if os.environ['ARTIFACTS_DIR']:
 checkpoint_dir = storage_dir + '/all-instruments'
 checkpoint_zip_file = storage_dir + '/all-instruments.zip'
 output_dir = artifacts_dir
-midi_file = os.getcwd() + '/input/sample.mid'
+midi_file = os.getcwd() + '/input/sample.mp3'
 
 def init():
 	print("compute: %s" %(os.environ['COMPUTE_TYPE']))
@@ -38,7 +38,7 @@ def generate():
 	subprocess.call(['gansynth_generate', 
 									'-ckpt_dir=%s' %(checkpoint_dir),
 									'--output_dir=%s' %(output_dir),
-									'--midi_file=%s' %(midi_file),
+									# '--midi_file=%s' %(midi_file),
 								])
 
 if __name__ == "__main__":
@@ -50,7 +50,5 @@ if __name__ == "__main__":
 	print("-------------------")
 	print("generating sound...")
 	generate()
-	print("-------------------")
 	print("generated")
 	print("-------------------")
-	print(os.listdir(output_dir))

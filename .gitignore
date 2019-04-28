@@ -4,20 +4,13 @@
 # Log files.
 *.log
 
-# Sensitive data
-local_only
-
-# Storage
-# this replicates paperspace's storage so local dev can happen
-# folder and files should be generated & downloaded on init
-storage
-
-# Audio files
-app/aif_bkp
-app/audio_input
-app/embeddings_input
-app/working_dir
-app/artifacts
-
-#OSX hidden metadata file
+# OSX hidden metadata file
 .DS_Store
+
+# specific directories
+find-better-places-for-these
+
+# checkpoints
+**/storage/*
+
+

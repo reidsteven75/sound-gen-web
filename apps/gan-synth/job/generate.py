@@ -4,11 +4,11 @@ import sys
 import zipfile
 
 storage_dir = '/storage'
-if "STORAGE_DIR" in os.environ:
+if os.environ['STORAGE_DIR']:
 	storage_dir = os.environ['STORAGE_DIR']
 
 artifacts_dir = '/artifacts'
-if "ARTIFACTS_DIR" in os.environ:
+if os.environ['ARTIFACTS_DIR']:
 	artifacts_dir = os.environ['ARTIFACTS_DIR']
 
 checkpoint_dir = storage_dir + '/all-instruments'
@@ -38,7 +38,7 @@ def generate():
 	subprocess.call(['gansynth_generate', 
 									'-ckpt_dir=%s' %(checkpoint_dir),
 									'--output_dir=%s' %(output_dir),
-									# '--midi_file=%s' %(midi_file),
+									'--midi_file=%s' %(midi_file),
 								])
 
 if __name__ == "__main__":

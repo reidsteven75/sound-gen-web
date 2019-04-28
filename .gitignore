@@ -8,7 +8,8 @@
 .DS_Store
 
 # specific directories
-find-better-places-for-these
+find-better-places-for-these/
+.ps_project/
 
 # checkpoints
 **/storage/*

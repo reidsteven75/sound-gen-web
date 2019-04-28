@@ -2,6 +2,6 @@
 
 paperspace jobs create \
     --machineType 'GPU+' \
-    --container 'reidsteven75/sound-generation:latest'\
+    --container 'reidsteven75/sound-gen-gan-synth:latest'\
     --command "ENV='paperspace' python generate.py"\
-    --workspace './app-test'
+    --workspace './job'

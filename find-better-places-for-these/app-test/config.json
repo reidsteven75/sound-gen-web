@@ -6,10 +6,10 @@
 		"SE": 		["hoxhit"]
 	},
 
-	"checkpoint_dir":"/storage/wavenet-ckpt",
+	"checkpoint_dir":"/storage/checkpoints/wavenet-ckpt",
 	"pitches":   	[24],
-	"resolution": 	4,
-	"final_length": 640,
+	"resolution": 	9,
+	"final_length": 64000,
     "gpus": 		1,
     "name":         "funk_grid"
 }

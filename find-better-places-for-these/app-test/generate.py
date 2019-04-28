@@ -10,6 +10,9 @@ from itertools import product
 from os.path import basename
 from utils import *
 
+# Out of memory error
+# - nsynth generate needs sample length cut down to avoid this
+
 env = os.environ['ENV']
 
 #	preserve the working directory path
@@ -21,7 +24,7 @@ with open('config.json', 'r') as infile:
   settings = json.load(infile)
 
 def compute_embeddings():
-	subprocess.check_call(["nsynth_save_embeddings", 
+	subprocess.call(["nsynth_save_embeddings", 
 		"--checkpoint_path=%s/model.ckpt-200000" % settings['checkpoint_dir'], 
 		"--source_path=audio_input", 
 		"--save_path=embeddings_input", 
@@ -143,7 +146,6 @@ if __name__ == "__main__":
 	print "ENV: " + env
 	print "source_dir: " + source_dir
 	print "=================="  
-	time.sleep(1)
 
 	print "Computing input embeddings"
 	print "==================" 
@@ -159,7 +161,6 @@ if __name__ == "__main__":
 
 	print "Generate Audio"
 	print "==================" 
-	# generate_audio()
 	generate_audio()
 
 	print "Done"

@@ -1,5 +1,10 @@
 # Dev
 
+Run docker locally
+```
+docker-compose up --build
+```
+
 Run scripts from root folder
 
 Init locally
@@ -31,6 +36,19 @@ Data Storage
 https://support.paperspace.com/hc/en-us/articles/360001480494-Gradient-Storage-Overview
 - use paperspace persistant storage
 - access this by using the jupiter notebook on paperspace and go to /storage dir
+
+# Deployment 
+Deployed as a docker container which is pulled down in Paperspace jobs and uses checkpoints of AI models.
+
+1) Deploy Docker
+$ ./deploy-docker.sh
+
+2) Deploy Checkpoint
+Checkpoints are accessed through the Paperspace 'storage' directory, which can be accessed on Paperspace in the 'Notebooks' section under the container named 'COMMON STORAGE'. The 'storage' directory is common accross all jobs running on Paperspace.
+
+3) Deploy Job
+$ ./deploy-job.sh
+
 
 # Paperspace (cloud GPU on demand)
 CLI

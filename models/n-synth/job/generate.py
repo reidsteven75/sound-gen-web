@@ -139,7 +139,7 @@ def gen_call(gpu):
 		"--checkpoint_path=%s/model.ckpt-200000" %(checkpoint_dir),
 		"--source_path=embeddings_batched/batch%i" % gpu,
 		"--save_path=audio_output/batch%i" % gpu,
-		"--sample_length=100",
+		"--sample_length=32000",
 		"--encodings=true",
 		"--log=INFO",
 		"--batch_size=512"])

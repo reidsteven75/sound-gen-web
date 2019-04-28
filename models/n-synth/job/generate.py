@@ -10,23 +10,54 @@ from itertools import product
 from os.path import basename
 from utils import *
 
-# Out of memory error
-# - nsynth generate needs sample length cut down to avoid this
-
-env = os.environ['ENV']
-
-#	preserve the working directory path
-source_dir = os.getcwd()
+import sys
+import zipfile
 
 #  load the config file
 settings = None
 with open('config.json', 'r') as infile:
   settings = json.load(infile)
 
+storage_dir = '/storage'
+if os.environ['STORAGE_DIR']:
+	storage_dir = os.environ['STORAGE_DIR']
+
+artifacts_dir = '/artifacts'
+if os.environ['ARTIFACTS_DIR']:
+	artifacts_dir = os.environ['ARTIFACTS_DIR']
+
+checkpoint_dir = storage_dir + '/%s' %(settings['checkpoint_name'])
+checkpoint_zip_file = storage_dir + '/%s.zip' %(settings['checkpoint_name'])
+output_dir = artifacts_dir
+
+# Out of memory error
+# - nsynth generate needs sample length cut down to avoid this
+
+#	preserve the working directory path
+source_dir = os.getcwd()
+
+def init():
+	print("compute: %s" %(os.environ['COMPUTE_TYPE']))
+	print("python version: %s" %(sys.version))
+	print("storage: %s" %(storage_dir))
+	print("artifacts: %s" %(artifacts_dir))
+	if (os.path.isdir(checkpoint_dir)):
+		print ("checkpoint already extracted")
+
+	else:
+		print("extracting checkpoint...")
+
+		zip_ref = zipfile.ZipFile(checkpoint_zip_file, 'r')
+		zip_ref.extractall(storage_dir)
+		zip_ref.close()
+
+		print("extracted")
+		print(os.listdir(checkpoint_dir))
+
 def compute_embeddings():
 	subprocess.call(["nsynth_save_embeddings", 
-		"--checkpoint_path=%s/model.ckpt-200000" % settings['checkpoint_dir'], 
-		"--source_path=audio_input", 
+		"--checkpoint_path=%s/model.ckpt-200000" %(checkpoint_dir), 
+		"--source_path=input", 
 		"--save_path=embeddings_input", 
 		"--batch_size=32"])
 
@@ -105,7 +136,7 @@ def batch_embeddings():
 
 def gen_call(gpu):
 	return subprocess.call(["nsynth_generate",
-		"--checkpoint_path=%s/model.ckpt-200000" % settings['checkpoint_dir'],
+		"--checkpoint_path=%s/model.ckpt-200000" %(checkpoint_dir),
 		"--source_path=embeddings_batched/batch%i" % gpu,
 		"--save_path=audio_output/batch%i" % gpu,
 		"--sample_length=100",
@@ -119,48 +150,45 @@ def generate_audio():
 	results = pool.map_async(gen_call, range(settings['gpus']))
 	time.sleep(5)
 	pbar = tqdm(total=sum([len(os.listdir('embeddings_batched/batch%s'%(i))) for i in range(settings['gpus'])]))
-	# pbar = tqdm(len(os.listdir('embeddings_output')))
+	pbar = tqdm(len(os.listdir('embeddings_output')))
 	pbar.set_description("Number of files for which processing has started")
 	while not results.ready():
 		num_files = sum([len(os.listdir('audio_output/batch%s' %(i))) for i in range(settings['gpus'])])
-		# num_files = len(os.listdir('audio_output'))
+		num_files = len(os.listdir('audio_output'))
 		pbar.update(num_files - pbar.n)
 		time.sleep(1)
 	pbar.close()
 	pool.close()
 	pool.join()
 
-	dest = '/artifacts/audio_output/'
-	if not os.path.exists(dest):
-		os.mkdir(dest)
-
 	for i in range(0, settings['gpus']):
 		source = 'audio_output/batch%i/' % i
 		files = os.listdir(source)
 		for f in files:
-			shutil.move(source + f, dest)
+			shutil.move(source + f, output_dir)
 	
 
 if __name__ == "__main__":
-	print "=================="
-	print "ENV: " + env
-	print "source_dir: " + source_dir
-	print "=================="  
+	print("============================")
+	print("N-SYNTH")
+	print("-------------------")
+	print("initializing...")
+	init()
 
-	print "Computing input embeddings"
-	print "==================" 
+	print("-------------------")
+	print("Computing input embeddings...")
 	compute_embeddings()
 
-	print "Computing new embeddings"
-	print "==================" 
+	print("-------------------")
+	print("Computing new embeddings...")
 	compute_new_embeddings()
 
-	print "Batch embeddings"
-	print "==================" 
+	print("-------------------")
+	print("Batching embeddings...")
 	batch_embeddings()
 
-	print "Generate Audio"
-	print "==================" 
+	print("-------------------")
+	print("Generating sounds...")
 	generate_audio()
 
-	print "Done"
+	print("Done")

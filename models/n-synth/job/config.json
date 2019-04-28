@@ -5,8 +5,7 @@
 		"SW": 		["synthbass"],
 		"SE": 		["hoxhit"]
 	},
-
-	"checkpoint_dir":"/storage/checkpoints/wavenet-ckpt",
+	"checkpoint_name": "wavenet-ckpt",
 	"pitches":   	[24],
 	"resolution": 	9,
 	"final_length": 64000,

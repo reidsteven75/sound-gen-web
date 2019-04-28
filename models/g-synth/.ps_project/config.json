@@ -1,8 +1,8 @@
 {
   "project": "gan-synth",
   "machineType": "GPU+",
-  "container": "reidsteven75/sound-gen-gan-synth:latest",
+  "container": "reidsteven75/sound-gen-g-synth:latest",
   "command": "RU5WPSdwYXBlcnNwYWNlJyBweXRob24gZ2VuZXJhdGUucHk=",
   "workspace": "./job",
-  "lastJobId": "jsniqpuwb7qd5x"
+  "lastJobId": "jsnr0j7l4cwm9v"
 }

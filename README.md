@@ -1,7 +1,12 @@
 # Dev
-Run from root
+n-synth cpu
 ```
-docker-compose up --build
+docker-compose -f docker-compose-n-synth.yml up --build
+```
+
+g-synth cpu
+```
+docker-compose -f docker-compose-g-synth.yml up --build
 ```
 
 # Deployment 

@@ -1,8 +1,8 @@
 version: '3'
 services:
-  gan-synth-cpu:
+  n-synth:
     build:
-      context: ./apps/gan-synth
+      context: ./models/n-synth
       args: 
         TENSORFLOW_IMAGE: tensorflow/tensorflow:1.13.1-py3
         COMPUTE_TYPE: cpu

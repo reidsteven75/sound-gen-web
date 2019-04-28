@@ -1,0 +1,7 @@
+# whitelist
+
+*
+!artifacts
+!storage
+!job
+!.ps_project

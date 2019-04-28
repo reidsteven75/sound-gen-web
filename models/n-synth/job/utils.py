@@ -106,9 +106,8 @@ def post_process(audio, sr, onset_search=0.25, walk_onset_back=16, final_length=
     
     # fix erroneously shortened samples
     if len(x) != 60000:
-            padding_amount = final_length - len(x)
-	    x = np.append(x, np.zeros(padding_amount))
-        
+        padding_amount = final_length - len(x)
+        x = np.append(x, np.zeros(padding_amount))
     # silence_ending(x)
     fade_in(x)
     fade_out(x)

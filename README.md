@@ -5,7 +5,7 @@ docker-compose up --build
 ```
 
 # Deployment 
-Deployed as a job that runs in Paperspace which pulls down docker container uses an AI model checkpoint that has been upload as .zip file to Paperspace 'storage' (common persistant storage)
+Deployed as a job that runs in Paperspace. Job runs in a configurable docker container and uses configurable AI model checkpoint(s) that has been upload as .zip file to Paperspace 'storage' (common persistant storage)
 
 1) Deploy Docker
 $ ./deploy-docker.sh

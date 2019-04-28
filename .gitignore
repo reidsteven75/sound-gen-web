@@ -9,9 +9,9 @@
 
 # specific directories
 find-better-places-for-these/
-.ps_project/
+**/.ps_project/
 
 # checkpoints
-**/storage/*
+**/storage/
 
 

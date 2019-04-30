@@ -8,6 +8,8 @@ services:
         COMPUTE_TYPE: cpu
         STORAGE_DIR: './storage'
         ARTIFACTS_DIR: './artifacts'
+    volumes:
+        - ./models/n-synth/job/data:/code/job/data
     ports:
      - "80:4000"
     tty: true

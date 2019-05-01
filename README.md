@@ -33,3 +33,18 @@ https://docs.paperspace.com/gradient/experiments/run-experiments
 
 GPU & CPU Types
 https://support.paperspace.com/hc/en-us/articles/360007742114-Gradient-Instance-Types
+
+GPU Kubernetes
+https://github.com/Paperspace/GPU-Kubernetes-Guide
+
+dev private network:
+10.30.141.0/24
+
+master: 
+10.30.141.4
+kubeadm join --token 245126.c4204c198296da2f 10.30.141.4:6443
+
+worker: 
+10.30.141.2
+
+kubectl get nodes

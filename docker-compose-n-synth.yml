@@ -6,13 +6,11 @@ services:
       args: 
         TENSORFLOW_IMAGE: tensorflow/tensorflow:1.13.1-py3
         COMPUTE_TYPE: cpu
-        STORAGE_DIR: './storage'
-        ARTIFACTS_DIR: './artifacts'
-        BATCH_SIZE_SAVE_EMBEDDINGS: 1
+        CONFIG_FILE: config-local.json
     volumes:
         - ./models/n-synth/artifacts:/code/job/artifacts
         - ./models/n-synth/storage:/code/job/storage
-        - ./models/n-synth/job/data:/code/job/data
+        - ./models/n-synth/job/data/embeddings_raw:/code/job/data/embeddings_raw
     ports:
      - "80:4000"
     tty: true

@@ -5,10 +5,11 @@
 		"SW": 		["synthbass"],
 		"SE": 		["hoxhit"]
 	},
-	"checkpoint_name": 			"wavenet-ckpt",
-	"pitches":   				[24],
-	"resolution": 				9,
-	"sample_length": 			8000,   		    
-    "gpus": 					8,
-    "name":         			"funk_grid"
+	"checkpoint_name": 				"wavenet-ckpt",
+	"pitches":   					[24],
+	"resolution": 					9,
+	"sample_length": 				8000,   
+	"batch_size_save_embeddings": 	32,		    
+    "gpus": 						8,
+    "name":         				"funk_grid"
 }

@@ -13,22 +13,30 @@ from utils import *
 import sys
 import zipfile
 
+from dask import compute, delayed
+from dask.distributed import Client
+import joblib
+
 #  load the config file
 settings = None
 with open('config.json', 'r') as infile:
   settings = json.load(infile)
 
-storage_dir = '/storage'
+STORAGE_DIR = '/storage'
 if os.environ['STORAGE_DIR']:
-	storage_dir = os.environ['STORAGE_DIR']
+	STORAGE_DIR = os.environ['STORAGE_DIR']
 
-artifacts_dir = '/artifacts'
+ARTIFACTS_DIR = '/artifacts'
 if os.environ['ARTIFACTS_DIR']:
-	artifacts_dir = os.environ['ARTIFACTS_DIR']
+	ARTIFACTS_DIR = os.environ['ARTIFACTS_DIR']
 
-checkpoint_dir = storage_dir + '/%s' %(settings['checkpoint_name'])
-checkpoint_zip_file = storage_dir + '/%s.zip' %(settings['checkpoint_name'])
-output_dir = artifacts_dir
+BATCH_SIZE_SAVE_EMBEDDINGS = settings['batch_size_save_embeddings']
+if os.environ['BATCH_SIZE_SAVE_EMBEDDINGS']:
+	BATCH_SIZE_SAVE_EMBEDDINGS = os.environ['BATCH_SIZE_SAVE_EMBEDDINGS']
+
+checkpoint_dir = STORAGE_DIR + '/%s' %(settings['checkpoint_name'])
+checkpoint_zip_file = STORAGE_DIR + '/%s.zip' %(settings['checkpoint_name'])
+output_dir = ARTIFACTS_DIR
 
 # Out of memory error
 # - nsynth generate needs sample length cut down to avoid this
@@ -36,11 +44,21 @@ output_dir = artifacts_dir
 #	preserve the working directory path
 source_dir = os.getcwd()
 
+def get_only_files(path):
+	files = []
+	for file in os.listdir(path):
+		if os.path.isfile(os.path.join(path, file)):
+			if not file.startswith('.'):
+				files.append(file)
+	return files
+
 def init():
 	print("compute: %s" %(os.environ['COMPUTE_TYPE']))
-	print("python version: %s" %(sys.version))
-	print("storage: %s" %(storage_dir))
-	print("artifacts: %s" %(artifacts_dir))
+	print("python: %s" %(sys.version))
+	print("current working path: %s" %(os.getcwd()))
+	print("STORAGE_DIR: %s" %(STORAGE_DIR))
+	print("ARTIFACTS_DIR: %s" %(ARTIFACTS_DIR))
+	print("BATCH_SIZE_SAVE_EMBEDDINGS: %s" %(BATCH_SIZE_SAVE_EMBEDDINGS))
 	if (os.path.isdir(checkpoint_dir)):
 		print ("checkpoint already extracted")
 
@@ -48,20 +66,44 @@ def init():
 		print("extracting checkpoint...")
 
 		zip_ref = zipfile.ZipFile(checkpoint_zip_file, 'r')
-		zip_ref.extractall(storage_dir)
+		zip_ref.extractall(STORAGE_DIR)
 		zip_ref.close()
 
 		print("extracted")
 		print(os.listdir(checkpoint_dir))
 
 def compute_embeddings():
+
+	print("-----------------------------")
+	print("Computing sound embeddings...")
+
+	input_path = 'data/input'
+	output_path = 'data/embeddings_raw'
+	num_input_files = len(os.listdir(input_path))
+
 	subprocess.call(["nsynth_save_embeddings", 
 		"--checkpoint_path=%s/model.ckpt-200000" %(checkpoint_dir), 
-		"--source_path=data/input", 
-		"--save_path=data/embeddings_input", 
-		"--batch_size=32"])
+		"--source_path=%s" %(input_path), 
+		"--save_path=%s" %(output_path), 
+		"--log=ERROR",
+		"--batch_size=%s" %(BATCH_SIZE_SAVE_EMBEDDINGS)])
 
-def compute_new_embeddings():
+	num_output_files = len(get_only_files(output_path))
+	print('------------------------')
+	print('RESULT')
+	print('# input wav files: %s' %(num_input_files))
+	print('# embeddings generated: %s' %(num_output_files))
+	print(get_only_files(output_path))
+	
+	assert num_input_files==num_output_files, '[compute_embeddings]: different quanity of files generated'
+
+	print('Success!')
+
+def interpolate_embeddings():
+
+	print("---------------------------")
+	print("Interpolating embeddings...")
+
 	#	constants and rearrangement of settings vars for processing
 	pitches = settings['pitches']
 	resolution = settings['resolution']
@@ -73,7 +115,7 @@ def compute_new_embeddings():
 	#	cache all embeddings
 	embeddings_lookup = {}
 
-	for filename in os.listdir('data/embeddings_input/'):
+	for filename in os.listdir('data/embeddings_raw/'):
 		# ignore all non-npy files
 		if '.npy' in  filename:
 			#	convert filename to reference key
@@ -81,7 +123,7 @@ def compute_new_embeddings():
 			reference = '{}_{}'.format(parts[0], parts[1])
 
 			#	load the saved embedding
-			embeddings_lookup[reference] = np.load("data/embeddings_input/%s" % filename)
+			embeddings_lookup[reference] = np.load("data/embeddings_raw/%s" % filename)
 
 	def get_embedding(instrument, pitch):
 		reference = '{}_{}'.format(instrument, pitch)
@@ -110,10 +152,14 @@ def compute_new_embeddings():
 				#	reshape array
 				# interpolated = np.reshape(interpolated, (1,) + interpolated.shape)
 
-				np.save('data/embeddings_output/' + name + '.npy', interpolated.astype(np.float32))
+				np.save('data/embeddings_interpolated/' + name + '.npy', interpolated.astype(np.float32))
 
 def batch_embeddings():
-	num_embeddings = len(os.listdir('data/embeddings_output'))
+
+	print("---------------------")
+	print("Batching embeddings...")
+
+	num_embeddings = len(os.listdir('data/embeddings_interpolated'))
 	batch_size = num_embeddings / settings['gpus']
 	#	split the embeddings per gpu in folders
 	for i in range(0, settings['gpus']):
@@ -126,31 +172,35 @@ def batch_embeddings():
 
 	#	shuffle to the folders
 	batch = 0
-	for filename in os.listdir('data/embeddings_output'):
+	for filename in os.listdir('data/embeddings_interpolated'):
 		target_folder = 'data/embeddings_batched/batch%i/' % batch
 		batch += 1
 		if batch >= settings['gpus']:
 			batch = 0
 
-		os.rename('data/embeddings_output/' + filename, target_folder + filename)
+		os.rename('data/embeddings_interpolated/' + filename, target_folder + filename)
 
 def gen_call(gpu):
 	return subprocess.call(["nsynth_generate",
 		"--checkpoint_path=%s/model.ckpt-200000" %(checkpoint_dir),
-		"--source_path=data/embeddings_batched/batch%i" % gpu,
-		"--save_path=data/audio_output/batch%i" % gpu,
+		"--input_path=data/embeddings_batched/batch%i" % gpu,
+		"--output_path=data/audio_output/batch%i" % gpu,
 		"--sample_length=%s" %(settings['sample_length']),
 		"--encodings=true",
 		"--log=INFO",
 		"--batch_size=512"])
 
 def generate_audio():
+
+	print("--------------------")
+	print("Generating sounds...")
+
 	#  map calls to gpu threads
 	pool = ThreadPool(settings['gpus'])
 	results = pool.map_async(gen_call, range(settings['gpus']))
 	time.sleep(5)
 	pbar = tqdm(total=sum([len(os.listdir('embeddings_batched/batch%s'%(i))) for i in range(settings['gpus'])]))
-	pbar = tqdm(len(os.listdir('embeddings_output')))
+	pbar = tqdm(len(os.listdir('embeddings_interpolated')))
 	pbar.set_description("Number of files for which processing has started")
 	while not results.ready():
 		num_files = sum([len(os.listdir('data/audio_output/batch%s' %(i))) for i in range(settings['gpus'])])
@@ -169,26 +219,16 @@ def generate_audio():
 	
 
 if __name__ == "__main__":
-	print("============================")
+	print("=======")
 	print("N-SYNTH")
-	print("-------------------")
-	print("initializing...")
+	print("-------")
+	
 	init()
-
-	print("-------------------")
-	print("Computing input embeddings...")
-	compute_embeddings()
-
-	print("-------------------")
-	print("Computing new embeddings...")
-	compute_new_embeddings()
-
-	print("-------------------")
-	print("Batching embeddings...")
+	# compute_embeddings()
+	# interpolate_embeddings()
 	batch_embeddings()
+	# generate_audio()
 
-	print("-------------------")
-	print("Generating sounds...")
-	generate_audio()
-
-	print("Done")
+	print("--------")
+	print("COMPLETE")
+	print("========")

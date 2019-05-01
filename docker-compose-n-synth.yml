@@ -8,7 +8,10 @@ services:
         COMPUTE_TYPE: cpu
         STORAGE_DIR: './storage'
         ARTIFACTS_DIR: './artifacts'
+        BATCH_SIZE_SAVE_EMBEDDINGS: 1
     volumes:
+        - ./models/n-synth/artifacts:/code/job/artifacts
+        - ./models/n-synth/storage:/code/job/storage
         - ./models/n-synth/job/data:/code/job/data
     ports:
      - "80:4000"

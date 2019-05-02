@@ -16,6 +16,7 @@ import zipfile
 JOB_NAME = 'DECODE'
 
 COMPUTE_ENVIRONMENT = os.environ['COMPUTE_ENVIRONMENT']
+ARTIFACT_ID = os.environ['ARTIFACT_ID']
 config = None
 with open('config-%s.json' %(COMPUTE_ENVIRONMENT), 'r') as infile:
   config = json.load(infile)
@@ -50,6 +51,7 @@ def init():
 	print('DIR_STORAGE: %s' %(DIR_STORAGE))
 	print('DIR_ARTIFACTS: %s' %(DIR_ARTIFACTS))
 	print('BATCH_SIZE: %s' %(BATCH_SIZE))
+	print('CURRENT ARTIFACT DIR: %s' %(ARTIFACT_ID))
 
 	create_dir(BATCH_PATH)
 	create_dir(OUTPUT_PATH)
@@ -140,13 +142,13 @@ def generate_audio():
 		source = OUTPUT_PATH + '/batch%i/' % i
 		files = os.listdir(source)
 		for f in files:
-			shutil.move(source + f, DIR_ARTIFACTS)
+			shutil.move(source + f, DIR_ARTIFACTS + '/' + ARTIFACT_ID)
 
 	print('------------------------')
 	print('RESULT: sound generation')
 	print('------------------------')
-	print('# sounds generated: %s' %(DIR_ARTIFACTS))
-	print(get_only_files(DIR_ARTIFACTS))	
+	print('# sounds generated: %s' %(DIR_ARTIFACTS + '/' + ARTIFACT_ID))
+	print(get_only_files(DIR_ARTIFACTS + '/' + ARTIFACT_ID))	
 
 if __name__ == '__main__':
 	print('============================')

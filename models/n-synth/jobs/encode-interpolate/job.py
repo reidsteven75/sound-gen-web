@@ -12,6 +12,7 @@ from utils import *
 JOB_NAME = 'ENCODE-INTERPOLATE'
 
 COMPUTE_ENVIRONMENT = os.environ['COMPUTE_ENVIRONMENT']
+ARTIFACT_ID = os.environ['ARTIFACT_ID']
 config = None
 with open('config-%s.json' %(COMPUTE_ENVIRONMENT), 'r') as infile:
   config = json.load(infile)
@@ -40,6 +41,7 @@ def init():
 	print('DIR_STORAGE: %s' %(DIR_STORAGE))
 	print('DIR_ARTIFACTS: %s' %(DIR_ARTIFACTS))
 	print('BATCH_SIZE: %s' %(BATCH_SIZE))
+	print('ARTIFACT_ID: %s' %(ARTIFACT_ID))
 	if (os.path.isdir(DIR_CHECKPOINT)):
 		print ('checkpoint already extracted')
 
@@ -89,7 +91,7 @@ def interpolate_embeddings():
 	print('-------------------------------')
 
 	input_path = 'data/embeddings_raw'
-	output_path = DIR_ARTIFACTS
+	output_path = DIR_ARTIFACTS + '/' + ARTIFACT_ID
 	create_dir(output_path)
 
 	#	constants and rearrangement of config vars for processing

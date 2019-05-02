@@ -3,6 +3,7 @@ import subprocess
 import requests
 import json
 import shutil
+import uuid 
 
 with open('config.json', 'r') as infile:
   config = json.load(infile)
@@ -17,9 +18,6 @@ DIR_JOB_DECODE = './jobs/decode'
 COMPUTE_ENVIRONMENT = os.environ['COMPUTE_ENVIRONMENT']
 PAPERSPACE_API_KEY = config['paperspace']['api_key']
 PAPERSPACE_URL = config['paperspace']['url']
-
-def delete_dir_contents(dir):
-  shutil.rmtree(dir) 
 
 def create_dir(path):
 	os.makedirs(path, exist_ok=True)
@@ -60,9 +58,9 @@ if __name__ == "__main__":
   print('N-SYNTH')
   print('~~~~~~~')
 
-  # delete_dir_contents(DIR_DATASET_INTERPOLATIONS)
-  # delete_dir_contents(DIR_DATASET_GENERATIONS)
-  create_dir(DIR_DATASET_INTERPOLATIONS)
+  os.environ['ARTIFACT_ID'] = uuid.uuid4().hex[:6].upper()
+  create_dir(DIR_ARTIFACTS + '/' + os.environ['CURRENT_ARTIFACT_ID'])
+  create_dir(DIR_ARTIFACTS + '/' + os.environ['CURRENT_ARTIFACT_ID'] + '/' + DIR_DATASET_INTERPOLATIONS)
 
   if (COMPUTE_ENVIRONMENT == 'paperspace'):
     paperspace_generation()

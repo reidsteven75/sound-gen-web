@@ -17,6 +17,8 @@ from dask import compute, delayed
 from dask.distributed import Client
 import joblib
 
+import requests
+
 CONFIG_FILE = os.environ['CONFIG_FILE']
 settings = None
 with open(CONFIG_FILE, 'r') as infile:
@@ -27,6 +29,10 @@ ARTIFACTS_DIR = settings['artifacts_dir']
 BATCH_SIZE_SAVE_EMBEDDINGS = settings['batch_size_save_embeddings']
 BATCH_SIZE_GENERATE_SOUNDS = settings['batch_size_generate_sounds']
 SAMPLE_LENGTH_GENERATE_SOUNDS = settings['sample_length_generate_sounds']
+NODES_GENERATE_SOUNDS = settings['nodes_generate_sounds']
+PAPERSPACE_API_KEY = settings['paperspace']['api_key']
+PAPERSPACE_URL = settings['paperspace']['url']
+LOCAL_GENERATION = settings['local_generation']
 
 checkpoint_dir = STORAGE_DIR + '/%s' %(settings['checkpoint_name'])
 checkpoint_zip_file = STORAGE_DIR + '/%s.zip' %(settings['checkpoint_name'])
@@ -191,30 +197,52 @@ def gen_call(gpu):
 		"--log=INFO",
 		"--batch_size=%s" %(BATCH_SIZE_GENERATE_SOUNDS)])
 
+def gen_job_execute(node):
+	#  map calls to gpu threads
+	pool = ThreadPool(settings['gpus'])
+	results = pool.map_async(gen_call, range(settings['gpus']))
+	time.sleep(5)
+	pbar = tqdm(total=sum([len(os.listdir('data/embeddings_batched/batch%s'%(i))) for i in range(settings['gpus'])]))
+	pbar = tqdm(len(os.listdir('data/embeddings_interpolated')))
+	pbar.set_description("Number of files for which processing has started")
+	while not results.ready():
+		num_files = sum([len(os.listdir('data/audio_output/batch%s' %(i))) for i in range(settings['gpus'])])
+		num_files = len(os.listdir('data/audio_output'))
+		pbar.update(num_files - pbar.n)
+		time.sleep(1)
+	pbar.close()
+	pool.close()
+	pool.join()
+
+def gen_job_create(node):
+	print(node)
+	response = requests.post(
+		PAPERSPACE_URL,
+		params={
+			'machineType': 'GPU+',
+			'container': 'reidsteven75/sound-gen-n-synth:latest',
+			'command': 'python generate.py',
+			'workspace': './job'
+		},
+		headers={'x-api-key': PAPERSPACE_API_KEY}
+	)
+
 def generate_audio():
 
 	print("--------------------")
 	print("Generating sounds...")
 
-	#  map calls to gpu threads
-	# pool = ThreadPool(settings['gpus'])
-	# results = pool.map_async(gen_call, range(settings['gpus']))
-	# time.sleep(5)
-	# pbar = tqdm(total=sum([len(os.listdir('embeddings_batched/batch%s'%(i))) for i in range(settings['gpus'])]))
-	# pbar = tqdm(len(os.listdir('embeddings_interpolated')))
-	# pbar.set_description("Number of files for which processing has started")
-	# while not results.ready():
-	# 	num_files = sum([len(os.listdir('data/audio_output/batch%s' %(i))) for i in range(settings['gpus'])])
-	# 	num_files = len(os.listdir('data/audio_output'))
-	# 	pbar.update(num_files - pbar.n)
-	# 	time.sleep(1)
-	# pbar.close()
-	# pool.close()
-	# pool.join()
+	if LOCAL_GENERATION:
+		gen_job_execute()
+	else:
+		# distribute jobs across machines
+		for node in range(NODES_GENERATE_SOUNDS):
+			gen_job_create(node)
 
-	client = Client(processes=False)
-	with joblib.parallel_backend('dask'):
-		joblib.Parallel(verbose=10)(joblib.delayed(gen_call)(core) for core in range(settings['gpus']))
+
+	# client = Client(processes=False)
+	# with joblib.parallel_backend('dask'):
+	# 	joblib.Parallel(verbose=10)(joblib.delayed(gen_call)(core) for core in range(settings['gpus']))
 
 	for i in range(0, settings['gpus']):
 		source = 'data/audio_output/batch%i/' % i
@@ -229,7 +257,7 @@ if __name__ == "__main__":
 	print("-------")
 	
 	init()
-	# compute_embeddings()
+	compute_embeddings()
 	interpolate_embeddings()
 	batch_embeddings()
 	generate_audio()

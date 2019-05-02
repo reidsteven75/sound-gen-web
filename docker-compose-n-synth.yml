@@ -10,7 +10,6 @@ services:
     volumes:
         - ./models/n-synth/artifacts:/code/job/artifacts
         - ./models/n-synth/storage:/code/job/storage
-        - ./models/n-synth/job/data/embeddings_raw:/code/job/data/embeddings_raw
     ports:
      - "80:4000"
     tty: true

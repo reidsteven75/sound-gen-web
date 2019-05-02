@@ -1,0 +1,11 @@
+{
+	"checkpoint_name": 				      "wavenet-ckpt",   
+  "dir": {
+		"storage": "./storage",
+		"artifacts": "./artifacts/generations"
+	},            
+	"gpus": 					1,
+	"nodes":					1,
+  "batch_size":   	1,
+	"sample_length": 	1
+}					

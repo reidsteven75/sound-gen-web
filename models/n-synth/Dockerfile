@@ -25,13 +25,13 @@ ARG COMPUTE_TYPE
 COPY requirements-${COMPUTE_TYPE}.txt /code/requirements-${COMPUTE_TYPE}.txt
 RUN pip install -r requirements-${COMPUTE_TYPE}.txt
 
-# Copy code
-COPY . /code
-
 # Env
 ENV COMPUTE_TYPE $COMPUTE_TYPE
-ARG CONFIG_FILE
-ENV CONFIG_FILE $CONFIG_FILE
+ARG COMPUTE_ENVIRONMENT
+ENV COMPUTE_ENVIRONMENT $COMPUTE_ENVIRONMENT
+
+# Copy code
+COPY . /code
 
 # Port
 EXPOSE 80

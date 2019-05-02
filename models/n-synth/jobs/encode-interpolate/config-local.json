@@ -1,0 +1,17 @@
+{
+  "name":   "funk_grid",
+	"pads": 	{
+		"NW": 		["distortedguitar"],
+		"NE": 		["electrokick"],
+		"SW": 		["synthbass"],
+		"SE": 		["hoxhit"]
+	},
+	"checkpoint_name": 				      "wavenet-ckpt",
+	"pitches":   					          [24],
+	"resolution": 					        2,     
+  "dir": {
+		"storage": "./storage",
+		"artifacts": "./artifacts/interpolations"
+	},            
+	"batch_size": 1
+}					

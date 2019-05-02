@@ -12,7 +12,6 @@ from utils import *
 JOB_NAME = 'ENCODE-INTERPOLATE'
 
 COMPUTE_ENVIRONMENT = os.environ['COMPUTE_ENVIRONMENT']
-ARTIFACT_ID = os.environ['ARTIFACT_ID']
 config = None
 with open('config-%s.json' %(COMPUTE_ENVIRONMENT), 'r') as infile:
   config = json.load(infile)
@@ -41,7 +40,7 @@ def init():
 	print('DIR_STORAGE: %s' %(DIR_STORAGE))
 	print('DIR_ARTIFACTS: %s' %(DIR_ARTIFACTS))
 	print('BATCH_SIZE: %s' %(BATCH_SIZE))
-	print('ARTIFACT_ID: %s' %(ARTIFACT_ID))
+
 	if (os.path.isdir(DIR_CHECKPOINT)):
 		print ('checkpoint already extracted')
 
@@ -55,11 +54,12 @@ def init():
 		print('extracted')
 		print(os.listdir(DIR_CHECKPOINT))
 
+
+
 def compute_embeddings():
 
 	print('-------------------------')
 	print('START: compute embeddings')
-	print('-------------------------')
 
 	input_path = 'data/input'
 	output_path = 'data/embeddings_raw'
@@ -75,7 +75,6 @@ def compute_embeddings():
 		'--batch_size=%s' %(BATCH_SIZE)])
 
 	num_output_files = len(get_only_files(output_path))
-	print('-------------------------')
 	print('RESULT: compute embeddings')
 	print('-------------------------')
 	print('# input wav files: %s' %(num_input_files))
@@ -88,10 +87,9 @@ def interpolate_embeddings():
 
 	print('-------------------------------')
 	print('START: interpolating embeddings')
-	print('-------------------------------')
 
 	input_path = 'data/embeddings_raw'
-	output_path = DIR_ARTIFACTS + '/' + ARTIFACT_ID
+	output_path = DIR_ARTIFACTS
 	create_dir(output_path)
 
 	#	constants and rearrangement of config vars for processing
@@ -145,7 +143,6 @@ def interpolate_embeddings():
 	
 	num_output_files = len(get_only_files(output_path))
 
-	print('--------------------------------')
 	print('RESULT: interpolating embeddings')
 	print('--------------------------------')
 	print('# interpolated embeddings generated: %s' %(num_output_files))

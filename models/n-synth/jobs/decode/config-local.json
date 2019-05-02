@@ -2,7 +2,7 @@
 	"checkpoint_name": 				      "wavenet-ckpt",   
   "dir": {
 		"storage": "./storage",
-		"artifacts": "./artifacts/generations"
+		"artifacts": "./artifacts"
 	},            
 	"gpus": 					1,
 	"nodes":					1,

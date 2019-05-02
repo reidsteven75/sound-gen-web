@@ -16,7 +16,6 @@ import zipfile
 JOB_NAME = 'DECODE'
 
 COMPUTE_ENVIRONMENT = os.environ['COMPUTE_ENVIRONMENT']
-ARTIFACT_ID = os.environ['ARTIFACT_ID']
 config = None
 with open('config-%s.json' %(COMPUTE_ENVIRONMENT), 'r') as infile:
   config = json.load(infile)
@@ -51,11 +50,9 @@ def init():
 	print('DIR_STORAGE: %s' %(DIR_STORAGE))
 	print('DIR_ARTIFACTS: %s' %(DIR_ARTIFACTS))
 	print('BATCH_SIZE: %s' %(BATCH_SIZE))
-	print('CURRENT ARTIFACT DIR: %s' %(ARTIFACT_ID))
 
 	create_dir(BATCH_PATH)
 	create_dir(OUTPUT_PATH)
-	create_dir(DIR_ARTIFACTS)
 
 	if (os.path.isdir(DIR_CHECKPOINT)):
 		print ('checkpoint already extracted')
@@ -74,7 +71,6 @@ def batch_embeddings():
 
 	print('--------------------------')
 	print('START: batching embeddings')
-	print('--------------------------')
 
 	num_embeddings = len(os.listdir(INPUT_PATH))
 	batch_size = num_embeddings / config['gpus']
@@ -97,7 +93,6 @@ def batch_embeddings():
 
 		os.rename(INPUT_PATH + '/' + filename, target_folder + filename)
 	
-	print('---------------------------')
 	print('RESULT: batching embeddings')
 	print('---------------------------')
 	print('success')
@@ -116,7 +111,6 @@ def generate_audio():
 
 	print('-----------------------')
 	print('START: sound generation')
-	print('-----------------------')
 
 	#  map calls to gpu threads
 	pool = ThreadPool(config['gpus'])
@@ -142,13 +136,12 @@ def generate_audio():
 		source = OUTPUT_PATH + '/batch%i/' % i
 		files = os.listdir(source)
 		for f in files:
-			shutil.move(source + f, DIR_ARTIFACTS + '/' + ARTIFACT_ID)
+			shutil.move(source + f, DIR_ARTIFACTS)
 
-	print('------------------------')
 	print('RESULT: sound generation')
 	print('------------------------')
-	print('# sounds generated: %s' %(DIR_ARTIFACTS + '/' + ARTIFACT_ID))
-	print(get_only_files(DIR_ARTIFACTS + '/' + ARTIFACT_ID))	
+	print('# sounds generated: %s' %(DIR_ARTIFACTS))
+	print(get_only_files(DIR_ARTIFACTS))	
 
 if __name__ == '__main__':
 	print('============================')

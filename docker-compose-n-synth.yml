@@ -8,13 +8,9 @@ services:
         COMPUTE_TYPE: cpu
         COMPUTE_ENVIRONMENT: local
     volumes:
-        - ./models/n-synth/artifacts:/code/jobs/encode-interpolate/artifacts
-        - ./models/n-synth/storage:/code/jobs/encode-interpolate/storage
-        - ./models/n-synth/artifacts:/code/jobs/decode/artifacts
-        - ./models/n-synth/storage:/code/jobs/decode/storage
+        - ./models/n-synth/artifacts:/code/artifacts
     ports:
      - "80:4000"
     tty: true
-    restart: on-failure
     command: sh -c "python generate.py"
   

@@ -4,16 +4,22 @@ import requests
 import json
 import shutil
 import uuid 
+import datetime
 
 with open('config.json', 'r') as infile:
   config = json.load(infile)
 
-DIR_DATASET_INPUT = './dataset'
-DIR_ARTIFACTS = './artifacts'
-DIR_DATASET_INTERPOLATIONS = './artifacts/interpolations'
-DIR_DATASET_GENERATIONS = './artifacts/generations'
-DIR_JOB_ENCODE_INTERPOLATE = './jobs/encode-interpolate'
-DIR_JOB_DECODE = './jobs/decode'
+ARTIFACT_ID = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S') + '_' + uuid.uuid4().hex[:6].upper()
+ARTIFACTS = './artifacts/' + ARTIFACT_ID
+
+DIR_JOBS = './jobs'
+JOB_ENCODE_INTERPOLATE = 'encode-interpolate'
+JOB_DECODE = 'decode'
+
+FOLDER_DATASET_INTERPOLATIONS = '/interpolations'
+FOLDER_DATASET_GENERATIONS = '/generations'
+DATASET = './dataset'
+STORAGE_COMMON = './storage'
 
 COMPUTE_ENVIRONMENT = os.environ['COMPUTE_ENVIRONMENT']
 PAPERSPACE_API_KEY = config['paperspace']['api_key']
@@ -22,22 +28,27 @@ PAPERSPACE_URL = config['paperspace']['url']
 def create_dir(path):
 	os.makedirs(path, exist_ok=True)
 
-def inject_dataset(source, target):
+def copy_files(source, target):
   create_dir(target)
   files = os.listdir(source)
   for f in files:
-    shutil.move(source + '/' + f, target)
+    shutil.copy(source + '/' + f, target)
+
+def run_job_local(job, dataset):
+  path_job = DIR_JOBS + '/' + job
+  create_dir(ARTIFACTS + '/' + job)
+  create_dir(path_job + '/data')
+  create_dir(path_job + '/artifacts')
+  copy_files(dataset, path_job + '/data/input')
+  copy_files(STORAGE_COMMON, path_job + '/storage')
+  subprocess.call(['python', 'job.py'], cwd=path_job)
+  copy_files(path_job + '/artifacts', ARTIFACTS + '/' + job)
 
 def local_generation():
   print('COMPUTE_ENV: local')
   print('------------------')
-  create_dir(DIR_JOB_ENCODE_INTERPOLATE + '/data')
-  inject_dataset(DIR_DATASET_INPUT, DIR_JOB_ENCODE_INTERPOLATE + '/data/input')
-  subprocess.call(['python', 'job.py'], cwd=DIR_JOB_ENCODE_INTERPOLATE)
-
-  create_dir(DIR_JOB_DECODE + '/data')
-  inject_dataset(DIR_DATASET_INTERPOLATIONS, DIR_JOB_DECODE + '/data/input')
-  subprocess.call(['python', 'job.py'], cwd=DIR_JOB_DECODE)
+  run_job_local(JOB_ENCODE_INTERPOLATE, DATASET)
+  run_job_local(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
 
 def paperspace_generation():
   print('COMPUTE_ENV: paperspace')
@@ -57,10 +68,9 @@ if __name__ == "__main__":
   print('~~~~~~~')
   print('N-SYNTH')
   print('~~~~~~~')
+  print('ARTIFACT_ID: %s' %(ARTIFACT_ID))
 
-  os.environ['ARTIFACT_ID'] = uuid.uuid4().hex[:6].upper()
-  create_dir(DIR_ARTIFACTS + '/' + os.environ['CURRENT_ARTIFACT_ID'])
-  create_dir(DIR_ARTIFACTS + '/' + os.environ['CURRENT_ARTIFACT_ID'] + '/' + DIR_DATASET_INTERPOLATIONS)
+  create_dir(ARTIFACTS)
 
   if (COMPUTE_ENVIRONMENT == 'paperspace'):
     paperspace_generation()

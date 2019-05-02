@@ -11,7 +11,7 @@
 	"resolution": 					        2,     
   "dir": {
 		"storage": "./storage",
-		"artifacts": "./artifacts/interpolations"
+		"artifacts": "./artifacts"
 	},            
 	"batch_size": 1
 }					

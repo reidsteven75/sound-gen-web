@@ -12,7 +12,6 @@ from utils import *
 JOB_NAME = 'ENCODE-INTERPOLATE'
 
 COMPUTE_ENVIRONMENT = os.environ['COMPUTE_ENVIRONMENT']
-config = None
 with open('config-%s.json' %(COMPUTE_ENVIRONMENT), 'r') as infile:
   config = json.load(infile)
 

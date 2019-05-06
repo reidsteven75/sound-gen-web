@@ -6,7 +6,7 @@ services:
       args: 
         TENSORFLOW_IMAGE: tensorflow/tensorflow:1.13.1-py3
         COMPUTE_TYPE: cpu
-        COMPUTE_ENVIRONMENT: local
+        COMPUTE_ENVIRONMENT: paperspace
     volumes:
         - ./models/n-synth/artifacts:/code/artifacts
     ports:

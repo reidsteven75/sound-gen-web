@@ -1,0 +1,32 @@
+{
+	"sound": {
+		"name":   "funk_grid",
+		"pads": 	{
+			"NW": 		["distortedguitar"],
+			"NE": 		["electrokick"],
+			"SW": 		["synthbass"],
+			"SE": 		["hoxhit"]
+		},
+		"pitches":   					[24],
+		"resolution": 				2 
+	},
+	"checkpoint_name": 		"wavenet-ckpt",
+	"dir": {
+		"storage": "./storage",
+		"artifacts": "./artifacts"
+	},  
+	"jobs": {
+		"encode-interpolate": {
+			"batch_size": 		1	
+		},
+		"decode": {
+			"gpus": 					4,
+			"batch_size":   	64,
+			"sample_length": 	130
+		}
+	},
+	"paperspace": {
+		"url": "https://api.paperspace.io",
+		"api_key": "25f8821c308a51e267d6765e88ce28"
+	}          
+}					

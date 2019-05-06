@@ -15,8 +15,7 @@ import zipfile
 
 JOB_NAME = 'DECODE'
 
-COMPUTE_ENVIRONMENT = os.environ['COMPUTE_ENVIRONMENT']
-with open('config-%s.json' %(COMPUTE_ENVIRONMENT), 'r') as infile:
+with open('config.json', 'r') as infile:
   config = json.load(infile)
 
 INPUT_PATH = 'data/input'
@@ -25,9 +24,8 @@ OUTPUT_PATH = 'data/audio_output'
 
 DIR_STORAGE = config['dir']['storage']
 DIR_ARTIFACTS = config['dir']['artifacts']
-BATCH_SIZE = config['batch_size']
-SAMPLE_LENGTH = config['sample_length']
-NODES = config['nodes']
+BATCH_SIZE = config['jobs']['decode']['batch_size']
+SAMPLE_LENGTH = config['jobs']['decode']['sample_length']
 DIR_CHECKPOINT = DIR_STORAGE + '/%s' %(config['checkpoint_name'])
 CHECKPOINT_ZIP_FILE = DIR_STORAGE + '/%s.zip' %(config['checkpoint_name'])
 
@@ -72,9 +70,9 @@ def batch_embeddings():
 	print('START: batching embeddings')
 
 	num_embeddings = len(os.listdir(INPUT_PATH))
-	batch_size = num_embeddings / config['gpus']
+	batch_size = num_embeddings / config['jobs']['decode']['gpus']
 	#	split the embeddings per gpu in folders
-	for i in range(0, config['gpus']):
+	for i in range(0, config['jobs']['decode']['gpus']):
 		foldername = BATCH_PATH + '/batch%i' % i
 		if not os.path.exists(foldername):
 			os.mkdir(foldername)
@@ -87,7 +85,7 @@ def batch_embeddings():
 	for filename in os.listdir(INPUT_PATH):
 		target_folder = BATCH_PATH + '/batch%i/' % batch
 		batch += 1
-		if batch >= config['gpus']:
+		if batch >= config['jobs']['decode']['gpus']:
 			batch = 0
 
 		os.rename(INPUT_PATH + '/' + filename, target_folder + filename)
@@ -112,14 +110,14 @@ def generate_audio():
 	print('START: sound generation')
 
 	#  map calls to gpu threads
-	pool = ThreadPool(config['gpus'])
-	results = pool.map_async(gen_call, range(config['gpus']))
+	pool = ThreadPool(config['jobs']['decode']['gpus'])
+	results = pool.map_async(gen_call, range(config['jobs']['decode']['gpus']))
 	time.sleep(5)
-	pbar = tqdm(total=sum([len(os.listdir(BATCH_PATH + '/batch%s'%(i))) for i in range(config['gpus'])]))
+	pbar = tqdm(total=sum([len(os.listdir(BATCH_PATH + '/batch%s'%(i))) for i in range(config['jobs']['decode']['gpus'])]))
 	pbar = tqdm(len(os.listdir(INPUT_PATH)))
 	pbar.set_description('Number of files for which processing has started')
 	while not results.ready():
-		num_files = sum([len(os.listdir(OUTPUT_PATH + '/batch%s' %(i))) for i in range(config['gpus'])])
+		num_files = sum([len(os.listdir(OUTPUT_PATH + '/batch%s' %(i))) for i in range(config['jobs']['decode']['gpus'])])
 		num_files = len(os.listdir(OUTPUT_PATH))
 		pbar.update(num_files - pbar.n)
 		time.sleep(1)
@@ -131,7 +129,7 @@ def generate_audio():
 	# with joblib.parallel_backend('dask'):
 	# 	joblib.Parallel(verbose=10)(joblib.delayed(gen_call)(core) for core in range(config['gpus']))
 
-	for i in range(0, config['gpus']):
+	for i in range(0, config['jobs']['decode']['gpus']):
 		source = OUTPUT_PATH + '/batch%i/' % i
 		files = os.listdir(source)
 		for f in files:

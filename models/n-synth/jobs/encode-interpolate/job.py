@@ -11,13 +11,12 @@ from utils import *
 
 JOB_NAME = 'ENCODE-INTERPOLATE'
 
-COMPUTE_ENVIRONMENT = os.environ['COMPUTE_ENVIRONMENT']
-with open('config-%s.json' %(COMPUTE_ENVIRONMENT), 'r') as infile:
+with open('config.json', 'r') as infile:
   config = json.load(infile)
 
 DIR_STORAGE = config['dir']['storage']
 DIR_ARTIFACTS = config['dir']['artifacts']
-BATCH_SIZE = config['batch_size']
+BATCH_SIZE = config['jobs']['encode-interpolate']['batch_size']
 DIR_CHECKPOINT = DIR_STORAGE + '/%s' %(config['checkpoint_name'])
 CHECKPOINT_ZIP_FILE = DIR_STORAGE + '/%s.zip' %(config['checkpoint_name'])
 
@@ -92,9 +91,9 @@ def interpolate_embeddings():
 	create_dir(output_path)
 
 	#	constants and rearrangement of config vars for processing
-	pitches = config['pitches']
-	resolution = config['resolution']
-	instrument_groups = [config['pads']['NW'], config['pads']['NE'], config['pads']['SE'], config['pads']['SW']]
+	pitches = config['sound']['pitches']
+	resolution = config['sound']['resolution']
+	instrument_groups = [config['sound']['pads']['NW'], config['sound']['pads']['NE'], config['sound']['pads']['SE'], config['sound']['pads']['SW']]
 	combinations = sorted(product(*instrument_groups))
 	xy_grid = make_grid(resolution)
 

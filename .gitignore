@@ -14,4 +14,7 @@ find-better-places-for-these/
 # checkpoints
 **/storage/
 
+# artifacts
+**/artifacts/
+
 

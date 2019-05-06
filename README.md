@@ -1,17 +1,7 @@
 # Dev
-n-synth cpu
+n-synth
 ```
 docker-compose -f docker-compose-n-synth.yml up --build
-```
-
-g-synth cpu
-```
-docker-compose -f docker-compose-g-synth.yml up --build
-```
-
-kubernetes
-```
-minikube start --bootstrapper=localkube
 ```
 
 # Deployment 

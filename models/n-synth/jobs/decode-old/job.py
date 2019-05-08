@@ -3,6 +3,7 @@ import time
 import shutil
 
 import numpy as np
+from multiprocessing.dummy import Pool as ThreadPool
 
 from tqdm import tqdm
 from itertools import product
@@ -108,11 +109,31 @@ def generate_audio():
 	print('-----------------------')
 	print('START: sound generation')
 
-	gen_call(0)
-	source = OUTPUT_PATH + '/batch0/'
-	files = os.listdir(source)
-	for f in files:
-		shutil.move(source + f, DIR_ARTIFACTS)	
+	#  map calls to gpu threads
+	pool = ThreadPool(config['jobs']['decode']['gpus'])
+	results = pool.map_async(gen_call, range(config['jobs']['decode']['gpus']))
+	time.sleep(5)
+	pbar = tqdm(total=sum([len(os.listdir(BATCH_PATH + '/batch%s'%(i))) for i in range(config['jobs']['decode']['gpus'])]))
+	pbar = tqdm(len(os.listdir(INPUT_PATH)))
+	pbar.set_description('Number of files for which processing has started')
+	while not results.ready():
+		num_files = sum([len(os.listdir(OUTPUT_PATH + '/batch%s' %(i))) for i in range(config['jobs']['decode']['gpus'])])
+		num_files = len(os.listdir(OUTPUT_PATH))
+		pbar.update(num_files - pbar.n)
+		time.sleep(1)
+	pbar.close()
+	pool.close()
+	pool.join()
+
+	# client = Client(processes=False)
+	# with joblib.parallel_backend('dask'):
+	# 	joblib.Parallel(verbose=10)(joblib.delayed(gen_call)(core) for core in range(config['gpus']))
+
+	for i in range(0, config['jobs']['decode']['gpus']):
+		source = OUTPUT_PATH + '/batch%i/' % i
+		files = os.listdir(source)
+		for f in files:
+			shutil.move(source + f, DIR_ARTIFACTS)
 
 	print('RESULT: sound generation')
 	print('------------------------')

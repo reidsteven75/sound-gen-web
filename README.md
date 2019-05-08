@@ -4,6 +4,14 @@ n-synth
 docker-compose -f docker-compose-n-synth.yml up --build
 ```
 
+cleanup docker 
+```
+docker volume prune
+docker image prune
+```
+
+25f8821c308a51e267d6765e88ce28
+
 # Deployment 
 Deployed as a job that runs in Paperspace. Job runs in a configurable docker container and uses configurable AI model checkpoint(s) that has been upload as .zip file to Paperspace 'storage' (common persistant storage)
 

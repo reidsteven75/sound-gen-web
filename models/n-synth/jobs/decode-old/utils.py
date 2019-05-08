@@ -26,6 +26,7 @@ def list_all_files(directory, extensions=None):
             if extensions is None or ( len(ext) and ext.lower() in extensions ):
                 yield joined
 
+
 def make_grid(res):
 	x, y = np.meshgrid(np.linspace(0, 1, res), np.linspace(0, 1, res))
 	x = x.reshape(-1)
@@ -39,9 +40,11 @@ def get_weights(xy):
 	distances /= distances.sum()
 	return distances
 
+
 class hashabledict(dict):
     def __hash__(self):
         return hash(tuple(sorted(self.items())))
+
 	
 def get_description(combination, weights, pitch):
 	meta = {'pitch': pitch}
@@ -50,12 +53,15 @@ def get_description(combination, weights, pitch):
 			meta[i] = np.around(w, decimals=3)
 	return hashabledict(meta)
 
+
 def description_to_name(meta):
 	attr = []
 	for key in sorted(meta.keys()):
 		attr.append(key)
 		attr.append(meta[key])
 	return '_'.join(map(str, attr))
+
+
 
 def name_to_description(name):
 	parts = name.split('_')
@@ -67,6 +73,7 @@ def name_to_description(name):
 def get_filename(name):
 	fname = 'audio_output/output_wav/gen_{}.wav'.format(name)
 	return fname
+
 
 
 # susceptible to false onsets (brief burst before the real onset)

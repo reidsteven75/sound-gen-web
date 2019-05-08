@@ -1,4 +1,5 @@
 import os
+import sys
 import subprocess
 import requests
 import json
@@ -34,8 +35,9 @@ FOLDER_DATASET_GENERATIONS = '/generations'
 DATASET = './dataset'
 STORAGE_COMMON = './storage'
 
-PAPERSPACE_API_KEY = config['paperspace']['api_key']
-PAPERSPACE_URL = config['paperspace']['url']
+if (COMPUTE_ENVIRONMENT == 'paperspace'):
+  PAPERSPACE_API_KEY = config['paperspace']['api_key']
+  PAPERSPACE_URL = config['paperspace']['url']
 
 job_metrics = []
 
@@ -201,41 +203,40 @@ def run_job_paperspace(job, dataset):
     copy_files(dataset_batch_dir + '/batch%i' % i, job_data + '/input')
 
     # zip job directory
-    job_zip_name = 'job.zip'
     print('zipping job...')
     job_zip_path = zip_job(job_path, DIR_ZIP)
-    print('job zipped: %s' %(job_zip_path))
+    print('zipped like a fresh coat zipper')
 
     # run job
     start = time.time()
-
-    res = paperspace.jobs.create({
-      'apiKey': PAPERSPACE_API_KEY,
-      'projectId': job_config['project_id'],
-      'container': job_config['container'],
-      'machineType': job_config['machine_type'],
-      'command': job_config['command'],
-      'workspace': job_zip_path
-    })
-
-    print(res)
-    job_id = res['id']
-    job_error = res['jobError']
-
-    if res['jobError']:
-      print('job error: create_job()')
-      break
+    job_id = None
+    try:
+      res = paperspace.jobs.create({
+        'apiKey': PAPERSPACE_API_KEY,
+        'name': job,
+        'projectId': job_config['project_id'],
+        'container': job_config['container'],
+        'machineType': job_config['machine_type'],
+        'command': job_config['command'],
+        'workspace': job_zip_path
+      })
+      job_id = res['id']
+    except:
+      print('[ERROR]: jobs_create')
+      print(sys.exc_info())
+      return
 
     # get job artifacts
-    res = paperspace.jobs.artifactsGet({
-      'apiKey': PAPERSPACE_API_KEY,
-      'jobId': job_id,
-      'dest': workflow_artifacts
-    })
-
-    if res != True:
-      print('job error: get_artifacts()')
-      break
+    try:
+      paperspace.jobs.artifactsGet({
+        'apiKey': PAPERSPACE_API_KEY,
+        'jobId': job_id,
+        'dest': workflow_artifacts
+      })
+    except:
+      print('[ERROR]: artifacts_get')
+      print(sys.exc_info()[0])
+      return
 
     # job metrics
     end = time.time()
@@ -249,6 +250,7 @@ def paperspace_generation():
 
   run_job_paperspace(JOB_ENCODE_INTERPOLATE, DATASET)
   run_job_paperspace(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
+  # run_job_paperspace(JOB_DECODE, DATASET)
 
 if __name__ == "__main__":
   print('~~~~~~~~~~~~~~~')

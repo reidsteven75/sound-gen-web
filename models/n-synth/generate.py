@@ -7,9 +7,11 @@ import uuid
 import datetime
 import time
 import zipfile
+import paperspace
 
 COMPUTE_ENVIRONMENT = os.environ['COMPUTE_ENVIRONMENT']
-with open('config-%s.json' %(COMPUTE_ENVIRONMENT), 'r') as infile:
+CONFIG_FILE = 'config-%s.json' %(COMPUTE_ENVIRONMENT)
+with open(CONFIG_FILE, 'r') as infile:
   config = json.load(infile)
 
 def unique_id():
@@ -25,9 +27,7 @@ JOB_ENCODE_INTERPOLATE = 'encode-interpolate'
 JOB_DECODE = 'decode'
 
 DIR_BATCHES = './batches'
-
-CONFIG_LOCAL = 'config-local.json'
-CONFIG_PAPERSPACE = './config-paperspace.json'
+DIR_ZIP = './zip'
 
 FOLDER_DATASET_INTERPOLATIONS = '/interpolations'
 FOLDER_DATASET_GENERATIONS = '/generations'
@@ -88,14 +88,17 @@ def prepare_batch(dataset, num_batches):
 
   return batch_dir
 
-def run_job_local(job, dataset, concurrent_jobs):
+def run_job_local(job, dataset):
 
   job_path = DIR_JOBS + '/' + job
   job_data = job_path + '/data'
   job_artifacts = job_path + '/artifacts'
+  job_config = config['jobs'][job]
+
+  concurrent_jobs = job_config['concurrent_jobs']
 
   # inject config
-  inject_config(CONFIG_LOCAL, job_path)
+  inject_config(CONFIG_FILE, job_path)
 
   # job artifacts are gathered into overall workflow artifacts after
   workflow_artifacts = ARTIFACTS + '/' + job
@@ -133,11 +136,8 @@ def local_generation():
   print('COMPUTE_ENV: local')
   print('------------------')
 
-  concurrent_jobs = 1
-  run_job_local(JOB_ENCODE_INTERPOLATE, DATASET, concurrent_jobs)
-
-  concurrent_jobs = 4
-  run_job_local(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE, concurrent_jobs)
+  run_job_local(JOB_ENCODE_INTERPOLATE, DATASET)
+  run_job_local(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
 
 def get_paperspace_job_state(job_id):
   res = requests.get(
@@ -148,19 +148,41 @@ def get_paperspace_job_state(job_id):
   job_state = res_json['state']
   return(job_state)
 
-def zipdir(path, ziph):
-  # ziph is zipfile handle
-  for root, dirs, files in os.walk(path):
-    for file in files:
-      ziph.write(os.path.join(root, file))
+def zip_job(source, target):
 
-def run_job_paperspace(job, dataset, concurrent_jobs):
+  '''
+  1) zips entire job directory in 'source' directory
+  2) puts zipfile in 'target' directory
+  3) returns path to zip file in 'target' directory
+  '''
+
+  create_dir(target)
+  zip_name = unique_id() + '.zip'
+  zip_path = target + '/' + zip_name
+  file_paths = [] 
+  for root, directories, files in os.walk(source): 
+    for filename in files: 
+      filepath = os.path.join(root, filename) 
+      file_paths.append(filepath)
+
+  with zipfile.ZipFile(zip_path, 'a') as file:
+    for file_to_zip in file_paths:
+      arcname = file_to_zip.replace(source, '')
+      file.write(file_to_zip, arcname)
+    file.close()
+
+  return(zip_path)
+
+def run_job_paperspace(job, dataset):
   job_path = DIR_JOBS + '/' + job
   job_data = job_path + '/data'
   job_artifacts = job_path + '/artifacts'
+  job_config = config['jobs'][job]
+
+  concurrent_jobs = job_config['concurrent_jobs']
 
   # inject config
-  inject_config(CONFIG_LOCAL, job_path)
+  inject_config(CONFIG_FILE, job_path)
 
   # job artifacts are gathered into overall workflow artifacts after
   workflow_artifacts = ARTIFACTS + '/' + job
@@ -178,62 +200,55 @@ def run_job_paperspace(job, dataset, concurrent_jobs):
     # inject batched data into job
     copy_files(dataset_batch_dir + '/batch%i' % i, job_data + '/input')
 
+    # zip job directory
+    job_zip_name = 'job.zip'
+    print('zipping job...')
+    job_zip_path = zip_job(job_path, DIR_ZIP)
+    print('job zipped: %s' %(job_zip_path))
+
     # run job
     start = time.time()
 
-    # subprocess.call(['paperspace', 'jobs', 'create', 
-    #   '--projectId=pri4d7aaq',
-    #   '--machineType=C2', 
-    #   '--container=reidsteven75/sound-gen-n-synth:latest', 
-    #   '--command=python job.py', 
-    #   '--workspace=%s'%(job_path)])
-    zipf = zipfile.ZipFile('job.zip', 'w', zipfile.ZIP_DEFLATED)
-    zipdir(job_path, zipf)
-    zipf.close()
-    print('job zipped')
-    print(get_only_files('.'))
-    res = requests.post(
-      PAPERSPACE_URL + '/jobs/createJob',
-      headers={'x-api-key': PAPERSPACE_API_KEY},
-      params={
-        'projectId': 'pri4d7aaq', 
-        'machineType': 'C2',
-        'container': 'reidsteven75/sound-gen-n-synth:latest',
-        'command': 'cd %s; python job.py' %(job_path),
-        'workspace': None
-      }  
-    )
-    res_json = json.loads(res.text)
-    job_id = res_json['id']
+    res = paperspace.jobs.create({
+      'apiKey': PAPERSPACE_API_KEY,
+      'projectId': job_config['project_id'],
+      'container': job_config['container'],
+      'machineType': job_config['machine_type'],
+      'command': job_config['command'],
+      'workspace': job_zip_path
+    })
 
-    complete_job_states = ['Stopped', 'Error', 'Failed', 'Cancelled']
-    job_state_last = 'None'
-    while True:
-      job_state_current = get_paperspace_job_state(job_id)
-      if (job_state_last != job_state_current):
-        print('JOB %s: %s' %(job_id, job_state_current))
-        job_state_last = job_state_current
-      if job_state_current in complete_job_states:
-        break
-      time.sleep(1)
+    print(res)
+    job_id = res['id']
+    job_error = res['jobError']
 
+    if res['jobError']:
+      print('job error: create_job()')
+      break
+
+    # get job artifacts
+    res = paperspace.jobs.artifactsGet({
+      'apiKey': PAPERSPACE_API_KEY,
+      'jobId': job_id,
+      'dest': workflow_artifacts
+    })
+
+    if res != True:
+      print('job error: get_artifacts()')
+      break
+
+    # job metrics
     end = time.time()
     job_time = str(end - start)
     print('JOB TIME: ' + job_time)
     job_metrics.append(job + '_' + str(i) + ' - execution time (s): ' + job_time)
 
-    # gather artifacts from job
-    copy_files(job_artifacts, workflow_artifacts)
-
 def paperspace_generation():
   print('COMPUTE_ENV: paperspace')
   print('-----------------------')
 
-  concurrent_jobs = 1
-  run_job_paperspace(JOB_ENCODE_INTERPOLATE, DATASET, concurrent_jobs)
-
-  # concurrent_jobs = 1
-  # run_job_paperspace(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE, concurrent_jobs)
+  run_job_paperspace(JOB_ENCODE_INTERPOLATE, DATASET)
+  run_job_paperspace(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
 
 if __name__ == "__main__":
   print('~~~~~~~~~~~~~~~')

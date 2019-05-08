@@ -9,6 +9,7 @@ services:
         COMPUTE_ENVIRONMENT: paperspace
     volumes:
         - ./models/n-synth/artifacts:/code/artifacts
+        - ./models/n-synth/zip:/code/zip
     ports:
      - "80:4000"
     tty: true

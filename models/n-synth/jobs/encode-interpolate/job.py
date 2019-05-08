@@ -65,7 +65,7 @@ def compute_embeddings():
 
 	num_input_files = len(os.listdir(input_path))
 
-	subprocess.call(['nsynth_save_embeddings', 
+	subprocess.check_call(['nsynth_save_embeddings', 
 		'--checkpoint_path=%s/model.ckpt-200000' %(DIR_CHECKPOINT), 
 		'--source_path=%s' %(input_path), 
 		'--save_path=%s' %(output_path), 

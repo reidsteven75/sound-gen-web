@@ -8,7 +8,7 @@
 			"SE": 		["hoxhit"]
 		},
 		"pitches":   					[24],
-		"resolution": 				6
+		"resolution": 				2
 	},
 	"checkpoint_name": 		"wavenet-ckpt",
 	"dir": {
@@ -20,17 +20,17 @@
 			"batch_size": 				96,
 			"concurrent_jobs": 		1,
 			"project_id": 				"pri4d7aaq",
-      "container": 					"reidsteven75/sound-gen-n-synth:latest",
+      "container": 					"reidsteven75/sound-gen-n-synth-gpu:latest",
 			"machine_type": 			"P6000",
       "command": 						"python job.py"
 		},
 		"decode": {
-			"gpus": 							1,
-			"batch_size":   			128,
+			"gpus": 							4,
+			"batch_size":   			96,
 			"sample_length": 			130,
-			"concurrent_jobs": 		4,
+			"concurrent_jobs": 		1,
 			"project_id": 				"pri4d7aaq",
-      "container": 					"reidsteven75/sound-gen-n-synth:latest",
+      "container": 					"reidsteven75/sound-gen-n-synth-cpu:latest",
 			"machine_type": 			"P6000",
       "command": 						"python job.py"
 		}

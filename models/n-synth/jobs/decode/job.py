@@ -1,18 +1,16 @@
 import json, os, subprocess
 import time
 import shutil
-
+import sys
+import zipfile
 import numpy as np
 
 from multiprocessing.dummy import Pool as ThreadPool
-
 from tqdm import tqdm
 from itertools import product
 from os.path import basename
-from utils import *
-
-import sys
-import zipfile
+from utils_common import *
+from utils_job import *
 
 JOB_NAME = 'DECODE'
 

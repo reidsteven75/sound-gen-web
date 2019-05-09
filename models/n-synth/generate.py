@@ -4,91 +4,34 @@ import subprocess
 import requests
 import json
 import shutil
-import uuid 
-import datetime
 import time
-import zipfile
 import paperspace
+from utils_common import *
+from utils_workflow import *
 
 COMPUTE_ENVIRONMENT = os.environ['COMPUTE_ENVIRONMENT']
 CONFIG_FILE = 'config-%s.json' %(COMPUTE_ENVIRONMENT)
 with open(CONFIG_FILE, 'r') as infile:
   config = json.load(infile)
 
-def unique_id():
-  return datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S') + \
-          '_' + \
-          uuid.uuid4().hex[:6].upper()
-
+UTILS_COMMON_FILE = 'utils_common.py'
+UTILS_JOB_FILE = 'utils_job.py'
 ARTIFACT_ID = unique_id()
 ARTIFACTS = './artifacts/' + ARTIFACT_ID
-
 DIR_JOBS = './jobs'
 JOB_ENCODE_INTERPOLATE = 'encode-interpolate'
 JOB_DECODE = 'decode'
-
 DIR_BATCHES = './batches'
 DIR_ZIP = './zip'
-
 FOLDER_DATASET_INTERPOLATIONS = '/interpolations'
 FOLDER_DATASET_GENERATIONS = '/generations'
 DATASET = './dataset'
 STORAGE_COMMON = './storage'
-
 if (COMPUTE_ENVIRONMENT == 'paperspace'):
   PAPERSPACE_API_KEY = config['paperspace']['api_key']
   PAPERSPACE_URL = config['paperspace']['url']
 
 job_metrics = []
-
-def delete_dir(path):
-  if (os.path.exists(path)):
-    shutil.rmtree(path)
-
-def create_dir(path):
-	os.makedirs(path, exist_ok=True)
-
-def get_only_files(path):
-	files = []
-	for file in os.listdir(path):
-		if os.path.isfile(os.path.join(path, file)):
-			if not file.startswith('.'):
-				files.append(file)
-	return files
-
-def inject_config(config_file, job_dir):
-  shutil.copy(config_file, job_dir)
-  os.rename(job_dir + '/' + config_file, job_dir + '/config.json')
-
-def copy_files(source, target):
-  create_dir(target)
-  files = os.listdir(source)
-  for f in files:
-    shutil.copy(source + '/' + f, target)
-
-def prepare_batch(dataset, num_batches):
-  create_dir(DIR_BATCHES)
-  batch_dir = DIR_BATCHES + '/' + unique_id()
-  batch_size = len(get_only_files(dataset)) / num_batches
-
-  copy_files(dataset, batch_dir)
-
-  # create batch folders
-  for i in range(0, num_batches):
-    batch_folder = batch_dir + '/batch%i' % i
-    create_dir(batch_folder)
-
-  #	move files into batch folders
-  batch = 0
-  files = get_only_files(batch_dir) 
-  for filename in files:
-    target_folder = batch_dir + '/batch%i' % batch
-    batch += 1
-    if batch >= num_batches:
-      batch = 0
-    shutil.move(batch_dir + '/' + filename, target_folder)
-
-  return batch_dir
 
 def run_job_local(job, dataset):
 
@@ -99,15 +42,17 @@ def run_job_local(job, dataset):
 
   concurrent_jobs = job_config['concurrent_jobs']
 
-  # inject config
+  # inject config & utils
   inject_config(CONFIG_FILE, job_path)
+  inject_file(UTILS_COMMON_FILE, job_path)
+  inject_file(UTILS_JOB_FILE, job_path)
 
   # job artifacts are gathered into overall workflow artifacts after
   workflow_artifacts = ARTIFACTS + '/' + job
   create_dir(workflow_artifacts)
 
   # batch dataset for concurrent jobs
-  dataset_batch_dir = prepare_batch(dataset, concurrent_jobs)
+  dataset_batch_dir = prepare_batch(DIR_BATCHES, dataset, concurrent_jobs)
 
   for i in range(concurrent_jobs):
 
@@ -141,40 +86,6 @@ def local_generation():
   run_job_local(JOB_ENCODE_INTERPOLATE, DATASET)
   run_job_local(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
 
-def get_paperspace_job_state(job_id):
-  res = requests.get(
-    PAPERSPACE_URL + '/jobs/getJob?jobId=%s' %(job_id),
-    headers={'x-api-key': PAPERSPACE_API_KEY},
-  )
-  res_json = json.loads(res.text)
-  job_state = res_json['state']
-  return(job_state)
-
-def zip_job(source, target):
-
-  '''
-  1) zips entire job directory in 'source' directory
-  2) puts zipfile in 'target' directory
-  3) returns path to zip file in 'target' directory
-  '''
-
-  create_dir(target)
-  zip_name = unique_id() + '.zip'
-  zip_path = target + '/' + zip_name
-  file_paths = [] 
-  for root, directories, files in os.walk(source): 
-    for filename in files: 
-      filepath = os.path.join(root, filename) 
-      file_paths.append(filepath)
-
-  with zipfile.ZipFile(zip_path, 'a') as file:
-    for file_to_zip in file_paths:
-      arcname = file_to_zip.replace(source, '')
-      file.write(file_to_zip, arcname)
-    file.close()
-
-  return(zip_path)
-
 def run_job_paperspace(job, dataset):
   job_path = DIR_JOBS + '/' + job
   job_data = job_path + '/data'
@@ -183,15 +94,17 @@ def run_job_paperspace(job, dataset):
 
   concurrent_jobs = job_config['concurrent_jobs']
 
-  # inject config
+  # inject config & utils
   inject_config(CONFIG_FILE, job_path)
+  inject_file(UTILS_COMMON_FILE, job_path)
+  inject_file(UTILS_JOB_FILE, job_path)
 
   # job artifacts are gathered into overall workflow artifacts after
   workflow_artifacts = ARTIFACTS + '/' + job
   create_dir(workflow_artifacts)
 
   # batch dataset for concurrent jobs
-  dataset_batch_dir = prepare_batch(dataset, concurrent_jobs)
+  dataset_batch_dir = prepare_batch(DIR_BATCHES, dataset, concurrent_jobs)
 
   for i in range(concurrent_jobs):
 
@@ -249,7 +162,7 @@ def paperspace_generation():
   print('-----------------------')
 
   run_job_paperspace(JOB_ENCODE_INTERPOLATE, DATASET)
-  # run_job_paperspace(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
+  run_job_paperspace(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
 
 if __name__ == "__main__":
   print('~~~~~~~~~~~~~~~')

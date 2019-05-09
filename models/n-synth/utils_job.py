@@ -1,30 +1,6 @@
-# Copyright 2017 Google Inc
-
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-
-#     https://www.apache.org/licenses/LICENSE-2.0
-
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import os
 import numpy as np
-
-# extensions can be a single tring like '.png' or '.jpg'
-# or a list of extensions. they should all be lowercase
-# but the . is important.
-def list_all_files(directory, extensions=None):
-    for root, dirnames, filenames in os.walk(directory):
-        for filename in filenames:
-            base, ext = os.path.splitext(filename)
-            joined = os.path.join(root, filename)
-            if extensions is None or ( len(ext) and ext.lower() in extensions ):
-                yield joined
+from utils_common import *
 
 def make_grid(res):
 	x, y = np.meshgrid(np.linspace(0, 1, res), np.linspace(0, 1, res))

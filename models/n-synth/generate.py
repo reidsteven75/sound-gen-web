@@ -249,8 +249,7 @@ def paperspace_generation():
   print('-----------------------')
 
   run_job_paperspace(JOB_ENCODE_INTERPOLATE, DATASET)
-  run_job_paperspace(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
-  # run_job_paperspace(JOB_DECODE, DATASET)
+  # run_job_paperspace(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
 
 if __name__ == "__main__":
   print('~~~~~~~~~~~~~~~')

@@ -4,6 +4,8 @@ import shutil
 
 import numpy as np
 
+from multiprocessing.dummy import Pool as ThreadPool
+
 from tqdm import tqdm
 from itertools import product
 from os.path import basename
@@ -108,16 +110,24 @@ def generate_audio():
 	print('-----------------------')
 	print('START: sound generation')
 
-	gen_call(0)
-	source = OUTPUT_PATH + '/batch0/'
-	files = os.listdir(source)
-	for f in files:
-		shutil.move(source + f, DIR_ARTIFACTS)	
+	#  map calls to gpu threads
+	pool = ThreadPool(config['jobs']['decode']['gpus'])
+	results = pool.map_async(gen_call, range(config['jobs']['decode']['gpus']))
+	while not results.ready():
+		time.sleep(1)
+	pool.close()
+	pool.join()
+
+	for i in range(0, config['jobs']['decode']['gpus']):
+		source = OUTPUT_PATH + '/batch%i/' % i
+		files = os.listdir(source)
+		for f in files:
+			shutil.move(source + f, DIR_ARTIFACTS)
 
 	print('RESULT: sound generation')
 	print('------------------------')
 	print('# sounds generated: %s' %(DIR_ARTIFACTS))
-	print(get_only_files(DIR_ARTIFACTS))	
+	print(get_only_files(DIR_ARTIFACTS))
 
 if __name__ == '__main__':
 	print('============================')

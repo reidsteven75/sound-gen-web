@@ -52,8 +52,6 @@ def init():
 		print('extracted')
 		print(os.listdir(DIR_CHECKPOINT))
 
-
-
 def compute_embeddings():
 
 	print('-------------------------')

@@ -33,8 +33,7 @@ if (COMPUTE_ENVIRONMENT == 'paperspace'):
 
 job_metrics = []
 
-def run_job_local(job, dataset):
-
+def run_job(job, dataset):
   job_path = DIR_JOBS + '/' + job
   job_data = job_path + '/data'
   job_artifacts = job_path + '/artifacts'
@@ -56,128 +55,79 @@ def run_job_local(job, dataset):
 
   for i in range(concurrent_jobs):
 
-    # init job data & artifacts
-    delete_dir(job_data)
-    delete_dir(job_artifacts)
-    create_dir(job_data)
-    create_dir(job_artifacts)
-
-    # inject batched data into job
-    copy_files(dataset_batch_dir + '/batch%i' % i, job_data + '/input')
-    
-    # ensure job has common storage files
-    copy_files(STORAGE_COMMON, job_path + '/storage')
-
-    # run job
     start = time.time()
-    subprocess.call(['python', 'job.py'], cwd=job_path)
-    end = time.time()
-    job_time = str(end - start)
-    print('JOB TIME: ' + job_time)
-    job_metrics.append(job + '_' + str(i) + ' - execution time (s): ' + job_time)
 
-    # gather artifacts from job
-    copy_files(job_artifacts, workflow_artifacts)
-
-def local_generation():
-  print('COMPUTE_ENV: local')
-  print('------------------')
-
-  run_job_local(JOB_ENCODE_INTERPOLATE, DATASET)
-  run_job_local(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
-
-def run_job_paperspace(job, dataset):
-  job_path = DIR_JOBS + '/' + job
-  job_data = job_path + '/data'
-  job_artifacts = job_path + '/artifacts'
-  job_config = config['jobs'][job]
-
-  concurrent_jobs = job_config['concurrent_jobs']
-
-  # inject config & utils
-  inject_config(CONFIG_FILE, job_path)
-  inject_file(UTILS_COMMON_FILE, job_path)
-  inject_file(UTILS_JOB_FILE, job_path)
-
-  # job artifacts are gathered into overall workflow artifacts after
-  workflow_artifacts = ARTIFACTS + '/' + job
-  create_dir(workflow_artifacts)
-
-  # batch dataset for concurrent jobs
-  dataset_batch_dir = prepare_batch(DIR_BATCHES, dataset, concurrent_jobs)
-
-  for i in range(concurrent_jobs):
-
-    # init job data
+    # init job data, artifacts, and storage
     delete_dir(job_data)
     create_dir(job_data)
-
-    # inject batched data into job
     copy_files(dataset_batch_dir + '/batch%i' % i, job_data + '/input')
 
-    # zip job directory
-    print('zipping job...')
-    job_zip_path = zip_job(job_path, DIR_ZIP)
-    print('zipped like a fresh coat zipper')
+    if (COMPUTE_ENVIRONMENT == 'local'):
+      # replicate paperspace environment
+      delete_dir(job_artifacts)
+      create_dir(job_artifacts)
+      copy_files(STORAGE_COMMON, job_path + '/storage')
+      # run job
+      subprocess.call(['python', 'job.py'], cwd=job_path)
+      # get job artifacts
+      copy_files(job_artifacts, workflow_artifacts)
 
-    # run job
-    start = time.time()
-    job_id = None
-    try:
-      res = paperspace.jobs.create({
-        'apiKey': PAPERSPACE_API_KEY,
-        'name': job,
-        'projectId': job_config['project_id'],
-        'container': job_config['container'],
-        'machineType': job_config['machine_type'],
-        'command': job_config['command'],
-        'workspace': job_zip_path
-      })
-      job_id = res['id']
-    except:
-      print('[ERROR]: jobs_create')
-      print(sys.exc_info())
-      return
-
-    # get job artifacts
-    try:
-      paperspace.jobs.artifactsGet({
-        'apiKey': PAPERSPACE_API_KEY,
-        'jobId': job_id,
-        'dest': workflow_artifacts
-      })
-    except:
-      print('[ERROR]: artifacts_get')
-      print(sys.exc_info()[0])
-      return
-
+    if (COMPUTE_ENVIRONMENT == 'paperspace'):
+      # zip job directory
+      print('zipping job...')
+      job_zip_path = zip_job(job_path, DIR_ZIP)
+      print('zipped like a fresh coat zipper')
+      # run job
+      job_id = None
+      try:
+        res = paperspace.jobs.create({
+          'apiKey': PAPERSPACE_API_KEY,
+          'name': job,
+          'projectId': job_config['project_id'],
+          'container': job_config['container'],
+          'machineType': job_config['machine_type'],
+          'command': job_config['command'],
+          'workspace': job_zip_path
+        })
+        job_id = res['id']
+      except:
+        print('[ERROR]: jobs_create')
+        print(sys.exc_info())
+        return
+      # get job artifacts
+      try:
+        paperspace.jobs.artifactsGet({
+          'apiKey': PAPERSPACE_API_KEY,
+          'jobId': job_id,
+          'dest': workflow_artifacts
+        })
+      except:
+        print('[ERROR]: artifacts_get')
+        print(sys.exc_info()[0])
+        return
+        
     # job metrics
     end = time.time()
     job_time = str(end - start)
     print('JOB TIME: ' + job_time)
     job_metrics.append(job + '_' + str(i) + ' - execution time (s): ' + job_time)
 
-def paperspace_generation():
-  print('COMPUTE_ENV: paperspace')
-  print('-----------------------')
+def run_workflow():
 
-  run_job_paperspace(JOB_ENCODE_INTERPOLATE, DATASET)
-  run_job_paperspace(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
+  run_job(JOB_ENCODE_INTERPOLATE, DATASET)
+  run_job(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
 
 if __name__ == "__main__":
   print('~~~~~~~~~~~~~~~')
   print('N-SYNTH: START')
   print('~~~~~~~~~~~~~~~')
   print('ARTIFACT_ID: %s' %(ARTIFACT_ID))
+  print('COMPUTE_ENV: %s' %(COMPUTE_ENVIRONMENT))
 
   start = time.time()
 
   create_dir(ARTIFACTS)
-
-  if (COMPUTE_ENVIRONMENT == 'paperspace'):
-    paperspace_generation()
-  else: 
-    local_generation()
+  run_workflow()
 
   end = time.time()
   worflow_time = str(end - start)

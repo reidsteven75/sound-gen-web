@@ -25,8 +25,8 @@
       "command": 						"python job.py"
 		},
 		"decode": {
-			"gpus": 							4,
-			"batch_size":   			96,
+			"gpus": 							1,
+			"batch_size":   			4,
 			"sample_length": 			130,
 			"concurrent_jobs": 		1,
 			"project_id": 				"pri4d7aaq",

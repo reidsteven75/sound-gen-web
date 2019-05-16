@@ -12,8 +12,8 @@ const _ = require('lodash')
 const moment = require('moment')
 const size = require('object-sizeof')
 
-const PORT = process.env.PORT || 3001
-const MOCK_DATA = process.env.MOCK_DATA || false
+const PORT = process.env.PORT || 81
+const ENVIRONMENT = process.env.NODE_ENV || 'development'
 
 const config = {
 	storage: {
@@ -50,16 +50,22 @@ calcResponseTime = function(endpoint, startTime) {
 	console.log('time (s): ', timeDiff)
 }
 
+app.get('/test', function(req, res) {
+	res.send({test:'works'})
+})
+
+
 app.get('/app', function(req, res) {
 	res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
 })
 
 server.listen(PORT, () => {
 
-	console.log('====================')
-  	console.log('AUGMENTED MUSIC GENERATION: web server')
-	console.log('--------------------')
-	console.log('PORT: ', PORT)
+	console.log('=============')
+  console.log('SOUND SERVER')
+	console.log('-------------')
+	console.log('PORT:', PORT)
+	console.log('ENV:', ENVIRONMENT)
 	console.log('====================')
 
 })

@@ -1,6 +1,6 @@
 version: '3'
 services:
-  sound-server:
+  server:
     build:
       context: ./server
     environment:
@@ -13,4 +13,18 @@ services:
     tty: true
     restart: on-failure
     command: sh -c "npm run server"
+
+  app:
+    build:
+      context: ./client
+    environment:
+        - NODE_ENV=development
+    ports:
+     - "3000:80"
+    volumes:
+     - ./server:/code
+     - /code/node_modules
+    tty: true
+    restart: on-failure
+    command: sh -c "npm run client"
   

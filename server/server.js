@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
+const mongoose = require('mongoose')
 const {Storage} = require('@google-cloud/storage')
 
 const bodyParser = require('body-parser')
@@ -12,8 +13,9 @@ const _ = require('lodash')
 const moment = require('moment')
 const size = require('object-sizeof')
 
-const PORT = process.env.PORT || 81
+const PORT = process.env.PORT || 4001
 const ENVIRONMENT = process.env.NODE_ENV || 'development'
+const CLIENT_PATH = path.join('./client')
 
 const config = {
 	storage: {
@@ -27,11 +29,11 @@ const storage = new Storage({
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
-app.use(express.static('client/build'))
+app.use(express.static('client'))
 
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 })
 
@@ -51,12 +53,12 @@ calcResponseTime = function(endpoint, startTime) {
 }
 
 app.get('/test', function(req, res) {
-	res.send({test:'works'})
+	res.send({test:'works!'})
 })
 
 
 app.get('/app', function(req, res) {
-	res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
+	res.sendFile(path.resolve(CLIENT_PATH, 'index.html'))
 })
 
 server.listen(PORT, () => {
@@ -66,6 +68,19 @@ server.listen(PORT, () => {
 	console.log('-------------')
 	console.log('PORT:', PORT)
 	console.log('ENV:', ENVIRONMENT)
-	console.log('====================')
+	console.log('-----------------')
+
+	mongoose.connect('mongodb://mongodb:27017/test', { useNewUrlParser: true })
+
+	mongoose.connection.on('error', error => {
+		console.log('Database: error')
+		console.log('-----------------')
+		console.log(error)
+	})
+
+	mongoose.connection.once('open', () => {
+		console.log('Database: connected')
+		console.log('-------------------')
+	})
 
 })

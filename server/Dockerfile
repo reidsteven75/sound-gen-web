@@ -1,8 +1,5 @@
 FROM node:11
 
-# Install libraries
-RUN apt-get update && apt-get install -y 
-
 # Set working dir
 WORKDIR /code
 
@@ -14,4 +11,8 @@ RUN npm install
 COPY . /code
 
 # Port
-EXPOSE 81
+EXPOSE 4001
+
+# Wait until db is ready
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.5.0/wait /wait
+RUN chmod +x /wait

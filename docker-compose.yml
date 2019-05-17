@@ -1,30 +1,57 @@
 version: '3'
+networks:
+  sound_network:
+    driver: bridge
 services:
   server:
+    hostname: server
     build:
       context: ./server
+    restart: always
     environment:
-        - NODE_ENV=development
+      - NODE_ENV=development
+      - SERVER_PORT=4001
     ports:
-     - "3001:81"
+      - "4001:4001"
     volumes:
-     - ./server:/code
-     - /code/node_modules
-    tty: true
-    restart: on-failure
-    command: sh -c "npm run server"
+      - ./server:/code
+      - ./client/dist:/code/client
+      - /code/node_modules
+    depends_on:
+      - mongodb
+    environment:
+      WAIT_HOSTS: mongodb:27017
+    networks:
+      - sound_network
+    command: sh -c "/wait && npm run start"
 
-  app:
+  client:
+    hostname: client
     build:
       context: ./client
+    restart: always
     environment:
-        - NODE_ENV=development
+      - SERVER_PORT=4001
     ports:
-     - "3000:80"
+      - "8080:8080"
     volumes:
-     - ./server:/code
-     - /code/node_modules
-    tty: true
-    restart: on-failure
-    command: sh -c "npm run client"
+      - ./client:/code
+      - /code/node_modules
+    depends_on:
+      - server
+    links:
+      - server
+    networks:
+      - sound_network
+    command: sh -c "npm run start"
   
+  mongodb:
+    hostname: mongodb
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    networks:
+      - sound_network
+    logging:
+      driver: none

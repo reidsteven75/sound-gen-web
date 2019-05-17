@@ -1,8 +1,5 @@
 FROM node:11
 
-# Install libraries
-RUN apt-get update && apt-get install -y 
-
 # Set working dir
 WORKDIR /code
 
@@ -14,4 +11,4 @@ RUN npm install
 COPY . /code
 
 # Port
-EXPOSE 80
+EXPOSE 8080

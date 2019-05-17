@@ -159,7 +159,7 @@ class LatentExplorer extends Component {
     const x = parseFloat(data.x).toFixed(1)
 		const y = parseFloat(data.y).toFixed(1)
 		// de-activated for now
-			// --------------------
+		// --------------------
 		// const hasBeenActivated = data.hasBeenActivated
 
 		var latentSpace = [

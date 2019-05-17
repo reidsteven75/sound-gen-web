@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import axios from 'axios'
 
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -13,6 +14,8 @@ import pitches from './data/pitches.json'
 import grids from './data/grids.json'
 
 import './App.css'
+
+const API = 'http://localhost:4001'
 
 var data = {
   latentSpaces: latentSpaces,
@@ -48,7 +51,13 @@ const theme = createMuiTheme({
   },
 })
 
-
+axios.get(API + '/test')
+  .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  })
 
 class App extends Component {
   render() {

@@ -1,13 +1,9 @@
-## Web Server & App for Augmented Music Generation
+Dev
+```
+$ docker-compose up --build
 
-Init Local
-```
-$ npm install --only=dev
-```
-
-Dev Locally
-```
-$ npm run dev
+API: http://localhost:4001
+CLIENT: http://localhost:8080
 ```
 
 Cloud Cors

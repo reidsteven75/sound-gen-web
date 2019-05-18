@@ -1,3 +1,5 @@
+require('dotenv').config({ path: 'build/.env' })
+
 const express = require('express')
 const app = express()
 const server = require('http').Server(app)
@@ -5,8 +7,8 @@ const io = require('socket.io')(server)
 const mongoose = require('mongoose')
 const {Storage} = require('@google-cloud/storage')
 
-const bodyParser = require('body-parser')
 const path = require('path')
+const bodyParser = require('body-parser')
 const assert = require('assert')
 const request = require('request')
 const _ = require('lodash')
@@ -20,7 +22,10 @@ const SERVER_PORT = process.env.SERVER_PORT
 const MONGO_PORT = process.env.MONGO_PORT
 const API_ROUTE = '/api'
 const CLIENT_ROUTE = '/app'
-const CLIENT_PATH = path.join('./client')
+const CLIENT_PATH = 'build/client'
+
+// const MONGO_URL = 'mongodb://mongodb:' + MONGO_PORT + '/test'
+const MONGO_URL = process.env.MONGO_URL
 
 const config = {
 	storage: {
@@ -34,7 +39,7 @@ const storage = new Storage({
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
-app.use(express.static('client'))
+app.use(express.static(CLIENT_PATH))
 
 app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -63,7 +68,7 @@ app.get(API_ROUTE + '/test', function(req, res) {
 
 
 app.get(CLIENT_ROUTE, function(req, res) {
-	res.sendFile(path.resolve(CLIENT_PATH, 'index.html'))
+	res.sendFile(path.resolve(path.join(CLIENT_PATH), 'index.html'))
 })
 
 server.listen(SERVER_PORT, () => {
@@ -72,9 +77,8 @@ server.listen(SERVER_PORT, () => {
   console.log('')
 	console.log('ENV:    ', ENVIRONMENT)
 	console.log('API:    ', HOST + ':' + SERVER_PORT + API_ROUTE)
-	console.log('CLIENT: ', HOST + ':' + SERVER_PORT + CLIENT_ROUTE)
 
-	mongoose.connect('mongodb://mongodb:' + MONGO_PORT + '/test', { useNewUrlParser: true })
+	mongoose.connect(MONGO_URL, { useNewUrlParser: true })
 
 	mongoose.connection.on('error', error => {
 		console.log('DB:      error')

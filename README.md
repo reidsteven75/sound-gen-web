@@ -8,32 +8,48 @@ $ ./init.sh
 Dev
 ----------------
 
-all (client, server, mongodb)
+all
 ```
 $ docker-compose up --build
 ```
 
 client
 ```
-$ docker-compose -f docker-compose-client.yml up --build
+$ docker-compose up --build client
 ```
 
 server
 ```
-$ docker-compose -f docker-compose-server.yml up --build
+$ docker-compose up --build server
 ```
 
-Deploy to Production
---------------------
+Build
+-----
+dev
+```
+$ ./build.sh .env
+```
+
+prod
+```
+$ ./build.sh .env.prod
+```
+
+Deploy
+------
 ```
 $ ./deploy.sh
 ```
-- uses 'app.yml' for Google Apps Engine config
+- uses 'server/app.yml' for Google Apps Engine config
+- uses 'server/Dockerfile' for Google Apps Engine container
 
-Managing Modules
-----------------
-- all node install & uninstalls should be done locally
-- after install / uninstall restart docker container
+Node Modules
+------------
+- install & uninstalls should be done locally
+- when changing node_modules run the following command:
+```
+$ docker-compose down
+```
 
 Environment Variables
 ---------------------
@@ -43,6 +59,10 @@ Environment Variables
   - client/webpack.*.js files
   - client/App.js
   - server/server.js
+
+DB Service
+----------
+https://cloud.mongodb.com
 
 Google Storage
 --------------

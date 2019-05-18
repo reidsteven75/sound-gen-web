@@ -9,6 +9,7 @@ services:
     env_file: .env
     build:
       context: ./client
+      dockerfile: Dockerfile.dev
     restart: always
     volumes:
       - ./client:/code
@@ -34,10 +35,7 @@ services:
     restart: always
     volumes:
       - ./server:/code
-      - ./client/dist:/code/client
       - /code/node_modules
-    depends_on:
-      - mongodb
     networks:
       - sound_network
     ports:
@@ -46,16 +44,19 @@ services:
       - "${SERVER_PORT}"
     environment:
       WAIT_HOSTS: mongodb:${MONGO_PORT}
-    command: sh -c "/wait && npm run dev"
+    command: sh -c "npm run dev"
+    # depends_on:
+    #   - mongodb
+    # command: sh -c "/wait && npm run dev"
   
-  mongodb:
-    hostname: mongodb
-    env_file: .env
-    image: mongo
-    restart: always
-    networks:
-      - sound_network
-    logging:
-      driver: none
-    ports:
-      - ${MONGO_PORT}:${MONGO_PORT}
+  # mongodb:
+  #   hostname: mongodb
+  #   env_file: .env
+  #   image: mongo
+  #   restart: always
+  #   networks:
+  #     - sound_network
+  #   logging:
+  #     driver: none
+  #   ports:
+  #     - ${MONGO_PORT}:${MONGO_PORT}

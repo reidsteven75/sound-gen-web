@@ -1,12 +1,12 @@
+const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const CopyPlugin = require('copy-webpack-plugin')
-const webpack = require('webpack')
 
 module.exports = {
   entry: __dirname + '/src/index.js',
   output: {
-    path: __dirname + '/dist',
+    path: __dirname + '/build',
     publicPath: '/',
     filename: 'bundle.js'
   },
@@ -36,8 +36,9 @@ module.exports = {
   },
   resolve: {
     extensions: ['*', '.js', '.jsx']
-  },
+	},
   plugins: [
+		new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       PUBLIC_URL: '',
       inject: false,
@@ -46,7 +47,6 @@ module.exports = {
     new CopyPlugin([
       { from: 'public', to: '' }
 		]),
-		new CleanWebpackPlugin(),
     new webpack.DefinePlugin({
       'process.env':{
 				'NODE_ENV':       JSON.stringify(process.env.NODE_ENV),
@@ -55,6 +55,7 @@ module.exports = {
 				'SERVER_PORT': 		JSON.stringify(process.env.SERVER_PORT),
         'CLIENT_PORT':    JSON.stringify(process.env.CLIENT_PORT)
       }
-    })
+		}),
+		
   ]
 }

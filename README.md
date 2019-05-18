@@ -1,10 +1,35 @@
+Init
+----------------
+```
+$ ./init.sh
+```
+
 Dev
+----------------
+
+all (client, server, mongodb)
 ```
 $ docker-compose up --build
-
-API: http://localhost:4001
-CLIENT: http://localhost:8080
 ```
+
+client
+```
+$ docker-compose -f docker-compose-client.yml up --build
+```
+
+Managing Modules
+----------------
+- local node_modules syncs with docker images node_modules
+- all node install & uninstalls should be done locally
+
+Deploy to Production
+--------------------
+```
+$ ./deploy-prod.sh
+```
+
+Google Storage
+--------------
 
 Cloud Cors
 ```

@@ -15,7 +15,15 @@ import grids from './data/grids.json'
 
 import './App.css'
 
-const API = 'http://localhost:4001'
+const API = 'http://localhost:' + process.env.SERVER_PORT + '/api'
+
+axios.get(API + '/test')
+  .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  })
 
 var data = {
   latentSpaces: latentSpaces,
@@ -50,14 +58,6 @@ const theme = createMuiTheme({
     useNextVariants: true,
   },
 })
-
-axios.get(API + '/test')
-  .then(function (response) {
-    console.log(response);
-  })
-  .catch(function (error) {
-    console.log(error);
-  })
 
 class App extends Component {
   render() {

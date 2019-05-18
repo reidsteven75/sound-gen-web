@@ -67,7 +67,8 @@ class Keyboard extends Component {
 					<Grid item xs={1} style={style.keyWrapper}><KeyboardKey label='J' pitch={84} updateKeyPressed={this.props.updateKeyPressed}/></Grid>
 				</Grid>
 			</div>
-				
+	
+
     return (
         <div style={style.wrapper}>
           {content}

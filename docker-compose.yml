@@ -3,55 +3,59 @@ networks:
   sound_network:
     driver: bridge
 services:
+
+  client:
+    hostname: client
+    env_file: .env
+    build:
+      context: ./client
+    restart: always
+    volumes:
+      - ./client:/code
+      - /code/node_modules
+    networks:
+      - sound_network
+    ports:
+      - "${CLIENT_PORT}:${CLIENT_PORT}"
+    expose:
+      - "${CLIENT_PORT}"
+    command: sh -c "npm run start"
+    depends_on:
+      - server
+    links:
+      - server
+
   server:
     hostname: server
+    env_file: .env
     build:
       context: ./server
+      dockerfile: Dockerfile.dev
     restart: always
-    environment:
-      - NODE_ENV=development
-      - SERVER_PORT=4001
-    ports:
-      - "4001:4001"
     volumes:
       - ./server:/code
       - ./client/dist:/code/client
       - /code/node_modules
     depends_on:
       - mongodb
-    environment:
-      WAIT_HOSTS: mongodb:27017
     networks:
       - sound_network
-    command: sh -c "/wait && npm run start"
-
-  client:
-    hostname: client
-    build:
-      context: ./client
-    restart: always
-    environment:
-      - SERVER_PORT=4001
     ports:
-      - "8080:8080"
-    volumes:
-      - ./client:/code
-      - /code/node_modules
-    depends_on:
-      - server
-    links:
-      - server
-    networks:
-      - sound_network
-    command: sh -c "npm run start"
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    expose:
+      - "${SERVER_PORT}"
+    environment:
+      WAIT_HOSTS: mongodb:${MONGO_PORT}
+    command: sh -c "/wait && npm run start"
   
   mongodb:
     hostname: mongodb
+    env_file: .env
     image: mongo
     restart: always
-    ports:
-      - 27017:27017
     networks:
       - sound_network
     logging:
       driver: none
+    ports:
+      - ${MONGO_PORT}:${MONGO_PORT}

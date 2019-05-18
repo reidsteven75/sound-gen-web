@@ -1,6 +1,6 @@
-const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyPlugin = require('copy-webpack-plugin')
+const webpack = require('webpack')
 
 module.exports = {
   entry: {
@@ -35,6 +35,13 @@ module.exports = {
     }),
     new CopyPlugin([
       { from: 'public', to: '' }
-    ])
+    ]),
+    new webpack.DefinePlugin({
+      'process.env':{
+        'NODE_ENV':       JSON.stringify(process.env.NODE_ENV),
+        'SERVER_PORT':    JSON.stringify(process.env.SERVER_PORT),
+        'CLIENT_PORT':    JSON.stringify(process.env.CLIENT_PORT)
+      }
+    })
   ]
 }

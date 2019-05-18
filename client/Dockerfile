@@ -4,11 +4,10 @@ FROM node:11
 WORKDIR /code
 
 # Install packages
-COPY package*.json /code/
-RUN npm install
+# COPY package*.json /code/
+# RUN npm install
 
 # Copy code
 COPY . /code
 
-# Port
-EXPOSE 8080
+ENV SECRET='test'

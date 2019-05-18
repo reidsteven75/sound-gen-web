@@ -3,7 +3,6 @@
     "start": "webpack-dev-server --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js"
   },
-  "proxy": "http://localhost:4001",
   "eslintConfig": {
     "extends": "react-app"
   },
@@ -42,7 +41,6 @@
     "env-cmd": "^8.0.2",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
-    "react-hot-loader": "^4.8.5",
     "webpack": "^4.31.0",
     "webpack-cli": "^3.3.2",
     "webpack-dev-server": "^3.3.1",

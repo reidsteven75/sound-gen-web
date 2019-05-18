@@ -13,7 +13,10 @@ const _ = require('lodash')
 const moment = require('moment')
 const size = require('object-sizeof')
 
-const PORT = process.env.PORT || 4001
+const API_ROUTE = '/api'
+const MONGO_PORT = process.env.MONGO_PORT
+const SERVER_HOST = 'http://0.0.0.0'
+const SERVER_PORT = process.env.SERVER_PORT
 const ENVIRONMENT = process.env.NODE_ENV || 'development'
 const CLIENT_PATH = path.join('./client')
 
@@ -52,7 +55,7 @@ calcResponseTime = function(endpoint, startTime) {
 	console.log('time (s): ', timeDiff)
 }
 
-app.get('/test', function(req, res) {
+app.get(API_ROUTE + '/test', function(req, res) {
 	res.send({test:'works!'})
 })
 
@@ -61,26 +64,27 @@ app.get('/app', function(req, res) {
 	res.sendFile(path.resolve(CLIENT_PATH, 'index.html'))
 })
 
-server.listen(PORT, () => {
+server.listen(SERVER_PORT, () => {
 
-	console.log('=============')
-  console.log('SOUND SERVER')
-	console.log('-------------')
-	console.log('PORT:', PORT)
+	console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+	console.log('~= Sound Server Ready =~')
+	
+  console.log('')
+	console.log('API:', SERVER_HOST + ':' + SERVER_PORT + API_ROUTE)
 	console.log('ENV:', ENVIRONMENT)
-	console.log('-----------------')
 
-	mongoose.connect('mongodb://mongodb:27017/test', { useNewUrlParser: true })
+	mongoose.connect('mongodb://mongodb:' + MONGO_PORT + '/test', { useNewUrlParser: true })
 
 	mongoose.connection.on('error', error => {
-		console.log('Database: error')
+		console.log('DB: error')
 		console.log('-----------------')
 		console.log(error)
+		console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
 	})
 
 	mongoose.connection.once('open', () => {
-		console.log('Database: connected')
-		console.log('-------------------')
+		console.log('DB: connected')
+		console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
 	})
 
 })

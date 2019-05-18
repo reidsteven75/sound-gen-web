@@ -1,11 +1,10 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
 const CopyPlugin = require('copy-webpack-plugin')
 const webpack = require('webpack')
 
 module.exports = {
-  entry: {
-    app: './src/index.js'
-  },
+  entry: __dirname + '/src/index.js',
   output: {
     path: __dirname + '/dist',
     publicPath: '/',
@@ -16,7 +15,18 @@ module.exports = {
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: ['babel-loader']
+        use: {
+					loader: 'babel-loader',
+					options: {
+						presets: [
+							'@babel/preset-env',
+							'@babel/preset-react'
+						],
+						plugins: [
+							'@babel/plugin-proposal-class-properties'
+						]
+					}
+				}
       },
       {
         test: /\.css$/,
@@ -35,11 +45,14 @@ module.exports = {
     }),
     new CopyPlugin([
       { from: 'public', to: '' }
-    ]),
+		]),
+		new CleanWebpackPlugin(),
     new webpack.DefinePlugin({
       'process.env':{
-        'NODE_ENV':       JSON.stringify(process.env.NODE_ENV),
-        'SERVER_PORT':    JSON.stringify(process.env.SERVER_PORT),
+				'NODE_ENV':       JSON.stringify(process.env.NODE_ENV),
+				'HTTPS':       		JSON.stringify(process.env.HTTPS),
+				'HOST': 					JSON.stringify(process.env.HOST),
+				'SERVER_PORT': 		JSON.stringify(process.env.SERVER_PORT),
         'CLIENT_PORT':    JSON.stringify(process.env.CLIENT_PORT)
       }
     })

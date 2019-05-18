@@ -19,4 +19,4 @@ services:
       - "${CLIENT_PORT}:${CLIENT_PORT}"
     expose:
       - "${CLIENT_PORT}"
-    command: sh -c "npm run start"
+    command: sh -c "npm run dev"

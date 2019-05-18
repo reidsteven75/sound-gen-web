@@ -4,27 +4,6 @@ networks:
     driver: bridge
 services:
 
-  client:
-    hostname: client
-    env_file: .env
-    build:
-      context: ./client
-    restart: always
-    volumes:
-      - ./client:/code
-      - /code/node_modules
-    networks:
-      - sound_network
-    ports:
-      - "${CLIENT_PORT}:${CLIENT_PORT}"
-    expose:
-      - "${CLIENT_PORT}"
-    command: sh -c "npm run dev"
-    depends_on:
-      - server
-    links:
-      - server
-
   server:
     hostname: server
     env_file: .env

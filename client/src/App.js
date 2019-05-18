@@ -15,7 +15,8 @@ import grids from './data/grids.json'
 
 import './App.css'
 
-const API = 'http://localhost:' + process.env.SERVER_PORT + '/api'
+const HTTPS = (process.env.HTTPS === 'true')
+const API = (HTTPS ? 'https://' : 'http://') + process.env.HOST + ':' + process.env.SERVER_PORT + '/api'
 
 axios.get(API + '/test')
   .then(function (response) {

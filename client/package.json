@@ -1,21 +1,14 @@
 {
+  "name": "sound_client",
+  "description": "react web app",
+  "repository": "https://github.com/reidsteven75/sound-generation-web",
+  "license": "MIT",
   "scripts": {
-    "start": "webpack-dev-server --config webpack.dev.js",
+    "dev": "webpack-dev-server --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js"
   },
   "eslintConfig": {
     "extends": "react-app"
-  },
-  "babel": {
-    "presets": [
-      "@babel/preset-env",
-      "@babel/preset-react"
-    ],
-    "plugins": [
-      [
-        "@babel/plugin-proposal-class-properties"
-      ]
-    ]
   },
   "dependencies": {
     "@material-ui/core": "^3.9.3",
@@ -36,6 +29,7 @@
     "@babel/preset-env": "^7.4.4",
     "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.6",
+    "clean-webpack-plugin": "^2.0.2",
     "copy-webpack-plugin": "^5.0.3",
     "css-loader": "^2.1.1",
     "env-cmd": "^8.0.2",

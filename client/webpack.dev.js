@@ -3,11 +3,9 @@ const common = require('./webpack.common.js')
 const webpack = require('webpack')
 
 const config = {
-  logs: {
-    section: ('--------------'),
-    soundWaveGraphic: ('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-  },
-  host: '0.0.0.0',
+	env: process.env.NODE_ENV,
+	host: process.env.HOST,
+	port: process.env.CLIENT_PORT,
   progressBar: {
     enabled: false,
     lastMessage: null,
@@ -24,10 +22,7 @@ const config = {
 const progressBar = (percentage, message) => {
 
   // Start
-  if (percentage == 0) {
-
-    console.log('web-packing...')
-    console.log(config.logs.section)
+  if (percentage === 0) {
     
   }
 
@@ -44,16 +39,14 @@ const progressBar = (percentage, message) => {
     }
   }
   
-
   // Done
   if (percentage >= 1) {
     console.log('')
-    console.log(config.logs.soundWaveGraphic)
+    console.log('~~~~~~~~~~~~~~~~~~~~~~~~')
     console.log('~= Sound Client Ready =~')
     console.log('')
-    console.log('URL: http://' + config.host + ':' + process.env.CLIENT_PORT)
-    console.log('ENV: ' + process.env.NODE_ENV)
-    console.log(config.logs.soundWaveGraphic)
+		console.log('URL: http://' + config.host + ':' + config.port)
+    console.log('ENV: ' + config.env)
   }
 
 }
@@ -63,7 +56,7 @@ module.exports = merge(common, {
   devtool: 'eval',
   devServer: {
     host: config.host,
-    port: process.env.CLIENT_PORT,
+    port: config.port,
     contentBase: './dist',
     stats: 'none'
   },

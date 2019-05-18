@@ -13,11 +13,13 @@ const _ = require('lodash')
 const moment = require('moment')
 const size = require('object-sizeof')
 
-const API_ROUTE = '/api'
-const MONGO_PORT = process.env.MONGO_PORT
-const SERVER_HOST = 'http://0.0.0.0'
-const SERVER_PORT = process.env.SERVER_PORT
 const ENVIRONMENT = process.env.NODE_ENV || 'development'
+const HTTPS = (process.env.HTTPS === 'true')
+const HOST = (HTTPS ? 'https://' : 'http://') + process.env.HOST
+const SERVER_PORT = process.env.SERVER_PORT
+const MONGO_PORT = process.env.MONGO_PORT
+const API_ROUTE = '/api'
+const CLIENT_ROUTE = '/app'
 const CLIENT_PATH = path.join('./client')
 
 const config = {
@@ -60,31 +62,28 @@ app.get(API_ROUTE + '/test', function(req, res) {
 })
 
 
-app.get('/app', function(req, res) {
+app.get(CLIENT_ROUTE, function(req, res) {
 	res.sendFile(path.resolve(CLIENT_PATH, 'index.html'))
 })
 
 server.listen(SERVER_PORT, () => {
-
-	console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+	console.log('~~~~~~~~~~~~~~~~~~~~~~~~')
 	console.log('~= Sound Server Ready =~')
-	
   console.log('')
-	console.log('API:', SERVER_HOST + ':' + SERVER_PORT + API_ROUTE)
-	console.log('ENV:', ENVIRONMENT)
+	console.log('ENV:    ', ENVIRONMENT)
+	console.log('API:    ', HOST + ':' + SERVER_PORT + API_ROUTE)
+	console.log('CLIENT: ', HOST + ':' + SERVER_PORT + CLIENT_ROUTE)
 
 	mongoose.connect('mongodb://mongodb:' + MONGO_PORT + '/test', { useNewUrlParser: true })
 
 	mongoose.connection.on('error', error => {
-		console.log('DB: error')
+		console.log('DB:      error')
 		console.log('-----------------')
 		console.log(error)
-		console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
 	})
 
 	mongoose.connection.once('open', () => {
-		console.log('DB: connected')
-		console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+		console.log('DB:      connected')
 	})
 
 })

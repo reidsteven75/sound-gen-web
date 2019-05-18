@@ -1,8 +1,8 @@
 #!/bin/bash
 
-echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-echo '~= Sound Web SDK: Initializing =~'
-echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+echo '~= Sound Web: Initializing =~'
+echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 
 echo 'installing client modules...'
 echo '----------------------------'
@@ -16,6 +16,6 @@ cd ..
 cd server
 npm install
 
-echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-echo '~= Sound Web SDK: Ready =~'
-echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+echo '~~~~~~~~~~~~~~~~~~~~~~'
+echo '~= Sound Web: Ready =~'
+echo '~~~~~~~~~~~~~~~~~~~~~~'

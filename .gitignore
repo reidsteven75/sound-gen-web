@@ -1,20 +1,17 @@
-# Temporary files.
+# common files
 .#*
-
-# Log files.
 *.log
-
-# OSX hidden metadata file
 .DS_Store
+
+# common directories
+**/node_modules/
+**/storage/
+**/artifacts/
 
 # specific directories
 find-better-places-for-these/
 **/.ps_project/
 
-# checkpoints
-**/storage/
 
-# artifacts
-**/artifacts/
 
 

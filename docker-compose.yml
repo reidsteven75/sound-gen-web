@@ -21,8 +21,6 @@ services:
     expose:
       - "${CLIENT_PORT}"
     command: sh -c "npm run dev"
-    depends_on:
-      - server
     links:
       - server
 
@@ -61,18 +59,21 @@ services:
   #   ports:
   #     - ${MONGO_PORT}:${MONGO_PORT}
 
-  generate-sound:
+  generate:
+    hostname: generate
+    env_file: .env
     build:
       context: ./models/n-synth
       args: 
-        TENSORFLOW_IMAGE: tensorflow/tensorflow:1.13.1-py3
-        COMPUTE_TYPE: cpu
+        TENSORFLOW_IMAGE: tensorflow/tensorflow:1.13.1-gpu-py3
+        CONFIG: paperspace
+        COMPUTE_TYPE: gpu
         COMPUTE_ENVIRONMENT: paperspace
     volumes:
       - ./models/n-synth/artifacts:/code/artifacts
     networks:
       - sound_network
     ports:
-     - "80:4000"
+     - "${GENERATE_PORT}:${GENERATE_PORT}"
     tty: true
     command: sh -c "python generate.py"

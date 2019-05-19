@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
   build-essential \
   libasound2-dev \
   libjack-dev \
+  libav-tools \
   sox \
   lame
 
@@ -29,6 +30,9 @@ RUN pip install -r requirements-${COMPUTE_TYPE}.txt
 ENV COMPUTE_TYPE $COMPUTE_TYPE
 ARG COMPUTE_ENVIRONMENT
 ENV COMPUTE_ENVIRONMENT $COMPUTE_ENVIRONMENT
+
+ARG CONFIG
+ENV CONFIG $CONFIG
 
 # Copy code
 COPY . /code

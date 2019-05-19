@@ -33,10 +33,6 @@ const config = {
 	}
 }
 
-const storage = new Storage({
-  projectId: config.storage.projectId,
-})
-
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static(CLIENT_PATH))
@@ -47,25 +43,22 @@ app.use(function(req, res, next) {
   next();
 })
 
-io.on('connection', function (socket) {
-	console.log('[socket]: connected')
+const storage = new Storage({
+  projectId: config.storage.projectId,
 })
-
-calcResponseSize = function(data) {
-	console.log('size (kB): ', size(data)/1000)
-}
-
-calcResponseTime = function(endpoint, startTime) {
-	const endTime = Date.now()
-	var timeDiff = (( endTime - startTime ) / 1000).toFixed(2)
-	console.log(endpoint)
-	console.log('time (s): ', timeDiff)
-}
+const bucket = storage.bucket('sound-gen-dev')
+app.post(API_ROUTE + '/sounds', function(req, res) {
+	req.on('readable', function(){
+		console.log(req.read())
+		
+	})
+	res.send({test:'works!'})
+	
+})
 
 app.get(API_ROUTE + '/test', function(req, res) {
 	res.send({test:'works!'})
 })
-
 
 app.get(CLIENT_ROUTE, function(req, res) {
 	res.sendFile(path.resolve(path.join(CLIENT_PATH), 'index.html'))

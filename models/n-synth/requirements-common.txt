@@ -1,8 +1,6 @@
-tqdm==4.31.1
-librosa==0.6.3
+tqdm
+librosa
 requests
-dask
-distributed
-dask-kubernetes
 joblib
 paperspace
+google-cloud-storage

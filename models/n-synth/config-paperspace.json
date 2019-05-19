@@ -2,13 +2,13 @@
 	"sound": {
 		"name":   "funk_grid",
 		"pads": 	{
-			"NW": 		["distortedguitar"],
-			"NE": 		["electrokick"],
-			"SW": 		["synthbass"],
-			"SE": 		["hoxhit"]
+			"NW": 		["epic"],
+			"NE": 		["synth-1"],
+			"SW": 		["synth-2"],
+			"SE": 		["electric-guitar"]
 		},
 		"pitches":   					[24],
-		"resolution": 				2
+		"resolution": 				36
 	},
 	"checkpoint_name": 		"wavenet-ckpt",
 	"dir": {
@@ -28,7 +28,7 @@
 			"gpus": 							1,
 			"batch_size":   			4,
 			"sample_length": 			130,
-			"concurrent_jobs": 		1,
+			"concurrent_jobs": 		5,
 			"project_id": 				"pri4d7aaq",
       "container": 					"reidsteven75/sound-gen-n-synth-cpu:latest",
 			"machine_type": 			"P6000",

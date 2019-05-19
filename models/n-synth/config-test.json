@@ -22,8 +22,8 @@
 		},
 		"decode": {
 			"gpus": 							1,
-			"batch_size":   			64,
-			"sample_length": 			130,
+			"batch_size":   			1,
+			"sample_length": 			1,
 			"concurrent_jobs": 		2
 		}
 	}       

@@ -7,12 +7,6 @@ $ ./init.sh
 
 Dev
 ----------------
-
-all
-```
-$ docker-compose up --build
-```
-
 client
 ```
 $ docker-compose up --build client
@@ -21,6 +15,11 @@ $ docker-compose up --build client
 server
 ```
 $ docker-compose up --build server
+```
+
+generate sound
+```
+$ docker-compose up --build generate
 ```
 
 Build
@@ -71,6 +70,9 @@ Cloud Cors
 $ gsutil cors set google-storage-cors.json gs://augmented-music-generation-dev
 $ gsutil cors get gs://augmented-music-generation-dev
 ```
+
+Python SDK Docs
+https://googleapis.github.io/google-cloud-python/latest/storage/blobs.html#google.cloud.storage.blob.Blob.upload_from_file
 
 # Dev
 n-synth

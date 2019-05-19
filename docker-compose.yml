@@ -1,0 +1,30 @@
+version: '3'
+services:
+  n-synth:
+    build:
+      context: ./models/n-synth
+      args: 
+        TENSORFLOW_IMAGE: tensorflow/tensorflow:1.13.1-py3
+        COMPUTE_TYPE: cpu
+        COMPUTE_ENVIRONMENT: paperspace
+    volumes:
+        - ./models/n-synth/artifacts:/code/artifacts
+    ports:
+     - "80:4000"
+    tty: true
+    command: sh -c "python generate.py"
+
+  g-synth:
+    build:
+      context: ./models/g-synth
+      args: 
+        TENSORFLOW_IMAGE: tensorflow/tensorflow:1.13.1-py3
+        COMPUTE_TYPE: cpu
+        STORAGE_DIR: './storage'
+        ARTIFACTS_DIR: './artifacts'
+    ports:
+     - "80:4000"
+    tty: true
+    restart: on-failure
+    command: sh -c "python mock-job.py"
+  

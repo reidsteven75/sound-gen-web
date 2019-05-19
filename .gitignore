@@ -1,0 +1,20 @@
+# Temporary files.
+.#*
+
+# Log files.
+*.log
+
+# OSX hidden metadata file
+.DS_Store
+
+# specific directories
+find-better-places-for-these/
+**/.ps_project/
+
+# checkpoints
+**/storage/
+
+# artifacts
+**/artifacts/
+
+

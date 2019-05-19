@@ -1,5 +1,33 @@
 [
   {
+    "id": "grid_custom_1",
+    "name": "Custom #1: Strings, Bells, Synth, Guitar",
+    "fileUrl": {
+      "storagePath": "https://storage.googleapis.com",
+      "bucket": "augmented-music-generation-dev",
+      "folderPath": "/latent_grids/custom_1",
+      "gridName": "gen"
+    },
+    "labels": [
+        {
+          "name": "Epic",
+          "position": "NW"
+        },
+        {
+          "name": "Synth 1",
+          "position": "NE"
+        },
+        {
+          "name": "Synth 2",
+          "position": "SW"
+        },
+        {
+          "name": "Electric Guitar",
+          "position": "SE"
+        }
+      ]
+  },
+  {
     "id": "grid_1",
     "name": "#1: Strings, Bells, Synth, Guitar",
     "fileUrl": {

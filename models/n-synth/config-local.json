@@ -7,7 +7,6 @@
 			"SW": 		["synthbass"],
 			"SE": 		["hoxhit"]
 		},
-		"pitches":   					[24],
 		"resolution": 				2 
 	},
 	"checkpoint_name": 		"wavenet-ckpt",

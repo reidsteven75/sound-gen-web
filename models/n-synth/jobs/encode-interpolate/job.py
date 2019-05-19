@@ -90,7 +90,7 @@ def interpolate_embeddings():
 	create_dir(output_path)
 
 	#	constants and rearrangement of config vars for processing
-	pitches = config['sound']['pitches']
+	grid_name = config['sound']['name']
 	resolution = config['sound']['resolution']
 	instrument_groups = [config['sound']['pads']['NW'], config['sound']['pads']['NE'], config['sound']['pads']['SE'], config['sound']['pads']['SW']]
 	combinations = sorted(product(*instrument_groups))
@@ -100,43 +100,42 @@ def interpolate_embeddings():
 	embeddings_lookup = {}
 
 	for filename in os.listdir(input_path):
-		# ignore all non-npy files
 		if '.npy' in  filename:
-			#	convert filename to reference key
+			#	cache by name of sound defined in initial file
 			parts = basename(filename).split('_')
-			reference = '{}_{}'.format(parts[0], parts[1])
-
-			#	load the saved embedding
+			reference = parts[0]
 			embeddings_lookup[reference] = np.load(input_path + '/' + filename)
 
-	def get_embedding(instrument, pitch):
-		reference = '{}_{}'.format(instrument, pitch)
-		return embeddings_lookup[reference]
+	def get_embedding(instrument):
+		return embeddings_lookup[instrument]
+
+	def parse_weight(weight):
+		return str(round(weight, 1))
 
 	done = set()
 	all_names = []
 	all_embeddings = []
 
 	for combination in tqdm(combinations):
-		for pitch in  pitches:
-			embeddings = np.asarray([get_embedding(instrument, pitch) for instrument in combination])
-			
-			for xy in xy_grid:
-				weights = get_weights(xy)
-				interpolated = (embeddings.T * weights).T.sum(axis=0)
+		embeddings = np.asarray([get_embedding(instrument) for instrument in combination])
+		
+		for xy in xy_grid:
+			weights = get_weights(xy)
+			interpolated = (embeddings.T * weights).T.sum(axis=0)
 
-				#	avoid repetition
-				meta = get_description(combination, weights, pitch)
-				if meta in done:
-					continue
-				done.add(meta)
+			#	avoid repetition
+			# meta = get_description(combination, weights, pitch)
+			# if meta in done:
+			# 	continue
+			# done.add(meta)
 
-				name = description_to_name(meta)
+			# name = description_to_name(meta)
+			name = grid_name + '_[ls]_' +  parse_weight(weights[0]) + '_' + parse_weight(weights[1]) + '_' + parse_weight(weights[2]) + '_' + parse_weight(weights[3]) + '_[ls]'
 
-				#	reshape array
-				# interpolated = np.reshape(interpolated, (1,) + interpolated.shape)
+			#	reshape array
+			# interpolated = np.reshape(interpolated, (1,) + interpolated.shape)
 
-				np.save(output_path + '/' + name + '.npy', interpolated.astype(np.float32))
+			np.save(output_path + '/' + name + '.npy', interpolated.astype(np.float32))
 	
 	num_output_files = len(get_only_files(output_path))
 

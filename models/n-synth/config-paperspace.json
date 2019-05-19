@@ -7,8 +7,7 @@
 			"SW": 		["synth-2"],
 			"SE": 		["electric-guitar"]
 		},
-		"pitches":   					[24],
-		"resolution": 				36
+		"resolution": 				6
 	},
 	"checkpoint_name": 		"wavenet-ckpt",
 	"dir": {

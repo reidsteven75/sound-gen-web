@@ -3,4 +3,3 @@ librosa
 requests
 joblib
 paperspace
-google-cloud-storage

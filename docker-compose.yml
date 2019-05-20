@@ -34,6 +34,7 @@ services:
     volumes:
       - ./server:/code
       - /code/node_modules
+      - ./models/n-synth/artifacts:/code/artifacts
     networks:
       - sound_network
     ports:
@@ -42,7 +43,7 @@ services:
       - "${SERVER_PORT}"
     environment:
       WAIT_HOSTS: mongodb:${MONGO_PORT}
-    command: sh -c "npm run dev"
+    command: sh -c "export GOOGLE_APPLICATION_CREDENTIALS=google-storage-auth.json; npm run dev"
     # depends_on:
     #   - mongodb
     # command: sh -c "/wait && npm run dev"

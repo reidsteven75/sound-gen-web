@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import axios from 'axios'
 import Tone from 'tone'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import compose from 'recompose/compose'
@@ -37,7 +38,8 @@ class LatentExplorer extends Component {
 			labelSW: '',
 			labelSE: '',
 			pitch: null,
-			selectedGrid: null
+			selectedSoundSpace: null,
+			latentSpaces: null
 		}
 
 		this.loadPlayer = this.loadPlayer.bind(this)
@@ -45,19 +47,52 @@ class LatentExplorer extends Component {
 
 	}
 
+	componentDidMount() {
+
+		if (this.props.soundSpace) {
+			axios.get(this.props.api + '/sound-spaces/' + this.props.soundSpace)
+				.then((res) => {
+					this.setState({selectedSoundSpace: res.data})
+				})
+				.catch((err) => {
+					console.log(err)
+				})
+				.finally( () => {
+					axios.get(this.props.api + '/sound-spaces/' + this.props.soundSpace + '/files')
+						.then((res) => {
+							this.setState({latentSpaces: res.data})
+						})
+						.catch((err) => {
+							console.log(err)
+						})
+						.finally( () => {
+							this.loadGrid()
+						})
+				})
+		}
+		else {
+			this.loadGrid()
+		}
+		
+	}
+
 	loadGrid() {
-		const selectedGridId = this.state.selectedGridId
-		const selectedGrid = this.props.data.grids.find(grid => selectedGridId === grid.id)
+		// const selectedSoundSpaceId = this.state.selectedSoundSpaceId
+		// const selectedSoundSpace = this.props.data.grids.find(grid => selectedSoundSpaceId === grid.id)
+		const selectedSoundSpace = this.state.selectedSoundSpace
 
 		this.setState({latentSpaceLoading: true})
 
-		if (selectedGrid) {
+		if (selectedSoundSpace) {
 			this.setState({
-				selectedGrid: selectedGrid,
-				labelNW: selectedGrid.labels.find(label => label.position === 'NW') || {name: this.state.notConfiguredText},
-				labelNE: selectedGrid.labels.find(label => label.position === 'NE') || {name: this.state.notConfiguredText},
-				labelSW: selectedGrid.labels.find(label => label.position === 'SW') || {name: this.state.notConfiguredText},
-				labelSE: selectedGrid.labels.find(label => label.position === 'SE') || {name: this.state.notConfiguredText},
+				labelNW: selectedSoundSpace.labels.NW,
+				labelNE: selectedSoundSpace.labels.NE,
+				labelSW: selectedSoundSpace.labels.SW,
+				labelSE: selectedSoundSpace.labels.SE
+				// labelNW: selectedSoundSpace.labels.find(label => label.position === 'NW') || {name: this.state.notConfiguredText},
+				// labelNE: selectedSoundSpace.labels.find(label => label.position === 'NE') || {name: this.state.notConfiguredText},
+				// labelSW: selectedSoundSpace.labels.find(label => label.position === 'SW') || {name: this.state.notConfiguredText},
+				// labelSE: selectedSoundSpace.labels.find(label => label.position === 'SE') || {name: this.state.notConfiguredText},
 			}, () => {
 				this.downloadSoundFiles()
 				this.loadPlayer()
@@ -67,19 +102,16 @@ class LatentExplorer extends Component {
 
 	downloadSoundFiles() {
 
-		const selectedGrid = this.state.selectedGrid
-		const latentSpaces = this.props.data.latentSpaces
-		const baseUrl = `${selectedGrid.fileUrl.storagePath}/${selectedGrid.fileUrl.bucket}`
-
+		const selectedSoundSpace = this.state.selectedSoundSpace
+		const latentSpaces = this.state.latentSpaces
+		const baseUrl = 'https://storage.googleapis.com/sound-gen-dev'
 		this.soundUrls = {}
 
 		latentSpaces.forEach((latentSpace) => {
 			// get urls for each sound
-			this.props.data.pitches.forEach((pitch) => {
-				const name = `${latentSpace}_pitch_${pitch.value}`
-				const fileUrl = `${baseUrl}${selectedGrid.fileUrl.folderPath}/${selectedGrid.fileUrl.gridName}_${name}_vel_127.mp3`
-				this.soundUrls[name] = fileUrl	
-			})	
+			const name = latentSpace.file
+			const fileLocation = `${baseUrl}/${latentSpace.path}/${latentSpace.file}`
+			this.soundUrls[name] = fileLocation	
 		})
 
 	}
@@ -92,15 +124,6 @@ class LatentExplorer extends Component {
 				this.setState({latentSpaceLoading: false})
 			}).toMaster()	
 		}, 500)
-	}
-
-  componentDidMount() {
-		this.setState({
-			pitch: this.props.data.default.pitch.value,
-			selectedGridId: this.props.data.default.selectedGridId
-		}, () => {
-			this.loadGrid()
-		})
 	}
 
 	updatePitch(data) {
@@ -149,7 +172,7 @@ class LatentExplorer extends Component {
 	
 	updateGridSelector(data) {
 		this.setState({
-			selectedGridId: data.value
+			selectedSoundSpaceId: data.value
 		}, () => {
 			this.loadGrid()
 		})
@@ -238,7 +261,7 @@ class LatentExplorer extends Component {
 						<Hidden xsDown>
 							<GridSelector 
 								changeHandler={this.updateGridSelector.bind(this)}
-								defaultValue={this.props.data.default.selectedGridId}
+								defaultValue={this.props.data.default.selectedSoundSpaceId}
 								options={this.props.data.grids}
 							/>
 							<br/>
@@ -246,6 +269,7 @@ class LatentExplorer extends Component {
 						:
 						null
 					}
+					<br/>
 					
 					<LatentSelector 
 						changeHandler={this.updateLatentSelector.bind(this)}

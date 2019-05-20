@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import axios from 'axios'
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import './App.css'
 
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -13,18 +14,8 @@ import latentSpaces from './data/latent-spaces.json'
 import pitches from './data/pitches.json'
 import grids from './data/grids.json'
 
-import './App.css'
-
 const HTTPS = (process.env.HTTPS === 'true')
 const API = (HTTPS ? 'https://' : 'http://') + process.env.HOST + ':' + process.env.SERVER_PORT + '/api'
-
-axios.get(API + '/test')
-  .then(function (response) {
-    console.log(response);
-  })
-  .catch(function (error) {
-    console.log(error);
-  })
 
 const features = {
   keyboardPlayer: false,
@@ -66,17 +57,28 @@ const theme = createMuiTheme({
   },
 })
 
+const latentExplorer = ({ match }) => {
+  return (
+    <LatentExplorer
+      api={API}
+      data={data}
+      features={features}
+      soundSpace={match.params.id}
+    />
+  )
+}
+
 class App extends Component {
   render() {
     return (
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
-        <div className="App">
-          <main className="App-main">
-            <LatentExplorer
-              data={data}
-              features={features}
-            />
+        <div className='App'>
+          <main className='App-main'>
+            <Router>
+              <Route path='/' exact component={latentExplorer} />
+              <Route path='/sound-space/:id' component={latentExplorer} />å
+            </Router>
           </main>
         </div> 
       </MuiThemeProvider>

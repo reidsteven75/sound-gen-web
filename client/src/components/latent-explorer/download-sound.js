@@ -10,7 +10,9 @@ const style = {
     
   },
   button: {
-    border: '1px solid ' + blue['A400']
+    border: '1px solid ' + blue['A400'],
+    height: 60,
+    width: 300
 	}
 }
 

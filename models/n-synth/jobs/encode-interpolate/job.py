@@ -123,14 +123,7 @@ def interpolate_embeddings():
 			weights = get_weights(xy)
 			interpolated = (embeddings.T * weights).T.sum(axis=0)
 
-			#	avoid repetition
-			# meta = get_description(combination, weights, pitch)
-			# if meta in done:
-			# 	continue
-			# done.add(meta)
-
-			# name = description_to_name(meta)
-			name = grid_name + '_[ls]_' +  parse_weight(weights[0]) + '_' + parse_weight(weights[1]) + '_' + parse_weight(weights[2]) + '_' + parse_weight(weights[3]) + '_[ls]'
+			name = '[g]' + grid_name + '[-g]_[ls]' +  parse_weight(weights[0]) + '_' + parse_weight(weights[1]) + '_' + parse_weight(weights[2]) + '_' + parse_weight(weights[3]) + '[-ls]'
 
 			#	reshape array
 			# interpolated = np.reshape(interpolated, (1,) + interpolated.shape)

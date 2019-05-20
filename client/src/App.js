@@ -26,6 +26,12 @@ axios.get(API + '/test')
     console.log(error);
   })
 
+const features = {
+  keyboardPlayer: false,
+  pitchSelector: false,
+  gridSelector: false
+}
+
 var data = {
   latentSpaces: latentSpaces,
   pitches: pitches,
@@ -69,6 +75,7 @@ class App extends Component {
           <main className="App-main">
             <LatentExplorer
               data={data}
+              features={features}
             />
           </main>
         </div> 

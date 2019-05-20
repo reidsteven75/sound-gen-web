@@ -233,14 +233,20 @@ class LatentExplorer extends Component {
 						downloadSound={this.downloadSound.bind(this)}
 					/>
 					<br/>
-					<Hidden xsDown>
-						<GridSelector 
-							changeHandler={this.updateGridSelector.bind(this)}
-							defaultValue={this.props.data.default.selectedGridId}
-							options={this.props.data.grids}
-						/>
-						<br/>
-					</Hidden>
+					{
+						this.props.features.gridSelector ?
+						<Hidden xsDown>
+							<GridSelector 
+								changeHandler={this.updateGridSelector.bind(this)}
+								defaultValue={this.props.data.default.selectedGridId}
+								options={this.props.data.grids}
+							/>
+							<br/>
+						</Hidden>
+						:
+						null
+					}
+					
 					<LatentSelector 
 						changeHandler={this.updateLatentSelector.bind(this)}
 						loading={this.state.latentSpaceLoading}
@@ -250,24 +256,34 @@ class LatentExplorer extends Component {
 						labelSW={this.state.labelSW}
 					/>
 					<br/>
-					<PitchSlider
-						min={this.props.data.default.pitch.min}
-						max={this.props.data.default.pitch.max}
-						step={this.props.data.default.pitch.stepSize}
-						defaultValue={this.state.pitch}
-						handleChange={this.updatePitch.bind(this)}
-					/>
+					{
+						this.props.features.pitchSelector ?
+						<PitchSlider
+							min={this.props.data.default.pitch.min}
+							max={this.props.data.default.pitch.max}
+							step={this.props.data.default.pitch.stepSize}
+							defaultValue={this.state.pitch}
+							handleChange={this.updatePitch.bind(this)}
+						/>
+						:
+						null
+					}
 					<br/>
 					<PlaySound 
 						playSound={this.playSound.bind(this)}
 						playTimeout={500}
 					/>
 					<br/>
-					<Hidden xsDown>
-						<Keyboard 
-							updateKeyPressed={this.updateKeyPressed.bind(this)}
-						/>
-					</Hidden>
+					{
+						this.props.features.keyboardPlayer ?
+						<Hidden xsDown>
+							<Keyboard 
+								updateKeyPressed={this.updateKeyPressed.bind(this)}
+							/>
+						</Hidden>
+						:
+						null
+					}
 				</div>
     }
 

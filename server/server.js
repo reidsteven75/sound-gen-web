@@ -1,4 +1,5 @@
 require('dotenv').config({ path: 'build/.env' })
+require('console-stamp')(console, { pattern: 'dd/mm/yyyy HH:MM:ss.l' })
 
 const express = require('express')
 const app = express()

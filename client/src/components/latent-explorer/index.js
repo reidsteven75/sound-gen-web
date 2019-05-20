@@ -95,7 +95,7 @@ class LatentExplorer extends Component {
 				// labelSE: selectedSoundSpace.labels.find(label => label.position === 'SE') || {name: this.state.notConfiguredText},
 			}, () => {
 				this.downloadSoundFiles()
-				this.loadPlayer()
+				// this.loadPlayer()
 			})
 		}	
 	}
@@ -109,11 +109,12 @@ class LatentExplorer extends Component {
 
 		latentSpaces.forEach((latentSpace) => {
 			// get urls for each sound
-			const name = latentSpace.file
+			const name = latentSpace._id
 			const fileLocation = `${baseUrl}/${latentSpace.path}/${latentSpace.file}`
 			this.soundUrls[name] = fileLocation	
 		})
 
+		console.log(this.soundUrls)
 	}
 
 	loadPlayer() {

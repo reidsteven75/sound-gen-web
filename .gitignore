@@ -9,8 +9,10 @@
 **/artifacts/
 
 # specific directories
-find-better-places-for-these/
 **/.ps_project/
+
+# specific files
+**/google-storage-auth.json
 
 
 

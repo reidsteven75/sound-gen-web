@@ -22,22 +22,22 @@ const schema = new mongoose.Schema({
   labels: {
     NW: {
       type: String,
-      trime: true, 
+      trim: true, 
       required: true
     },
     NE: {
       type: String,
-      trime: true, 
+      trim: true, 
       required: true
     },
     SW: {
       type: String,
-      trime: true, 
+      trim: true, 
       required: true
     },
     SE: {
       type: String,
-      trime: true, 
+      trim: true, 
       required: true
     }
   },

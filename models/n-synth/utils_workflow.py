@@ -1,6 +1,7 @@
 import os
 import shutil
 import zipfile
+import re
 from utils_common import *
 
 def inject_file(util_file, job_dir):
@@ -58,3 +59,10 @@ def zip_job(source, target):
     file.close()
 
   return(zip_path)
+
+def parse_latent_space(string, vector):
+  match = re.search(vector + r'_(...)', string)
+  if match:
+    return float(match.group(1))
+  else:
+    return None

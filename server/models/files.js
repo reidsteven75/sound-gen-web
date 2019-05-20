@@ -16,8 +16,22 @@ const schema = new mongoose.Schema({
     required: true
   },
   latentSpace: {
-    type: Array,
-    required: true
+    NW: {
+      type: Number,
+      required: true
+    },
+    NE: {
+      type: Number,
+      required: true
+    },
+    SW: {
+      type: Number,
+      required: true
+    },
+    SE: {
+      type: Number,
+      required: true
+    }
   }
 }, {
   timestamps: true,

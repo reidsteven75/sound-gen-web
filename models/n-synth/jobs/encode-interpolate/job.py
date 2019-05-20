@@ -123,7 +123,7 @@ def interpolate_embeddings():
 			weights = get_weights(xy)
 			interpolated = (embeddings.T * weights).T.sum(axis=0)
 
-			name = '[g]' + grid_name + '[-g]_[ls]' +  parse_weight(weights[0]) + '_' + parse_weight(weights[1]) + '_' + parse_weight(weights[2]) + '_' + parse_weight(weights[3]) + '[-ls]'
+			name = grid_name + '_NW_' +  parse_weight(weights[0]) + '_NE_' + parse_weight(weights[1]) + '_SE_' + parse_weight(weights[2]) + '_SW_' + parse_weight(weights[3])
 
 			#	reshape array
 			# interpolated = np.reshape(interpolated, (1,) + interpolated.shape)

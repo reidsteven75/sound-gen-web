@@ -14,7 +14,6 @@ const assert = require('assert')
 const request = require('request')
 const _ = require('lodash')
 const moment = require('moment')
-const size = require('object-sizeof')
 
 const { 
 	SoundSpaces, 
@@ -26,7 +25,7 @@ const HTTPS = (process.env.HTTPS === 'true')
 const HOST = (HTTPS ? 'https://' : 'http://') + process.env.HOST
 const SERVER_PORT = process.env.SERVER_PORT
 const MONGO_PORT = process.env.MONGO_PORT
-const GOOGLE_STORAGE_URL = 'https://storage.googleapis.com'
+const GOOGLE_STORAGE_SERVICE = 'https://storage.googleapis.com'
 const GOOGLE_STORAGE_BUCKET = process.env.GOOGLE_STORAGE_BUCKET
 const API_ROUTE = '/api'
 const CLIENT_ROUTE = '/app'
@@ -78,7 +77,7 @@ app.get(API_ROUTE + '/sound-spaces/:id', (req, res) => {
 	const id = req.params.id
 	SoundSpaces.findById(id, (err, record) => {
 		if (err) {
-			console.log(err)
+			console.error(err)
 			return res.send({err: true})
 		}
 		res.send(record)
@@ -86,7 +85,32 @@ app.get(API_ROUTE + '/sound-spaces/:id', (req, res) => {
 })
 
 app.post(API_ROUTE + '/sound-spaces', (req, res) => {
-
+	const data = req.body
+	const record = new SoundSpaces({
+		name: data.name,
+		user: data.user,
+		dimensions: data.dimensions,
+		resolution: data.resolution,
+		labels: {
+			NW: data.labels.NW,
+			NE: data.labels.NE,
+			SW: data.labels.SW,
+			SE: data.labels.SE
+		},
+		fileLocation: {
+			service: GOOGLE_STORAGE_SERVICE,
+			bucket: GOOGLE_STORAGE_BUCKET,
+			path: data.fileLocation.path
+		}
+	})
+	record.save( (err) => {
+		if (err) {
+			console.error('save DB error: files')
+			console.log(err)
+			return res.send({err: true})
+		}
+		res.send(record)
+	})
 })
 
 // files
@@ -95,7 +119,7 @@ app.get(API_ROUTE + '/sound-spaces/:id/files', (req, res) => {
 	const id = req.params.id
 	Files.find({soundSpace:id}, (err, records) => {
 		if (err) {
-			console.log(err)
+			console.error(err)
 			return res.send({err: true})
 		}
 		res.send(records)
@@ -105,7 +129,6 @@ app.get(API_ROUTE + '/sound-spaces/:id/files', (req, res) => {
 app.post(API_ROUTE + '/files', (req, res) => {
 
 	const data = req.body
-
 	const options = {
 		destination: data.uploadPath + '/' + data.fileName,
 		resumable: true,
@@ -113,10 +136,12 @@ app.post(API_ROUTE + '/files', (req, res) => {
 
 	bucket.upload(data.filePath + '/' + data.fileName, options, function(err, file) {
 		if (err) {
-			console.log('upload Google Storage error: files')
+			console.error('upload Google Storage error: files')
 			console.log(err)
 			return res.send({err: true})
 		}
+		
+		console.log(data.latentSpace)
 		const record = new Files({
 			soundSpace: data.soundSpace,
 			file: data.fileName,
@@ -125,7 +150,7 @@ app.post(API_ROUTE + '/files', (req, res) => {
 		})
 		record.save( (err) => {
 			if (err) {
-				console.log('save DB error: files')
+				console.error('save DB error: files')
 				console.log(err)
 				return res.send({err: true})
 			}

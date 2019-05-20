@@ -2,10 +2,10 @@
 	"sound": {
 		"name":   "funk_grid",
 		"pads": 	{
-			"NW": 		["distortedguitar"],
-			"NE": 		["electrokick"],
-			"SW": 		["synthbass"],
-			"SE": 		["hoxhit"]
+			"NW": 		["epic"],
+			"NE": 		["synth-1"],
+			"SW": 		["synth-2"],
+			"SE": 		["harmon"]
 		},
 		"resolution": 				2 
 	},

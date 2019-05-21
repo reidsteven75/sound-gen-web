@@ -6,22 +6,30 @@ import json
 import shutil
 import time
 import paperspace
+import urllib.request
 from utils_common import *
 from utils_workflow import *
 
 COMPUTE_ENVIRONMENT = os.environ['COMPUTE_ENVIRONMENT']
-CONFIG_FILE = 'config-%s.json' %(COMPUTE_ENVIRONMENT)
-with open(CONFIG_FILE, 'r') as infile:
-  config = json.load(infile)
+CONFIG_WORKFLOW = os.environ['CONFIG_WORKFLOW']
+CONFIG_WORKFLOW_FILE = 'config-workflow-%s.json' %(CONFIG_WORKFLOW)
+with open(CONFIG_WORKFLOW_FILE, 'r') as infile:
+  config_workflow = json.load(infile)
+CONFIG_SOUND_FILE = 'config-sound.json'
+with open(CONFIG_SOUND_FILE, 'r') as infile:
+  config_sound = json.load(infile)
 
-API = 'http://0.0.0.0:4001/api'
-ENDPOINT = '/files'
-ARTIFACT_DIR_TO_UPLOAD = './artifacts/2019-05-19_17-23-26_D75B20/decode'
+if os.environ['HTTPS'] == True:
+  HTTP = 'https://'
+else:
+  HTTP = 'http://'
+API = HTTP + os.environ['HOST'] + ':' + os.environ['SERVER_PORT']
 
 UTILS_COMMON_FILE = 'utils_common.py'
 UTILS_JOB_FILE = 'utils_job.py'
 ARTIFACT_ID = unique_id()
 ARTIFACTS = './artifacts/' + ARTIFACT_ID
+ARTIFACT_UPLOAD_PATH = 'test_sound_uploads/test_3'
 DIR_JOBS = './jobs'
 JOB_ENCODE_INTERPOLATE = 'encode-interpolate'
 JOB_DECODE = 'decode'
@@ -32,27 +40,32 @@ FOLDER_DATASET_GENERATIONS = '/generations'
 DATASET = './dataset'
 STORAGE_COMMON = './storage'
 if (COMPUTE_ENVIRONMENT == 'paperspace'):
-  PAPERSPACE_API_KEY = config['paperspace']['api_key']
-  PAPERSPACE_URL = config['paperspace']['url']
+  PAPERSPACE_API_KEY = config_workflow['paperspace']['api_key']
+  PAPERSPACE_URL = config_workflow['paperspace']['url']
 
 job_metrics = []
 sound_space = None
 
 def upload_artifacts(job):
+
+  ARTIFACTS = './artifacts/2019-05-20_23-48-56_FAE9FE/decode'
+
+  contents = urllib.request.urlopen(API + '/test').read()
+  print(contents)
+
+  return
+
   print('uploading artifacts...')
   record = {
-    'name': 'funk-grid',
-    'user': 'test_user',
+    'name': config_sound['name'],
+    'user': config_sound['user'],
     'dimensions': 4,
-    'resolution': 6,
+    'resolution': config_sound['resolution'],
     'labels': {
-      'NW': 'label-1',
-      'NE': 'label-2',
-      'SW': 'label-3',
-      'SE': 'label-4',
-    },
-    'fileLocation': {
-      'path': UPLOAD_PATH
+      'NW': config_sound['labels']['NW'],
+      'NE': config_sound['labels']['NE'],
+      'SW': config_sound['labels']['SW'],
+      'SE': config_sound['labels']['SE']
     }
   }
   res = requests.post(API + '/sound-spaces', json=record)
@@ -63,7 +76,7 @@ def upload_artifacts(job):
     sound_space_id = res_data['_id']
     print('sound-space created with ID: %s' %(sound_space_id))
     num_errors = 0
-    for file in os.listdir(ARTIFACT_DIR_TO_UPLOAD):
+    for file in os.listdir(ARTIFACTS):
       if '.wav' in file:
         latent_space = {
           'NW': None,
@@ -85,8 +98,8 @@ def upload_artifacts(job):
         else:
           record = {
             'soundSpace': sound_space_id,
-            'uploadPath': UPLOAD_PATH,
-            'filePath': ARTIFACT_DIR_TO_UPLOAD,
+            'uploadPath': ARTIFACT_UPLOAD_PATH + '/' + sound_space_id,
+            'filePath': ARTIFACTS,
             'fileName': file,
             'latentSpace': latent_space
           }
@@ -100,9 +113,9 @@ def upload_artifacts(job):
             print('success')
       
       if num_errors != 0:
-        print('[ERROR]: there were errors uploading files')
+        print('[ERROR]: artifact upload, there were errors uploading files')
       else:
-        print('[SUCCESS]: everything is just fine and dandy')
+        print('[SUCCESS]: artifact upload')
       
       global sound_space
       sound_space = sound_space_id
@@ -111,12 +124,13 @@ def run_job(job, dataset):
   job_path = DIR_JOBS + '/' + job
   job_data = job_path + '/data'
   job_artifacts = job_path + '/artifacts'
-  job_config = config['jobs'][job]
+  job_config_workflow = config_workflow['jobs'][job]
 
-  concurrent_jobs = job_config['concurrent_jobs']
+  concurrent_jobs = job_config_workflow['concurrent_jobs']
 
-  # inject config & utils
-  inject_config(CONFIG_FILE, job_path)
+  # inject config_workflow, config_sound & utils
+  inject_config_job(CONFIG_WORKFLOW_FILE, job_path)
+  inject_file(CONFIG_SOUND_FILE, job_path)
   inject_file(UTILS_COMMON_FILE, job_path)
   inject_file(UTILS_JOB_FILE, job_path)
 
@@ -157,10 +171,10 @@ def run_job(job, dataset):
         res = paperspace.jobs.create({
           'apiKey': PAPERSPACE_API_KEY,
           'name': job,
-          'projectId': job_config['project_id'],
-          'container': job_config['container'],
-          'machineType': job_config['machine_type'],
-          'command': job_config['command'],
+          'projectId': job_config_workflow['project_id'],
+          'container': job_config_workflow['container'],
+          'machineType': job_config_workflow['machine_type'],
+          'command': job_config_workflow['command'],
           'workspace': job_zip_path
         })
         job_id = res['id']
@@ -188,8 +202,8 @@ def run_job(job, dataset):
 
 def run_workflow():
 
-  run_job(JOB_ENCODE_INTERPOLATE, DATASET)
-  run_job(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
+  # run_job(JOB_ENCODE_INTERPOLATE, DATASET)
+  # run_job(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
   upload_artifacts(JOB_DECODE)
 
 if __name__ == "__main__":
@@ -198,6 +212,7 @@ if __name__ == "__main__":
   print('~~~~~~~~~~~~~~~')
   print('ARTIFACT_ID: %s' %(ARTIFACT_ID))
   print('COMPUTE_ENV: %s' %(COMPUTE_ENVIRONMENT))
+  print('API: %s' %(API))
 
   start = time.time()
 

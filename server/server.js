@@ -96,11 +96,6 @@ app.post(API_ROUTE + '/sound-spaces', (req, res) => {
 			NE: data.labels.NE,
 			SW: data.labels.SW,
 			SE: data.labels.SE
-		},
-		fileLocation: {
-			service: GOOGLE_STORAGE_SERVICE,
-			bucket: GOOGLE_STORAGE_BUCKET,
-			path: data.fileLocation.path
 		}
 	})
 	record.save( (err) => {
@@ -141,12 +136,12 @@ app.post(API_ROUTE + '/files', (req, res) => {
 			return res.send({err: true})
 		}
 		
-		console.log(data.latentSpace)
 		const record = new Files({
 			soundSpace: data.soundSpace,
+			latentSpace: data.latentSpace,
 			file: data.fileName,
-			path: data.uploadPath,
-			latentSpace: data.latentSpace
+			bucket: GOOGLE_STORAGE_BUCKET,
+			path: data.uploadPath
 		})
 		record.save( (err) => {
 			if (err) {

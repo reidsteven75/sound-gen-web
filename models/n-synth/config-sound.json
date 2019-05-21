@@ -1,0 +1,11 @@
+{
+	"name": "funk_grid",
+	"user": "test_user",
+	"resolution": 2,
+	"labels": {
+		"NW": ["epic"],
+		"NE": ["synth-1"],
+		"SW": ["synth-2"],
+		"SE": ["harmon"]
+	}
+}					

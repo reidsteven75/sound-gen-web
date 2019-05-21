@@ -1,14 +1,4 @@
 {
-	"sound": {
-		"name":   "funk_grid",
-		"pads": 	{
-			"NW": 		["distortedguitar"],
-			"NE": 		["electrokick"],
-			"SW": 		["synthbass"],
-			"SE": 		["hoxhit"]
-		},
-		"resolution": 				2 
-	},
 	"checkpoint_name": 		"wavenet-ckpt",
 	"dir": {
 		"storage": "./storage",

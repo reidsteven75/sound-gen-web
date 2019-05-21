@@ -1,14 +1,4 @@
 {
-	"sound": {
-		"name":   "funk_grid",
-		"pads": 	{
-			"NW": 		["epic"],
-			"NE": 		["synth-1"],
-			"SW": 		["synth-2"],
-			"SE": 		["harmon"]
-		},
-		"resolution": 				6
-	},
 	"checkpoint_name": 		"wavenet-ckpt",
 	"dir": {
 		"storage": "/storage",

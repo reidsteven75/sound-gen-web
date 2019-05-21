@@ -14,19 +14,19 @@ from utils_job import *
 
 JOB_NAME = 'DECODE'
 
-with open('config.json', 'r') as infile:
-  config = json.load(infile)
+with open('config-job.json', 'r') as infile:
+  config_job = json.load(infile)
 
 INPUT_PATH = 'data/input'
 BATCH_PATH = 'data/embeddings_batched'
 OUTPUT_PATH = 'data/audio_output'
 
-DIR_STORAGE = config['dir']['storage']
-DIR_ARTIFACTS = config['dir']['artifacts']
-BATCH_SIZE = config['jobs']['decode']['batch_size']
-SAMPLE_LENGTH = config['jobs']['decode']['sample_length']
-DIR_CHECKPOINT = DIR_STORAGE + '/%s' %(config['checkpoint_name'])
-CHECKPOINT_ZIP_FILE = DIR_STORAGE + '/%s.zip' %(config['checkpoint_name'])
+DIR_STORAGE = config_job['dir']['storage']
+DIR_ARTIFACTS = config_job['dir']['artifacts']
+BATCH_SIZE = config_job['jobs']['decode']['batch_size']
+SAMPLE_LENGTH = config_job['jobs']['decode']['sample_length']
+DIR_CHECKPOINT = DIR_STORAGE + '/%s' %(config_job['checkpoint_name'])
+CHECKPOINT_ZIP_FILE = DIR_STORAGE + '/%s.zip' %(config_job['checkpoint_name'])
 
 def create_dir(path):
 	os.makedirs(path, exist_ok=True)
@@ -69,9 +69,9 @@ def batch_embeddings():
 	print('START: batching embeddings')
 
 	num_embeddings = len(os.listdir(INPUT_PATH))
-	batch_size = num_embeddings / config['jobs']['decode']['gpus']
+	batch_size = num_embeddings / config_job['jobs']['decode']['gpus']
 	#	split the embeddings per gpu in folders
-	for i in range(0, config['jobs']['decode']['gpus']):
+	for i in range(0, config_job['jobs']['decode']['gpus']):
 		foldername = BATCH_PATH + '/batch%i' % i
 		if not os.path.exists(foldername):
 			os.mkdir(foldername)
@@ -84,7 +84,7 @@ def batch_embeddings():
 	for filename in os.listdir(INPUT_PATH):
 		target_folder = BATCH_PATH + '/batch%i/' % batch
 		batch += 1
-		if batch >= config['jobs']['decode']['gpus']:
+		if batch >= config_job['jobs']['decode']['gpus']:
 			batch = 0
 
 		os.rename(INPUT_PATH + '/' + filename, target_folder + filename)
@@ -109,14 +109,14 @@ def generate_audio():
 	print('START: sound generation')
 
 	#  map calls to gpu threads
-	pool = ThreadPool(config['jobs']['decode']['gpus'])
-	results = pool.map_async(gen_call, range(config['jobs']['decode']['gpus']))
+	pool = ThreadPool(config_job['jobs']['decode']['gpus'])
+	results = pool.map_async(gen_call, range(config_job['jobs']['decode']['gpus']))
 	while not results.ready():
 		time.sleep(1)
 	pool.close()
 	pool.join()
 
-	for i in range(0, config['jobs']['decode']['gpus']):
+	for i in range(0, config_job['jobs']['decode']['gpus']):
 		source = OUTPUT_PATH + '/batch%i/' % i
 		files = os.listdir(source)
 		for f in files:

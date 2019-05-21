@@ -1,14 +1,4 @@
 {
-	"sound": {
-		"name":   "funk_grid",
-		"pads": 	{
-			"NW": 		["epic"],
-			"NE": 		["synth-1"],
-			"SW": 		["synth-2"],
-			"SE": 		["harmon"]
-		},
-		"resolution": 				2 
-	},
 	"checkpoint_name": 		"wavenet-ckpt",
 	"dir": {
 		"storage": "./storage",
@@ -23,7 +13,7 @@
 			"gpus": 							1,
 			"batch_size":   			1,
 			"sample_length": 			1,
-			"concurrent_jobs": 		2
+			"concurrent_jobs": 		1
 		}
 	}       
 }					

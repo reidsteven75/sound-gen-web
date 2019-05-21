@@ -7,9 +7,9 @@ from utils_common import *
 def inject_file(util_file, job_dir):
   shutil.copy(util_file, job_dir)
 
-def inject_config(config_file, job_dir):
+def inject_config_job(config_file, job_dir):
   shutil.copy(config_file, job_dir)
-  os.rename(job_dir + '/' + config_file, job_dir + '/config.json')
+  os.rename(job_dir + '/' + config_file, job_dir + '/config-job.json')
 
 def prepare_batch(dir_batches, dataset, num_batches):
   create_dir(dir_batches)

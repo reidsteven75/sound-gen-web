@@ -12,14 +12,17 @@ from utils_job import *
 
 JOB_NAME = 'ENCODE-INTERPOLATE'
 
-with open('config.json', 'r') as infile:
-  config = json.load(infile)
+with open('config-job.json', 'r') as infile:
+  config_job = json.load(infile)
 
-DIR_STORAGE = config['dir']['storage']
-DIR_ARTIFACTS = config['dir']['artifacts']
-BATCH_SIZE = config['jobs']['encode-interpolate']['batch_size']
-DIR_CHECKPOINT = DIR_STORAGE + '/%s' %(config['checkpoint_name'])
-CHECKPOINT_ZIP_FILE = DIR_STORAGE + '/%s.zip' %(config['checkpoint_name'])
+with open('config-sound.json', 'r') as infile:
+  config_sound = json.load(infile)
+
+DIR_STORAGE = config_job['dir']['storage']
+DIR_ARTIFACTS = config_job['dir']['artifacts']
+BATCH_SIZE = config_job['jobs']['encode-interpolate']['batch_size']
+DIR_CHECKPOINT = DIR_STORAGE + '/%s' %(config_job['checkpoint_name'])
+CHECKPOINT_ZIP_FILE = DIR_STORAGE + '/%s.zip' %(config_job['checkpoint_name'])
 
 def create_dir(path):
 	os.makedirs(path, exist_ok=True)
@@ -89,10 +92,10 @@ def interpolate_embeddings():
 	output_path = DIR_ARTIFACTS
 	create_dir(output_path)
 
-	#	constants and rearrangement of config vars for processing
-	grid_name = config['sound']['name']
-	resolution = config['sound']['resolution']
-	instrument_groups = [config['sound']['pads']['NW'], config['sound']['pads']['NE'], config['sound']['pads']['SE'], config['sound']['pads']['SW']]
+	#	constants and rearrangement of config_sound vars for processing
+	grid_name = config_sound['name']
+	resolution = config_sound['resolution']
+	instrument_groups = [config_sound['labels']['NW'], config_sound['labels']['NE'], config_sound['labels']['SE'], config_sound['labels']['SW']]
 	combinations = sorted(product(*instrument_groups))
 	xy_grid = make_grid(resolution)
 
@@ -123,7 +126,7 @@ def interpolate_embeddings():
 			weights = get_weights(xy)
 			interpolated = (embeddings.T * weights).T.sum(axis=0)
 
-			name = grid_name + '_NW_' +  parse_weight(weights[0]) + '_NE_' + parse_weight(weights[1]) + '_SE_' + parse_weight(weights[2]) + '_SW_' + parse_weight(weights[3])
+			name = 'NW_' +  parse_weight(weights[0]) + '_NE_' + parse_weight(weights[1]) + '_SE_' + parse_weight(weights[2]) + '_SW_' + parse_weight(weights[3])
 
 			#	reshape array
 			# interpolated = np.reshape(interpolated, (1,) + interpolated.shape)

@@ -6,6 +6,7 @@ const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
 const mongoose = require('mongoose')
+const winston = require('winston');
 const {Storage} = require('@google-cloud/storage')
 
 const path = require('path')
@@ -40,12 +41,46 @@ const config = {
 	}
 }
 
-const logger = (req, res, next) => {
-	console.log(req.originalUrl)
+const loggerLevels = {
+  levels: {
+    error: 0, 
+		warn: 1, 
+		info: 2, 
+		verbose: 3, 
+		debug: 4, 
+		silly: 5
+  },
+  colors: {
+    error: 'red', 
+		warn: 'yellow', 
+		info: 'cyan', 
+		verbose: 'green', 
+		debug: 'blue', 
+		silly: 'gray'
+  }
+}
+
+const logger = winston.createLogger({
+	level: 'debug',
+	levels: loggerLevels.levels,
+  format: winston.format.combine(
+    winston.format.colorize(),
+    winston.format.timestamp({
+      format: 'YYYY-MM-DD HH:mm:ss'
+    }),
+    winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+  ),
+  transports: [new winston.transports.Console()]
+})
+
+winston.addColors(loggerLevels.colors)
+
+const logRequests = (req, res, next) => {
+	logger.info(`[${req.method}] ${req.originalUrl}`)
 	next()
 }
 
-app.use(logger)
+app.use(logRequests)
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static(CLIENT_PATH))
@@ -77,7 +112,7 @@ app.get(API_ROUTE + '/sound-spaces/:id', (req, res) => {
 	const id = req.params.id
 	SoundSpaces.findById(id, (err, record) => {
 		if (err) {
-			console.error(err)
+			logger.error(err)
 			return res.send({err: true})
 		}
 		res.send(record)
@@ -100,8 +135,8 @@ app.post(API_ROUTE + '/sound-spaces', (req, res) => {
 	})
 	record.save( (err) => {
 		if (err) {
-			console.error('save DB error: files')
-			console.log(err)
+			logger.error('save DB error: files')
+			logger.info(err)
 			return res.send({err: true})
 		}
 		res.send(record)
@@ -114,7 +149,7 @@ app.get(API_ROUTE + '/sound-spaces/:id/files', (req, res) => {
 	const id = req.params.id
 	Files.find({soundSpace:id}, (err, records) => {
 		if (err) {
-			console.error(err)
+			logger.error(err)
 			return res.send({err: true})
 		}
 		res.send(records)
@@ -131,8 +166,8 @@ app.post(API_ROUTE + '/files', (req, res) => {
 
 	bucket.upload(data.filePath + '/' + data.fileName, options, function(err, file) {
 		if (err) {
-			console.error('upload Google Storage error: files')
-			console.log(err)
+			logger.error('upload Google Storage error: files')
+			logger.info(err)
 			return res.send({err: true})
 		}
 		
@@ -145,8 +180,8 @@ app.post(API_ROUTE + '/files', (req, res) => {
 		})
 		record.save( (err) => {
 			if (err) {
-				console.error('save DB error: files')
-				console.log(err)
+				logger.error('save DB error: files')
+				logger.info(err)
 				return res.send({err: true})
 			}
 			res.send(record)
@@ -156,22 +191,22 @@ app.post(API_ROUTE + '/files', (req, res) => {
 })
 
 server.listen(SERVER_PORT, () => {
-	console.log('~~~~~~~~~~~~~~~~~~~~~~~~')
-	console.log('~= Sound Server Ready =~')
-  console.log('')
-	console.log('ENV:    ', ENVIRONMENT)
-	console.log('API:    ', HOST + ':' + SERVER_PORT + API_ROUTE)
+	logger.info('~~~~~~~~~~~~~~~~~~~~~~~~')
+	logger.info('~= Sound Server Ready =~')
+  logger.info('')
+	logger.info('ENV: ' + ENVIRONMENT)
+	logger.info('API: ' + HOST + ':' + SERVER_PORT + API_ROUTE)
 
 	mongoose.connect(MONGO_URL, { useNewUrlParser: true })
 
 	mongoose.connection.on('error', error => {
-		console.log('DB:      error')
-		console.log('-----------------')
-		console.log(error)
+		logger.error('DB: error')
+		logger.error('-----------------')
+		logger.error(error)
 	})
 
 	mongoose.connection.once('open', () => {
-		console.log('DB:      connected')
+		logger.info('DB: connected')
 	})
 
 })

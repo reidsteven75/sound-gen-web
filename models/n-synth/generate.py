@@ -23,13 +23,14 @@ if os.environ['HTTPS'] == True:
   HTTP = 'https://'
 else:
   HTTP = 'http://'
-API = HTTP + os.environ['HOST'] + ':' + os.environ['SERVER_PORT']
+
+API = HTTP + os.environ['HOST_ALIAS'] + ':' + os.environ['SERVER_PORT'] + '/api'
 
 UTILS_COMMON_FILE = 'utils_common.py'
 UTILS_JOB_FILE = 'utils_job.py'
 ARTIFACT_ID = unique_id()
 ARTIFACTS = './artifacts/' + ARTIFACT_ID
-ARTIFACT_UPLOAD_PATH = 'test_sound_uploads/test_3'
+ARTIFACT_UPLOAD_PATH = 'test_sound_uploads/' + ARTIFACT_ID
 DIR_JOBS = './jobs'
 JOB_ENCODE_INTERPOLATE = 'encode-interpolate'
 JOB_DECODE = 'decode'
@@ -46,26 +47,51 @@ if (COMPUTE_ENVIRONMENT == 'paperspace'):
 job_metrics = []
 sound_space = None
 
+def run_artifact_upload(job, file, sound_space_id):
+  print('parsing...')
+  latent_space = {
+    'NW': None,
+    'NE': None,
+    'SW': None,
+    'SE': None
+  }
+  latent_space['NW'] = parse_latent_space(file, 'NW')
+  latent_space['NE'] = parse_latent_space(file, 'NE')
+  latent_space['SW'] = parse_latent_space(file, 'SW')
+  latent_space['SE'] = parse_latent_space(file, 'SE')
+  parse_success = True
+  for key in latent_space:
+    if latent_space[key] == None:
+      parse_success = False
+  if parse_success == False:
+    print('error')
+    print('parse result: %s' %(latent_space))
+  else:
+    print('success')
+    record = {
+      'soundSpace': sound_space_id,
+      'uploadPath': ARTIFACT_UPLOAD_PATH + '/' + sound_space_id,
+      'filePath': ARTIFACTS + '/' + job,
+      'fileName': file,
+      'latentSpace': latent_space
+    }
+    print('uploading...')
+    res = requests.post(API + '/files', json=record)
+    return(res.json())
+
 def upload_artifacts(job):
 
-  ARTIFACTS = './artifacts/2019-05-20_23-48-56_FAE9FE/decode'
-
-  contents = urllib.request.urlopen(API + '/test').read()
-  print(contents)
-
-  return
-
-  print('uploading artifacts...')
+  print('[UPLOAD_ARTIFACTS] Start')
   record = {
     'name': config_sound['name'],
     'user': config_sound['user'],
     'dimensions': 4,
     'resolution': config_sound['resolution'],
     'labels': {
-      'NW': config_sound['labels']['NW'],
-      'NE': config_sound['labels']['NE'],
-      'SW': config_sound['labels']['SW'],
-      'SE': config_sound['labels']['SE']
+      'NW': config_sound['labels']['NW'][0],
+      'NE': config_sound['labels']['NE'][0],
+      'SW': config_sound['labels']['SW'][0],
+      'SE': config_sound['labels']['SE'][0]
     }
   }
   res = requests.post(API + '/sound-spaces', json=record)
@@ -76,49 +102,23 @@ def upload_artifacts(job):
     sound_space_id = res_data['_id']
     print('sound-space created with ID: %s' %(sound_space_id))
     num_errors = 0
-    for file in os.listdir(ARTIFACTS):
+    for file in os.listdir(ARTIFACTS + '/' + job):
       if '.wav' in file:
-        latent_space = {
-          'NW': None,
-          'NE': None,
-          'SW': None,
-          'SE': None
-        }
-        latent_space['NW'] = parse_latent_space(file, 'NW')
-        latent_space['NE'] = parse_latent_space(file, 'NE')
-        latent_space['SW'] = parse_latent_space(file, 'SW')
-        latent_space['SE'] = parse_latent_space(file, 'SE')
-        parse_success = True
-        for key in latent_space:
-          if latent_space[key] == None:
-            parse_success = False
-        if parse_success == False:
-          print('[ERROR]: parsing file: %s' %(file))
-          print('parse result: %s' %(latent_space))
+        print('file: %s' %(file))
+        res = run_artifact_upload(job, file, sound_space_id)
+        if 'err' in res:
+          print('error')
+          num_errors += 1
         else:
-          record = {
-            'soundSpace': sound_space_id,
-            'uploadPath': ARTIFACT_UPLOAD_PATH + '/' + sound_space_id,
-            'filePath': ARTIFACTS,
-            'fileName': file,
-            'latentSpace': latent_space
-          }
-          print('uploading: %s' %(file))
-          res = requests.post(API + '/files', json=record)
-          res_data = res.json()
-          if 'err' in res_data:
-            print('error')
-            num_errors += 1
-          else:
-            print('success')
-      
-      if num_errors != 0:
-        print('[ERROR]: artifact upload, there were errors uploading files')
-      else:
-        print('[SUCCESS]: artifact upload')
-      
-      global sound_space
-      sound_space = sound_space_id
+          print('success')
+
+    if num_errors != 0:
+      print('[UPLOAD_ARTIFACTS]: errors')
+    else:
+      print('[UPLOAD_ARTIFACTS]: success')
+    
+    global sound_space
+    sound_space = sound_space_id
 
 def run_job(job, dataset):
   job_path = DIR_JOBS + '/' + job
@@ -202,8 +202,8 @@ def run_job(job, dataset):
 
 def run_workflow():
 
-  # run_job(JOB_ENCODE_INTERPOLATE, DATASET)
-  # run_job(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
+  run_job(JOB_ENCODE_INTERPOLATE, DATASET)
+  run_job(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
   upload_artifacts(JOB_DECODE)
 
 if __name__ == "__main__":
@@ -227,6 +227,7 @@ if __name__ == "__main__":
   print('~~~~~~~~~~~~~~~')
   print('ARTIFACT_ID: %s' %(ARTIFACT_ID))
   print('SOUND SPACE ID: %s' %(sound_space))
+  print('ARTIFACTS UPLOADED TO: %s' %(ARTIFACT_UPLOAD_PATH))
   print('JOB METRICS: ')
   print('\n'.join(job_metrics))
   print('WORKFLOW TIME: ' + worflow_time)

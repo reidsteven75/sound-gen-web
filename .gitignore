@@ -7,6 +7,8 @@
 **/node_modules/
 **/storage/
 **/artifacts/
+**/dataset/
+**/dataset-queue/
 
 # specific directories
 **/.ps_project/

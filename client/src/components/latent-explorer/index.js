@@ -55,6 +55,7 @@ class LatentExplorer extends Component {
 					this.setState({selectedSoundSpace: res.data})
 				})
 				.catch((err) => {
+					console.log('error')
 					console.log(err)
 				})
 				.finally( () => {
@@ -63,6 +64,7 @@ class LatentExplorer extends Component {
 							this.setState({latentSpaces: res.data})
 						})
 						.catch((err) => {
+							console.log('error')
 							console.log(err)
 						})
 						.finally( () => {

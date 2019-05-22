@@ -4,7 +4,6 @@
 # Image depends on gpu/cpu type needed
 ARG TENSORFLOW_IMAGE
 FROM ${TENSORFLOW_IMAGE}
-# FROM python:3
 
 # Install libraries
 RUN apt-get update && apt-get install -y \

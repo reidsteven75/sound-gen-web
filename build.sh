@@ -15,6 +15,7 @@ cd client
 env NODE_ENV=$NODE_ENV \
     HTTPS=$HTTPS \
     HOST=$HOST \
+    HOST_ALIAS=$HOST_ALIAS \
     SERVER_PORT=$SERVER_PORT \
     npm run build
 cd ..

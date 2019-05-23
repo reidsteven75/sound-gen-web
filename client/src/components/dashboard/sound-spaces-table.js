@@ -11,6 +11,7 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import TableSortLabel from '@material-ui/core/TableSortLabel'
 import Tooltip from '@material-ui/core/Tooltip'
+import { withBreakpoints } from 'react-breakpoints'
 
 const style = {
   content: {
@@ -21,12 +22,18 @@ const style = {
 
 class EnhancedTableHead extends Component {
 
+
 	createSortHandler = property => event => {
     this.props.onRequestSort(event, property);
   }
 	
 	render() {
-		const { headers, order, orderBy } = this.props
+    const { isMobile, order, orderBy } = this.props
+    let headers = this.props.headers
+
+    if (isMobile) {
+      headers = headers.slice(0,2)
+    }
 
 		return(
 			<TableHead>
@@ -122,9 +129,13 @@ class SoundSpacesTable extends Component {
 	}
 
   render() {
-    const data = this.props.data
-    const headers = this.props.headers
     const { order, orderBy } = this.state
+    const { data, headers, breakpoints, currentBreakpoint } = this.props
+
+    let isMobile = null
+    if (breakpoints[currentBreakpoint] <= breakpoints.mobile) {
+      isMobile = true
+    }
 
     let content = 
 				<React.Fragment>
@@ -135,6 +146,7 @@ class SoundSpacesTable extends Component {
               orderBy={orderBy}
               onRequestSort={this.handleRequestSort}
               rowCount={data.length}
+              isMobile={isMobile}
           />
 					<TableBody>
 						{this.stableSort(data, this.getSorting(order, orderBy))
@@ -147,13 +159,17 @@ class SoundSpacesTable extends Component {
 										tabIndex={-1}
 										key={n._id}
 									>
-										<TableCell align="left">
-											{moment(n.createdAt).fromNow()}
-										</TableCell>
+										<TableCell align="left">{moment(n.createdAt).fromNow()}</TableCell>
 										<TableCell align="left">{n.name}</TableCell>
-										<TableCell align="left">{n.user}</TableCell>
-										<TableCell align="right">{n.dimensions}</TableCell>
-										<TableCell align="right">{n.resolution}</TableCell>				
+                    { !isMobile ?
+                      <React.Fragment>
+                        <TableCell align="left">{n.user}</TableCell>
+                        <TableCell align="right">{n.dimensions}</TableCell>
+                        <TableCell align="right">{n.resolution}</TableCell>	
+                      </React.Fragment>
+                    :
+                    null
+                    }		
 									</TableRow>
 								);
 							})}
@@ -169,7 +185,7 @@ class SoundSpacesTable extends Component {
   }
 }
 
-export default compose(
+export default withBreakpoints(compose(
   withStyles(style),
   withWidth(),
-)(SoundSpacesTable)
+)(SoundSpacesTable))

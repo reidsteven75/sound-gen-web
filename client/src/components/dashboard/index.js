@@ -29,8 +29,8 @@ class Dashboard extends Component {
 			{ id: 'createdAt', numeric: false, disablePadding: false, label: 'Created' },
 			{ id: 'name', numeric: false, disablePadding: false, label: 'Name' },
 			{ id: 'user', numeric: false, disablePadding: false, label: 'User' },
-			{ id: 'dimensions', numeric: true, disablePadding: false, label: 'Dimensions' },
-			{ id: 'resolution', numeric: true, disablePadding: false, label: 'Resolution' },
+			{ id: 'dimensions', numeric: true, disablePadding: false, label: 'Dim.' },
+			{ id: 'resolution', numeric: true, disablePadding: false, label: 'Res.' },
 		]
 		this.soundSpaces = []
 	}

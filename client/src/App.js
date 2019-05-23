@@ -87,7 +87,7 @@ class App extends Component {
         <div className='App'>
           <main className='App-main'>
             <Router>
-              <Route path='/' exact component={latentExplorer} />
+              <Route path='/' exact component={dashboard} />
               <Route path='/dashboard/' component={dashboard} />
               <Route path='/sound-spaces/:id' component={latentExplorer} />      
             </Router>

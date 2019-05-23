@@ -108,6 +108,16 @@ app.get(CLIENT_ROUTE, (req, res) => {
 
 // sound-spaces
 // ------------
+app.get(API_ROUTE + '/sound-spaces', (req, res) => {
+	SoundSpaces.find({}, (err, records) => {
+		if (err) {
+			logger.error(err)
+			return res.send({err: true})
+		}
+		res.send(records)
+	})
+})
+
 app.get(API_ROUTE + '/sound-spaces/:id', (req, res) => {
 	const id = req.params.id
 	SoundSpaces.findById(id, (err, record) => {

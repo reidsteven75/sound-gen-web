@@ -7,7 +7,8 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 import blue from '@material-ui/core/colors/blue'
 import teal from '@material-ui/core/colors/teal'
 
-import LatentExplorer from './components/latent-explorer/index'
+import LatentExplorer from './components/latent-explorer'
+import Dashboard from './components/dashboard'
 
 // data
 import latentSpaces from './data/latent-spaces.json'
@@ -68,6 +69,16 @@ const latentExplorer = ({ match }) => {
   )
 }
 
+const dashboard = () => {
+  return (
+    <Dashboard
+      api={API}
+      data={data}
+      features={features}
+    />
+  )
+}
+
 class App extends Component {
   render() {
     return (
@@ -77,7 +88,8 @@ class App extends Component {
           <main className='App-main'>
             <Router>
               <Route path='/' exact component={latentExplorer} />
-              <Route path='/sound-space/:id' component={latentExplorer} />å
+              <Route path='/dashboard/' component={dashboard} />
+              <Route path='/sound-spaces/:id' component={latentExplorer} />      
             </Router>
           </main>
         </div> 

@@ -79,10 +79,7 @@ class LatentExplorer extends Component {
 	}
 
 	loadGrid() {
-		// const selectedSoundSpaceId = this.state.selectedSoundSpaceId
-		// const selectedSoundSpace = this.props.data.grids.find(grid => selectedSoundSpaceId === grid.id)
 		const selectedSoundSpace = this.state.selectedSoundSpace
-
 		this.setState({latentSpaceLoading: true})
 
 		if (selectedSoundSpace) {
@@ -91,10 +88,6 @@ class LatentExplorer extends Component {
 				labelNE: selectedSoundSpace.labels.NE,
 				labelSW: selectedSoundSpace.labels.SW,
 				labelSE: selectedSoundSpace.labels.SE
-				// labelNW: selectedSoundSpace.labels.find(label => label.position === 'NW') || {name: this.state.notConfiguredText},
-				// labelNE: selectedSoundSpace.labels.find(label => label.position === 'NE') || {name: this.state.notConfiguredText},
-				// labelSW: selectedSoundSpace.labels.find(label => label.position === 'SW') || {name: this.state.notConfiguredText},
-				// labelSE: selectedSoundSpace.labels.find(label => label.position === 'SE') || {name: this.state.notConfiguredText},
 			}, () => {
 				this.downloadSoundFiles()
 				// this.loadPlayer()

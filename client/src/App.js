@@ -7,6 +7,7 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 import blue from '@material-ui/core/colors/blue'
 import teal from '@material-ui/core/colors/teal'
 
+import Header from './components/header'
 import LatentExplorer from './components/latent-explorer'
 import Dashboard from './components/dashboard'
 
@@ -85,13 +86,16 @@ class App extends Component {
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
         <div className='App'>
-          <main className='App-main'>
-            <Router>
-              <Route path='/' exact component={dashboard} />
-              <Route path='/dashboard/' component={dashboard} />
-              <Route path='/sound-spaces/:id' component={latentExplorer} />      
-            </Router>
-          </main>
+          <Router>
+            <Header/>
+            <main className='App-main'>
+              
+                <Route path='/' exact component={dashboard} />
+                <Route path='/dashboard/' component={dashboard} />
+                <Route path='/sound-spaces/:id' component={latentExplorer} />      
+            
+            </main>
+          </Router>
         </div> 
       </MuiThemeProvider>
     )

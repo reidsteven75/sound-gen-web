@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Redirect } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import compose from 'recompose/compose'
 import { withStyles } from '@material-ui/core/styles'
@@ -50,7 +50,7 @@ class Dashboard extends Component {
 	}
 
 	routeTo = (url) => {
-    this.setState({redirect: url})
+    this.props.history.push(url)
   }
 
   render() {
@@ -81,7 +81,7 @@ class Dashboard extends Component {
   }
 }
 
-export default compose(
+export default withRouter(compose(
   withStyles(style),
   withWidth(),
-)(Dashboard)
+)(Dashboard))

@@ -10,6 +10,11 @@ const schema = new mongoose.Schema({
     trim: true,
     required: true
   },
+  type: {
+    type: String,
+    trim: true,
+    required: true
+  },
   bucket: {
     type: String,
     trim: true,

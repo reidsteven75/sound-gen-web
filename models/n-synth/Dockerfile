@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
   libasound2-dev \
   libjack-dev \
   libav-tools \
+  libavcodec-extra \
   sox \
   lame
 

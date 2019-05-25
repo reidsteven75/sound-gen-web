@@ -3,3 +3,5 @@ librosa
 requests
 joblib
 paperspace
+pydub
+tabulate

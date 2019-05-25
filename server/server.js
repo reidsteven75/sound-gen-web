@@ -155,9 +155,16 @@ app.post(API_ROUTE + '/sound-spaces', (req, res) => {
 
 // files
 // -----
-app.get(API_ROUTE + '/sound-spaces/:id/files', (req, res) => {
+app.get(API_ROUTE + '/sound-spaces/:id/files/:type', (req, res) => {
 	const id = req.params.id
-	Files.find({soundSpace:id}, (err, records) => {
+	const type = req.params.type
+
+	const query = {
+		soundSpace:id
+	}
+	if (type) { query.type = type }
+
+	Files.find(query, (err, records) => {
 		if (err) {
 			logger.error(err)
 			return res.send({err: true})
@@ -170,11 +177,11 @@ app.post(API_ROUTE + '/files', (req, res) => {
 
 	const data = req.body
 	const options = {
-		destination: data.uploadPath + '/' + data.fileName,
+		destination: data.uploadPath + '/' + data.file,
 		resumable: true,
 	}
 
-	bucket.upload(data.filePath + '/' + data.fileName, options, function(err, file) {
+	bucket.upload(data.filePath + '/' + data.file, options, function(err, file) {
 		if (err) {
 			logger.error('upload Google Storage error: files')
 			logger.info(err)
@@ -184,7 +191,8 @@ app.post(API_ROUTE + '/files', (req, res) => {
 		const record = new Files({
 			soundSpace: data.soundSpace,
 			latentSpace: data.latentSpace,
-			file: data.fileName,
+			file: data.file,
+			type: data.type,
 			bucket: GOOGLE_STORAGE_BUCKET,
 			path: data.uploadPath
 		})

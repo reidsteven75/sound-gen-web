@@ -7,6 +7,10 @@ from utils_common import *
 def inject_file(util_file, job_dir):
   shutil.copy(util_file, job_dir)
 
+def inject_config_sound(config_file, job_dir):
+  shutil.copy(config_file, job_dir)
+  os.rename(job_dir + '/' + config_file, job_dir + '/config-sound.json')
+
 def inject_config_job(config_file, job_dir):
   shutil.copy(config_file, job_dir)
   os.rename(job_dir + '/' + config_file, job_dir + '/config-job.json')

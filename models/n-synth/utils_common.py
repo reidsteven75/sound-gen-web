@@ -3,6 +3,21 @@ import shutil
 import uuid 
 import datetime
 
+def check_dir(dir_path):
+  if os.path.exists(dir_path) and os.path.isdir(dir_path):
+    if not os.listdir(dir_path):
+      return({'err':'dir empty'})
+    else:    
+      return({'success': True})
+  else:
+    return({'err':'dir does not exist'})
+
+def get_filetype(file):
+  return os.path.splitext(file)[1].replace('.', '')
+
+def get_filename(file):
+  return os.path.splitext(file)[0]
+
 def unique_id():
   return datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S') + \
           '_' + \

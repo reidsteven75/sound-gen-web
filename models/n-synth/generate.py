@@ -7,6 +7,8 @@ import shutil
 import time
 import paperspace
 import urllib.request
+import tabulate
+from pydub import AudioSegment
 from utils_common import *
 from utils_workflow import *
 
@@ -15,7 +17,13 @@ CONFIG_WORKFLOW = os.environ['CONFIG_WORKFLOW']
 CONFIG_WORKFLOW_FILE = 'config-workflow-%s.json' %(CONFIG_WORKFLOW)
 with open(CONFIG_WORKFLOW_FILE, 'r') as infile:
   config_workflow = json.load(infile)
-CONFIG_SOUND_FILE = 'config-sound.json'
+
+if CONFIG_WORKFLOW == 'test':
+  CONFIG_SOUND_FILE = 'config-sound-test.json'
+  GOOGLE_STORAGE_UPLOAD_PATH = os.environ['GOOGLE_STORAGE_UPLOAD_PATH_TEST']
+else:
+  CONFIG_SOUND_FILE = 'config-sound.json'
+  GOOGLE_STORAGE_UPLOAD_PATH = os.environ['GOOGLE_STORAGE_UPLOAD_PATH_REAL']
 with open(CONFIG_SOUND_FILE, 'r') as infile:
   config_sound = json.load(infile)
 
@@ -30,7 +38,8 @@ UTILS_COMMON_FILE = 'utils_common.py'
 UTILS_JOB_FILE = 'utils_job.py'
 ARTIFACT_ID = unique_id()
 ARTIFACTS = './artifacts/' + ARTIFACT_ID
-ARTIFACT_UPLOAD_PATH = 'test_sound_uploads/' + ARTIFACT_ID
+ARTIFACT_UPLOAD_PATH = GOOGLE_STORAGE_UPLOAD_PATH
+ARTIFACT_TYPES = ['.wav','.mp3']
 DIR_JOBS = './jobs'
 JOB_ENCODE_INTERPOLATE = 'encode-interpolate'
 JOB_DECODE = 'decode'
@@ -47,6 +56,48 @@ if (COMPUTE_ENVIRONMENT == 'paperspace'):
 job_metrics = []
 sound_space = None
 
+def print_job_metrics(job_metrics):
+  header = job_metrics[0].keys()
+  rows =  [x.values() for x in job_metrics]
+  print(tabulate.tabulate(rows, header, tablefmt='fancy_grid'))
+
+def save_job_metrics(job, start, end, status):
+  job_time = '{0:.2f}'.format(end - start)
+  job_metrics.append({
+    'job': job,
+    'time':  job_time,
+    'status': status
+  })
+  print('[%s]: %s' %(job, status))
+
+def convert_wav_to_mp3(path, file):
+  print('generating mp3...')
+  file_name = get_filename(file)
+  AudioSegment.from_wav(path + '/' + file).export(path + '/' + file_name + '.mp3', format='mp3')
+  print('success')
+
+def convert_artifacts(job):
+  print('[convert_artifacts]: start')
+  start = time.time()
+  status = 'started'
+
+  file_path = ARTIFACTS + '/' + job
+  dir_status = check_dir(file_path)
+  if 'err' in dir_status.keys():
+    print(dir_status)
+    status = 'error'
+  else:
+    for file in os.listdir(file_path):
+      if '.wav' in file:
+        print('file: %s' %(file))
+        convert_wav_to_mp3(file_path, file)
+
+  # job metrics
+  if (status != 'error'):
+    status = 'success'
+  end = time.time()
+  save_job_metrics('convert_wav_to_mp3', start, end, status)
+
 def run_artifact_upload(job, file, sound_space_id):
   print('parsing...')
   latent_space = {
@@ -59,6 +110,7 @@ def run_artifact_upload(job, file, sound_space_id):
   latent_space['NE'] = parse_latent_space(file, 'NE')
   latent_space['SW'] = parse_latent_space(file, 'SW')
   latent_space['SE'] = parse_latent_space(file, 'SE')
+  file_type = get_filetype(file)
   parse_success = True
   for key in latent_space:
     if latent_space[key] == None:
@@ -72,7 +124,8 @@ def run_artifact_upload(job, file, sound_space_id):
       'soundSpace': sound_space_id,
       'uploadPath': ARTIFACT_UPLOAD_PATH + '/' + sound_space_id,
       'filePath': ARTIFACTS + '/' + job,
-      'fileName': file,
+      'file': file,
+      'type': file_type,
       'latentSpace': latent_space
     }
     print('uploading...')
@@ -81,7 +134,12 @@ def run_artifact_upload(job, file, sound_space_id):
 
 def upload_artifacts(job):
 
-  print('[UPLOAD_ARTIFACTS] Start')
+  print('[upload_artifacts]: start')
+
+  start = time.time()
+  status = 'started'
+
+  file_path = ARTIFACTS + '/' + job
   record = {
     'name': config_sound['name'],
     'user': config_sound['user'],
@@ -98,27 +156,38 @@ def upload_artifacts(job):
   res_data = res.json()
   if 'err' in res_data:
     print('error creating sound-space with API')
+    status = 'error'
   else:
     sound_space_id = res_data['_id']
     print('sound-space created with ID: %s' %(sound_space_id))
     num_errors = 0
-    for file in os.listdir(ARTIFACTS + '/' + job):
-      if '.wav' in file:
-        print('file: %s' %(file))
-        res = run_artifact_upload(job, file, sound_space_id)
-        if 'err' in res:
-          print('error')
-          num_errors += 1
-        else:
-          print('success')
 
-    if num_errors != 0:
-      print('[UPLOAD_ARTIFACTS]: errors')
+    dir_status = check_dir(file_path)
+    if 'err' in dir_status.keys():
+      print(dir_status)
+      status = 'error'
     else:
-      print('[UPLOAD_ARTIFACTS]: success')
+      for file in os.listdir(file_path):
+        if any(x in file for x in ARTIFACT_TYPES):
+          print('file: %s' %(file))
+          res = run_artifact_upload(job, file, sound_space_id)
+          if 'err' in res:
+            print('error')
+            num_errors += 1
+          else:
+            print('success')
     
     global sound_space
     sound_space = sound_space_id
+
+    if num_errors != 0:
+      status = 'error'
+
+  # job metrics
+  if (status != 'error'):
+    status = 'success'
+  end = time.time()
+  save_job_metrics('upload_artifacts', start, end, status)
 
 def run_job(job, dataset):
   job_path = DIR_JOBS + '/' + job
@@ -130,7 +199,7 @@ def run_job(job, dataset):
 
   # inject config_workflow, config_sound & utils
   inject_config_job(CONFIG_WORKFLOW_FILE, job_path)
-  inject_file(CONFIG_SOUND_FILE, job_path)
+  inject_config_sound(CONFIG_SOUND_FILE, job_path)
   inject_file(UTILS_COMMON_FILE, job_path)
   inject_file(UTILS_JOB_FILE, job_path)
 
@@ -144,6 +213,7 @@ def run_job(job, dataset):
   for i in range(concurrent_jobs):
 
     start = time.time()
+    status = 'started'
 
     # init job data, artifacts, and storage
     delete_dir(job_data)
@@ -181,6 +251,7 @@ def run_job(job, dataset):
       except:
         print('[ERROR]: jobs_create')
         print(sys.exc_info())
+        status = 'error'
         return
       # get job artifacts
       try:
@@ -192,18 +263,21 @@ def run_job(job, dataset):
       except:
         print('[ERROR]: artifacts_get')
         print(sys.exc_info()[0])
+        status = 'error'
         return
-        
+    
     # job metrics
+    if (status != 'error'):
+      status = 'success'
+        
     end = time.time()
-    job_time = str(end - start)
-    print('JOB TIME: ' + job_time)
-    job_metrics.append(job + '_' + str(i) + ' - execution time (s): ' + job_time)
+    save_job_metrics(job + '_' + str(i), start, end, status)
 
 def run_workflow():
 
   run_job(JOB_ENCODE_INTERPOLATE, DATASET)
   run_job(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
+  convert_artifacts(JOB_DECODE)
   upload_artifacts(JOB_DECODE)
 
 if __name__ == "__main__":
@@ -220,14 +294,15 @@ if __name__ == "__main__":
   run_workflow()
 
   end = time.time()
-  worflow_time = str(end - start)
+  worflow_time = '{0:.2f}'.format(end - start)
 
   print('~~~~~~~~~~~~~~~')
   print('N-SYNTH: RESULT')
   print('~~~~~~~~~~~~~~~')
   print('ARTIFACT_ID: %s' %(ARTIFACT_ID))
   print('SOUND SPACE ID: %s' %(sound_space))
-  print('ARTIFACTS UPLOADED TO: %s' %(ARTIFACT_UPLOAD_PATH))
-  print('JOB METRICS: ')
-  print('\n'.join(job_metrics))
+  print('ARTIFACT UPLOAD PATH: %s' %(ARTIFACT_UPLOAD_PATH))
   print('WORKFLOW TIME: ' + worflow_time)
+  print('JOB METRICS: ')
+  print_job_metrics(job_metrics)
+  

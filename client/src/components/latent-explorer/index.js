@@ -59,7 +59,7 @@ class LatentExplorer extends Component {
 					console.log(err)
 				})
 				.finally( () => {
-					axios.get(this.props.api + '/sound-spaces/' + this.props.soundSpace + '/files')
+					axios.get(this.props.api + '/sound-spaces/' + this.props.soundSpace + '/files/mp3')
 						.then((res) => {
 							this.setState({latentSpaces: res.data})
 						})

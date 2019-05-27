@@ -30,6 +30,9 @@ def delete_dir(path):
 def create_dir(path):
 	os.makedirs(path, exist_ok=True)
 
+def get_only_directories(path):
+	return [dI for dI in os.listdir(path) if os.path.isdir(os.path.join(path, dI))]
+
 def get_only_files(path):
 	files = []
 	for file in os.listdir(path):
@@ -50,4 +53,5 @@ def copy_files(source, target):
   create_dir(target)
   files = os.listdir(source)
   for f in files:
-    shutil.copy(source + '/' + f, target)
+    if not os.path.isfile(target + '/' + f):
+      shutil.copy(source + '/' + f, target)

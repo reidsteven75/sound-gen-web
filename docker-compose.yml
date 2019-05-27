@@ -64,7 +64,7 @@ services:
       context: ./models/n-synth
       args: 
         TENSORFLOW_IMAGE: tensorflow/tensorflow:1.13.1-py3
-        CONFIG_WORKFLOW: local
+        TEST: none
         COMPUTE_TYPE: cpu
         COMPUTE_ENVIRONMENT: local
     volumes:
@@ -81,7 +81,7 @@ services:
       context: ./models/n-synth
       args: 
         TENSORFLOW_IMAGE: tensorflow/tensorflow:1.13.1-py3
-        CONFIG_WORKFLOW: test
+        TEST: standard
         COMPUTE_TYPE: cpu
         COMPUTE_ENVIRONMENT: local
     volumes:
@@ -98,7 +98,7 @@ services:
       context: ./models/n-synth
       args: 
         TENSORFLOW_IMAGE: tensorflow/tensorflow:1.13.1-gpu-py3
-        CONFIG_WORKFLOW: paperspace
+        TEST: none
         COMPUTE_TYPE: gpu
         COMPUTE_ENVIRONMENT: paperspace
     volumes:
@@ -115,7 +115,7 @@ services:
       context: ./models/n-synth
       args: 
         TENSORFLOW_IMAGE: tensorflow/tensorflow:1.13.1-gpu-py3
-        CONFIG_WORKFLOW: test
+        TEST: standard
         COMPUTE_TYPE: gpu
         COMPUTE_ENVIRONMENT: paperspace
     volumes:

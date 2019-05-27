@@ -4,6 +4,7 @@ import shutil
 import sys
 import zipfile
 import numpy as np
+import argparse
 
 from multiprocessing.dummy import Pool as ThreadPool
 from tqdm import tqdm
@@ -14,12 +15,16 @@ from utils_job import *
 
 JOB_NAME = 'DECODE'
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-j', '--job', help='Job number')
+args = parser.parse_args()
+
 with open('config-job.json', 'r') as infile:
   config_job = json.load(infile)
 
-INPUT_PATH = 'data/input'
-BATCH_PATH = 'data/embeddings_batched'
-OUTPUT_PATH = 'data/audio_output'
+INPUT_DATASET = 'data/job%s/' %(args.job) + 'input'
+BATCH_PATH = 'data/job%s/' %(args.job) + 'embeddings_batched' 
+OUTPUT_PATH = 'data/job%s/' %(args.job) + 'audio_output'
 
 DIR_STORAGE = config_job['dir']['storage']
 DIR_ARTIFACTS = config_job['dir']['artifacts']
@@ -43,6 +48,7 @@ def init():
 	print('compute: %s' %(os.environ['COMPUTE_TYPE']))
 	print('python: %s' %(sys.version))
 	print('current working path: %s' %(os.getcwd()))
+	print('INPUT_DATASET: %s' %(INPUT_DATASET))
 	print('DIR_STORAGE: %s' %(DIR_STORAGE))
 	print('DIR_ARTIFACTS: %s' %(DIR_ARTIFACTS))
 	print('BATCH_SIZE: %s' %(BATCH_SIZE))
@@ -68,7 +74,7 @@ def batch_embeddings():
 	print('--------------------------')
 	print('START: batching embeddings')
 
-	num_embeddings = len(os.listdir(INPUT_PATH))
+	num_embeddings = len(os.listdir(INPUT_DATASET))
 	batch_size = num_embeddings / config_job['jobs']['decode']['gpus']
 	#	split the embeddings per gpu in folders
 	for i in range(0, config_job['jobs']['decode']['gpus']):
@@ -81,13 +87,20 @@ def batch_embeddings():
 
 	#	shuffle to the folders
 	batch = 0
-	for filename in os.listdir(INPUT_PATH):
+	for filename in os.listdir(INPUT_DATASET):
+
+		print('debug:batch input')
+		print(INPUT_DATASET)
+
 		target_folder = BATCH_PATH + '/batch%i/' % batch
 		batch += 1
 		if batch >= config_job['jobs']['decode']['gpus']:
 			batch = 0
 
-		os.rename(INPUT_PATH + '/' + filename, target_folder + filename)
+		os.rename(INPUT_DATASET + '/' + filename, target_folder + filename)
+
+		print('debug:batch output')
+		print(target_folder + filename)
 	
 	print('RESULT: batching embeddings')
 	print('---------------------------')
@@ -120,6 +133,8 @@ def generate_audio():
 		source = OUTPUT_PATH + '/batch%i/' % i
 		files = os.listdir(source)
 		for f in files:
+			print('debug:output')
+			print(f)
 			shutil.move(source + f, DIR_ARTIFACTS)
 
 	print('RESULT: sound generation')

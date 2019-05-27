@@ -3,6 +3,7 @@ import os
 import subprocess
 import json
 import zipfile
+import argparse
 
 from tqdm import tqdm
 from itertools import product
@@ -12,12 +13,19 @@ from utils_job import *
 
 JOB_NAME = 'ENCODE-INTERPOLATE'
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-j', '--job', help='Job number')
+args = parser.parse_args()
+
 with open('config-job.json', 'r') as infile:
   config_job = json.load(infile)
 
 with open('config-sound.json', 'r') as infile:
   config_sound = json.load(infile)
 
+INPUT_DATASET = 'data/job%s/' %(args.job) + 'input'
+
+DIR_EMBEDDINGS = 'data/job%s/' %(args.job) + 'embeddings_raw'
 DIR_STORAGE = config_job['dir']['storage']
 DIR_ARTIFACTS = config_job['dir']['artifacts']
 BATCH_SIZE = config_job['jobs']['encode-interpolate']['batch_size']
@@ -39,6 +47,7 @@ def init():
 	print('compute: %s' %(os.environ['COMPUTE_TYPE']))
 	print('python: %s' %(sys.version))
 	print('current working path: %s' %(os.getcwd()))
+	print('INPUT_DATASET: %s' %(INPUT_DATASET))
 	print('DIR_STORAGE: %s' %(DIR_STORAGE))
 	print('DIR_ARTIFACTS: %s' %(DIR_ARTIFACTS))
 	print('BATCH_SIZE: %s' %(BATCH_SIZE))
@@ -61,8 +70,8 @@ def compute_embeddings():
 	print('-------------------------')
 	print('START: compute embeddings')
 
-	input_path = 'data/input'
-	output_path = 'data/embeddings_raw'
+	input_path = INPUT_DATASET
+	output_path = DIR_EMBEDDINGS
 	create_dir(output_path)
 
 	num_input_files = len(os.listdir(input_path))
@@ -88,7 +97,7 @@ def interpolate_embeddings():
 	print('-------------------------------')
 	print('START: interpolating embeddings')
 
-	input_path = 'data/embeddings_raw'
+	input_path = DIR_EMBEDDINGS
 	output_path = DIR_ARTIFACTS
 	create_dir(output_path)
 

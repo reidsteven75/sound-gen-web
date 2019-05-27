@@ -6,7 +6,7 @@
 	},  
 	"jobs": {
 		"encode-interpolate": {
-			"batch_size": 				1,
+			"batch_size": 				96,
 			"concurrent_jobs": 		1,
 			"project_id": 				"pri4d7aaq",
       "container": 					"reidsteven75/sound-gen-n-synth-gpu:latest",

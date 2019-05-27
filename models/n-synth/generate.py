@@ -207,47 +207,27 @@ def upload_artifacts(job):
   end = time.time()
   save_job_metrics('upload_artifacts', start, end, status)
 
-child_processes = []
-
-def job_command(i, args):
-  time.sleep(i)
+def job_run(config):
   start = time.time()
-  status = 'started'
-  print('[%s_%s]: %s' %(args['job'], str(i), status))
-
-  print('batch files')
-  print(get_only_files(args['dataset_batch_dir'] + '/job%i' % i))
-
-  # init job data and artifacts
-  delete_dir(args['job_data'])
-  create_dir(args['job_data'])
-  copy_files(args['dataset_batch_dir'] + '/job%i' % i, args['job_data'] + '/job%i/' % i + 'input')
+  status = 'running'
+  print('[%s]: %s' %(config['job'], status))
 
   if (COMPUTE_ENVIRONMENT == 'local'):
-    # replicate paperspace environment
-    delete_dir(args['job_artifacts'] + '/job%i' % i)
-    create_dir(args['job_artifacts'] + '/job%i' % i)
-    # run job
-    p = subprocess.call(['python', 'job.py', '--job', str(i)], cwd=args['job_path'])
+    p = subprocess.call(['python', 'job.py'], cwd=config['job_path'])
     # get job artifacts
-    copy_files(args['job_artifacts'] + '/job%i' % i, args['workflow_artifacts'])
+    copy_files(config['job_artifacts'], config['workflow_artifacts'])
 
   if (COMPUTE_ENVIRONMENT == 'paperspace'):
-    # zip job directory
-    print('zipping job...')
-    job_zip_path = zip_job(args['job_path'], DIR_ZIP)
-    print('zipped like a fresh coat zipper')
-    # run job
     job_id = None
     try:
       res = paperspace.jobs.create({
         'apiKey': PAPERSPACE_API_KEY,
-        'name': args['job'],
-        'projectId': args['job_config_workflow']['project_id'],
-        'container': args['job_config_workflow']['container'],
-        'machineType': args['job_config_workflow']['machine_type'],
-        'command': 'python job.py --batch ' + str(i) ,
-        'workspace': job_zip_path
+        'name': config['job'],
+        'projectId': config['job_config_workflow']['project_id'],
+        'container': config['job_config_workflow']['container'],
+        'machineType': config['job_config_workflow']['machine_type'],
+        'command': 'python job.py',
+        'workspace': config['job_zip_path']
       })
       job_id = res['id']
     except:
@@ -260,7 +240,7 @@ def job_command(i, args):
       paperspace.jobs.artifactsGet({
         'apiKey': PAPERSPACE_API_KEY,
         'jobId': job_id,
-        'dest': args['workflow_artifacts']
+        'dest': config['workflow_artifacts']
       })
     except:
       print('[ERROR]: artifacts_get')
@@ -273,25 +253,74 @@ def job_command(i, args):
     status = 'success'
       
   end = time.time()
-  save_job_metrics(args['job'] + '_' + str(i), start, end, status)
+  save_job_metrics(config['job'], start, end, status)
 
-def job_run(job, dataset):
+def job_config(job, data_batch, i):
 
-  status = 'config'
+  status = 'configuring'
+  print('[%s_%s]: %s' %(job, str(i), status))
+
+  config = {}
+  config['job'] = job + '_' + str(i)
+  config['job_path'] = DIR_JOBS + '/' + job + '/job_' + str(i)
+  config['job_data'] = config['job_path'] + '/data'
+  config['job_artifacts'] = config['job_path'] + '/artifacts'
+  config['job_config_workflow'] = config_workflow['jobs'][job]
+  config['workflow_artifacts'] = ARTIFACTS + '/' + job
+
+  # create concurrent job dir in job
+  delete_dir(config['job_path'])
+  create_dir(config['job_path'])
+
+  # inject master job files
+  copy_files(DIR_JOBS + '/' + job, config['job_path'])
+
+  # inject config & utils
+  inject_config_job(CONFIG_WORKFLOW_FILE, config['job_path'])
+  inject_config_sound(CONFIG_SOUND_FILE, config['job_path'])
+  inject_file(UTILS_COMMON_FILE, config['job_path'])
+  inject_file(UTILS_JOB_FILE, config['job_path'])
+
+  # inject data
+  delete_dir(config['job_data'])
+  create_dir(config['job_data'])
+  copy_files(data_batch, config['job_data'] + '/' + 'input')
+
+  if (COMPUTE_ENVIRONMENT == 'local'):
+    # replicate paperspace environment
+    copy_files(STORAGE_COMMON, config['job_path'] + '/storage')
+    delete_dir(config['job_artifacts'])
+    create_dir(config['job_artifacts'])
+  
+  if (COMPUTE_ENVIRONMENT == 'paperspace'):
+    # zip job directory
+    print('zipping job...')
+    config['job_zip_path'] = zip_job(config['job_path'], DIR_ZIP)
+    print('zipped like a fresh coat zipper')
+  
+  # print('job')
+  # job_dir = get_only_directories(config['job_path'])
+  # files = get_only_files(config['job_path'])
+  # print(job_dir)
+  # print(files)
+  # for folder in job_dir:
+  #   print(folder)
+  #   if folder == 'data':
+  #     files = get_only_files(config['job_path'] + '/' + folder + '/input')
+  #   else:
+  #     files = get_only_files(config['job_path'] + '/' + folder)
+  #   print(files)
+
+  return(config)
+  
+
+def job_schedule(job, dataset):
+
+  status = 'scheduling'
   print('[%s]: %s' %(job, status))
 
-  job_path = DIR_JOBS + '/' + job
-  job_data = job_path + '/data'
-  job_artifacts = job_path + '/artifacts'
   job_config_workflow = config_workflow['jobs'][job]
-
   concurrent_jobs = job_config_workflow['concurrent_jobs']
-
-  # inject config_workflow, config_sound & utils
-  inject_config_job(CONFIG_WORKFLOW_FILE, job_path)
-  inject_config_sound(CONFIG_SOUND_FILE, job_path)
-  inject_file(UTILS_COMMON_FILE, job_path)
-  inject_file(UTILS_JOB_FILE, job_path)
 
   # job artifacts are gathered into overall workflow artifacts after
   workflow_artifacts = ARTIFACTS + '/' + job
@@ -299,76 +328,21 @@ def job_run(job, dataset):
 
   # batch dataset for concurrent jobs
   dataset_batch_dir = prepare_batch(DIR_BATCHES, dataset, concurrent_jobs)
-  print('batches')
-  batches = get_only_directories(dataset_batch_dir)
-  print(batches)
-  for batch in batches:
-    print(batch)
-    files = get_only_files(dataset_batch_dir + '/' + batch)
-    print(files)
 
-  # env specific
-  if (COMPUTE_ENVIRONMENT == 'local'):
-    copy_files(STORAGE_COMMON, job_path + '/storage')
-
-  args = {
-    'job': job,
-    'job_path': job_path,
-    'job_data': job_data,
-    'job_artifacts': job_artifacts,
-    'job_config_workflow': job_config_workflow,
-    'job_path': job_path,
-    'workflow_artifacts': workflow_artifacts,
-    'dataset_batch_dir': dataset_batch_dir
-  }
-
-  # if job == JOB_ENCODE_INTERPOLATE:
-  #   print('encode')
-  #   runInParallel(
-  #     job_command(0, args)
-  #   )
-
-  # if job == JOB_DECODE:
-  #   print('decode')
-  #   with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-  #     future_to_url = {executor.submit(job_command, i, args): i for i in range(4)}
-  #     for future in concurrent.futures.as_completed(future_to_url):
-  #       url = future_to_url[future]
-  #       print(url)
-
-  # run jobs async
-  # loop = asyncio.get_event_loop()
-
-  # if job == JOB_ENCODE_INTERPOLATE:
-  #   print('encode')
-  #   parallelFunc(1, args)
-
-  # if job == JOB_DECODE:
-  #   print('decode')
-  #   loop.run_until_complete(parallelFunc(4, args))
-
-  # loop.close()
-
+  config = {}
+  for i in range(int(concurrent_jobs)):
+    data_batch = dataset_batch_dir + '/batch' + str(i)
+    config[i] = job_config(job, data_batch, i)
+  
   # run jobs in parallel
-  job_command_with_args = partial(job_command, args=args)
-  Parallel(n_jobs=int(concurrent_jobs), verbose=10)(delayed(job_command_with_args)(i) for i in range(int(concurrent_jobs)))
+  Parallel(n_jobs=int(concurrent_jobs), verbose=10)(delayed(job_run)(config[i]) for i in range(int(concurrent_jobs)))
 
-  # run jobs in series
-  # for i in range(concurrent_jobs):
-  #   job_command(i, args)
-
-  # job_command_with_args = partial(job_command, args=args)
-  # pool = ThreadPool(int(concurrent_jobs))
-  # results = pool.map_async(job_command_with_args, range(int(concurrent_jobs)))
-  # while not results.ready():
-  #   time.sleep(1)
-  # pool.close()
-  # pool.join()
+  time.sleep(1)
 
 def run_workflow():
 
-  job_run(JOB_ENCODE_INTERPOLATE, DATASET)
-  job_run(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
+  job_schedule(JOB_ENCODE_INTERPOLATE, DATASET)
+  job_schedule(JOB_DECODE, ARTIFACTS + '/' + JOB_ENCODE_INTERPOLATE)
   generate_mp3(JOB_DECODE)
   upload_artifacts(JOB_DECODE)
 

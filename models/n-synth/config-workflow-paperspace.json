@@ -14,9 +14,9 @@
 		},
 		"decode": {
 			"gpus": 							1,
-			"batch_size":   			4,
-			"sample_length": 			130,
-			"concurrent_jobs": 		5,
+			"batch_size":   			1,
+			"sample_length": 			1,
+			"concurrent_jobs": 		4,
 			"project_id": 				"pri4d7aaq",
       "container": 					"reidsteven75/sound-gen-n-synth-cpu:latest",
 			"machine_type": 			"P6000"

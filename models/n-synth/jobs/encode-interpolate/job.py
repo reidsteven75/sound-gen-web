@@ -13,19 +13,14 @@ from utils_job import *
 
 JOB_NAME = 'ENCODE-INTERPOLATE'
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-j', '--job', help='Job number')
-args = parser.parse_args()
-
 with open('config-job.json', 'r') as infile:
   config_job = json.load(infile)
 
 with open('config-sound.json', 'r') as infile:
   config_sound = json.load(infile)
 
-INPUT_DATASET = 'data/job%s/' %(args.job) + 'input'
-
-DIR_EMBEDDINGS = 'data/job%s/' %(args.job) + 'embeddings_raw'
+INPUT_DATASET = 'data/input'
+DIR_EMBEDDINGS = 'data/embeddings_raw'
 DIR_STORAGE = config_job['dir']['storage']
 DIR_ARTIFACTS = config_job['dir']['artifacts']
 BATCH_SIZE = config_job['jobs']['encode-interpolate']['batch_size']

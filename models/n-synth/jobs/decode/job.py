@@ -15,16 +15,12 @@ from utils_job import *
 
 JOB_NAME = 'DECODE'
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-j', '--job', help='Job number')
-args = parser.parse_args()
-
 with open('config-job.json', 'r') as infile:
   config_job = json.load(infile)
 
-INPUT_DATASET = 'data/job%s/' %(args.job) + 'input'
-BATCH_PATH = 'data/job%s/' %(args.job) + 'embeddings_batched' 
-OUTPUT_PATH = 'data/job%s/' %(args.job) + 'audio_output'
+INPUT_DATASET = 'data/input'
+BATCH_PATH = 'data/embeddings_batched' 
+OUTPUT_PATH = 'data/audio_output'
 
 DIR_STORAGE = config_job['dir']['storage']
 DIR_ARTIFACTS = config_job['dir']['artifacts']

@@ -53,5 +53,6 @@ def copy_files(source, target):
   create_dir(target)
   files = os.listdir(source)
   for f in files:
-    if not os.path.isfile(target + '/' + f):
-      shutil.copy(source + '/' + f, target)
+    if os.path.isfile(os.path.join(source, f)):
+      if not os.path.isfile(target + '/' + f):
+        shutil.copy(source + '/' + f, target)

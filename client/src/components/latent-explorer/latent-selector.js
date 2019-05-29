@@ -132,6 +132,8 @@ class LatentSelector extends Component {
 
 	initP5(sk) {
 
+		const { latentSpaces, latentResolution } = this.props
+
 		this.setState({
 			targetX: this.sketchRef.current.offsetWidth/2,
 			targetY: this.sketchRef.current.offsetHeight/2
@@ -165,6 +167,17 @@ class LatentSelector extends Component {
 			this.setState({
 				currentPosX: this.state.currentPosX + dx * this.state.easing,
 				currentPosY: this.state.currentPosY + dy * this.state.easing
+			})
+
+			// draw latent spaces
+			this.sk.stroke(220,20,60)
+			this.sk.strokeWeight(1)
+			latentSpaces.forEach( (_xy) => {
+				this.sk.circle(
+					_xy[0] * this.state.canvasWidth,
+					_xy[1] * this.state.canvasHeight,
+					10
+				)
 			})
 
 			// determine if moving
@@ -260,8 +273,8 @@ class LatentSelector extends Component {
 		let content = 
 			<div>
 				<Grid container spacing={24} >
-					<Grid item xs={6} style={style.soundLeft}>{this.props.loading ? '-' : this.props.labelNW.name}</Grid>
-					<Grid item xs={6} style={style.soundRight}>{this.props.loading ? '-' : this.props.labelNE.name}</Grid>
+					<Grid item xs={6} style={style.soundLeft}>{this.props.loading ? '-' : this.props.labelNW}</Grid>
+					<Grid item xs={6} style={style.soundRight}>{this.props.loading ? '-' : this.props.labelNE}</Grid>
 				</Grid>
 				<Grid container spacing={24} >
 					<Grid item xs={12}>
@@ -277,8 +290,8 @@ class LatentSelector extends Component {
 					</Grid>	
 				</Grid>
 				<Grid container spacing={24} >
-					<Grid item xs={6} style={style.soundLeft}>{this.props.loading ? '-' : this.props.labelSW.name}</Grid>
-					<Grid item xs={6} style={style.soundRight}>{this.props.loading ? '-' : this.props.labelSE.name}</Grid>
+					<Grid item xs={6} style={style.soundLeft}>{this.props.loading ? '-' : this.props.labelSW}</Grid>
+					<Grid item xs={6} style={style.soundRight}>{this.props.loading ? '-' : this.props.labelSE}</Grid>
 				</Grid>
 			</div>
 

@@ -54,15 +54,11 @@ class Dashboard extends Component {
   }
 
   render() {
-		const { redirect } = this.state
 		
     let content
     if (this.state.loading === true) {
 			content = <CircularProgress/>
 		}
-		else if (redirect) {
-      return <Redirect to={redirect}/>
-    }
     else {
       content = 
 				<React.Fragment>

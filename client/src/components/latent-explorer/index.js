@@ -39,7 +39,7 @@ class LatentExplorer extends Component {
 			labelSE: '',
 			pitch: null,
 			selectedSoundSpace: null,
-			latentSpaces: null
+			sounds: null
 		}
 
 		this.loadPlayer = this.loadPlayer.bind(this)
@@ -61,7 +61,7 @@ class LatentExplorer extends Component {
 				.finally( () => {
 					axios.get(this.props.api + '/sound-spaces/' + this.props.soundSpace + '/files/mp3')
 						.then((res) => {
-							this.setState({latentSpaces: res.data})
+							this.setState({sounds: res.data})
 						})
 						.catch((err) => {
 							console.log('error')
@@ -89,35 +89,45 @@ class LatentExplorer extends Component {
 				labelSW: selectedSoundSpace.labels.SW,
 				labelSE: selectedSoundSpace.labels.SE
 			}, () => {
-				this.downloadSoundFiles()
-				// this.loadPlayer()
+				this.loadPlayer()
 			})
 		}	
 	}
 
-	downloadSoundFiles() {
+	loadPlayer() {
 
-		const selectedSoundSpace = this.state.selectedSoundSpace
-		const latentSpaces = this.state.latentSpaces
+		const { sounds, selectedSoundSpace } = this.state
 		const baseUrl = 'https://storage.googleapis.com/sound-gen-dev'
+
+		let latentSpaces = []
 		this.soundUrls = {}
 
-		latentSpaces.forEach((latentSpace) => {
+		sounds.forEach((sound) => {
 			// get urls for each sound
-			const name = latentSpace._id
-			const fileLocation = `${baseUrl}/${latentSpace.path}/${latentSpace.file}`
-			this.soundUrls[name] = fileLocation	
+			const fileLocation = `${baseUrl}/${sound.path}/${sound.file}`
+			this.soundUrls[sound._id] = fileLocation
+
+			// get latent space arrays for each sound
+			const latentSpaceXY = this.convert_LatentSpace_XY(
+												sound.latentSpace['NW'],
+												sound.latentSpace['NE'],
+												sound.latentSpace['SE'],
+												sound.latentSpace['SW']
+											)
+
+			latentSpaces.push(latentSpaceXY)
+			
 		})
 
-		console.log(this.soundUrls)
-	}
-
-	loadPlayer() {
 		// timeout makes initial loading animation smoother
 		setTimeout(() => {
 			this.players = new Tone.Players(this.soundUrls, () => {
-				this.setState({loading:false})
-				this.setState({latentSpaceLoading: false})
+				this.setState({
+					loading: false,
+					latentSpaceLoading: false,
+					latentSpaces: latentSpaces,
+					latentResolution: selectedSoundSpace.resolution
+				})
 			}).toMaster()	
 		}, 500)
 	}
@@ -126,28 +136,39 @@ class LatentExplorer extends Component {
 		this.setState({ pitch: data.pitch })
 	}
 
-	getCurrentSound(pitchValue) {
-		const pitch = pitchValue || this.state.pitch
-		const latentSpace = `${this.state.latentRatioNW}`
-												+ `_${this.state.latentRatioNE}`
-												+ `_${this.state.latentRatioSW}`
-												+ `_${this.state.latentRatioSE}`
-		const currentSound = latentSpace + '_pitch_' + pitch
+	getCurrentSound() {
+		const { sounds, currentSound, latentRatioNW, latentRatioNE, latentRatioSE, latentRatioSW } = this.state
+		const soundMatch = sounds.find( (sound) => {
+			return (
+				sound.latentSpace.NW === parseFloat(latentRatioNW) &&
+				sound.latentSpace.NE === parseFloat(latentRatioNE) &&
+				sound.latentSpace.SE === parseFloat(latentRatioSE) &&
+				sound.latentSpace.SW === parseFloat(latentRatioSW)
+			)
+		})
 
-		return currentSound
+		if (soundMatch) {
+			this.setState({currentSound: soundMatch})
+			return soundMatch	
+		}
+		else {
+			return currentSound
+		}
 	}
 
 	downloadSound() {
 		const currentSound = this.getCurrentSound()
-		const soundUrl = this.soundUrls[currentSound]
-		window.open(soundUrl, '_blank')
+		if (currentSound) {
+			const soundUrl = this.soundUrls[currentSound['_id']]
+			window.open(soundUrl, '_blank')
+		}
 	}
 
 	playSound(pitchValue) {
-		const currentSound = this.getCurrentSound(pitchValue)
+		const currentSound = this.getCurrentSound()
 
-		if (this.players) {
-			const player = this.players.get(currentSound)
+		if (this.players && currentSound) {
+			const player = this.players.get(currentSound['_id'])
 			if (player) {
 				try { player.start() }
 				catch(err) { console.log('error playing sound: ' + currentSound) }
@@ -174,6 +195,42 @@ class LatentExplorer extends Component {
 		})
 	}
 
+	convert_XY_LatentSpace(x,y) {
+		// x,y are values between [0.00, 1.00]
+		// NW = [0,0]
+		// NE = [1,0]
+		// SE = [1,1]
+		// SW = [0,1]
+		return [
+			Math.round( 10 * (1-x)*(1-y) ) / 10,
+			Math.round( 10 * (x)*(1-y) ) / 10,
+			Math.round( 10 * (x)*(y) ) / 10,
+			Math.round( 10 * (1-x)*(y) ) / 10
+		]
+	}
+
+	convert_LatentSpace_XY(NW, NE, SE, SW) {
+		// input values between [0.00, 1.00]
+		// NW = [0,0]
+		// NE = [1,0]
+		// SE = [1,1]
+		// SW = [0,1]
+
+		console.log('------------')
+		console.log(NW, NE, SE, SW)
+
+		console.log(
+			Math.round( 10 * ( 0.5 + (NE + SE)/2 - (NW + SW)/2 )) / 10,
+			Math.round( 10 * ( 0.5 + (SE + SW)/2 - (NW + NE)/2 )) / 10
+		)
+
+		return [
+			Math.round( 10 * ( 0.5 + (NE + SE)/2 - (NW + SW)/2 )) / 10,
+			Math.round( 10 * ( 0.5 + (SE + SW)/2 - (NW + NE)/2 )) / 10
+		]
+	}
+
+
   updateLatentSelector(data) {
     const x = parseFloat(data.x).toFixed(1)
 		const y = parseFloat(data.y).toFixed(1)
@@ -181,12 +238,7 @@ class LatentExplorer extends Component {
 		// --------------------
 		// const hasBeenActivated = data.hasBeenActivated
 
-		var latentSpace = [
-			Math.round( 10 * (1-x)*(1-y) ) / 10,
-			Math.round( 10 * (x)*(1-y) ) / 10,
-			Math.round( 10 * (1-x)*(y) ) / 10,
-			Math.round( 10 * (x)*(y) ) / 10
-		]
+		var latentSpace = this.convert_XY_LatentSpace(x,y)
 
 		// latent space should add up to 1
 		var sum = latentSpace.reduce((partial_sum, a) => partial_sum + a)
@@ -217,17 +269,7 @@ class LatentExplorer extends Component {
 				latentRatioSW: latentSpace[2],
 				latentRatioSE: latentSpace[3]
 			}, () => {
-			// de-activated for now
-			// --------------------
-			// if (hasBeenActivated === true) { this.playSound() }
 		})
-
-		// console.log(
-		// 		"NW:"+this.state.latentRatioNW, 
-		// 		"NE:"+this.state.latentRatioNE, 
-		// 		"SW:"+this.state.latentRatioSW, 
-		// 		"SE:"+this.state.latentRatioSE
-		// 		)
     
   }
 
@@ -274,6 +316,8 @@ class LatentExplorer extends Component {
 						labelNE={this.state.labelNE}
 						labelSE={this.state.labelSE}
 						labelSW={this.state.labelSW}
+						latentSpaces={this.state.latentSpaces}
+						latentResolution={this.state.latentResolution}
 					/>
 					<br/>
 					{

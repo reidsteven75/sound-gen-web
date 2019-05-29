@@ -64,24 +64,7 @@ services:
       context: ./models/n-synth
       args: 
         TENSORFLOW_IMAGE: tensorflow/tensorflow:1.13.1-py3
-        TEST: none
-        COMPUTE_TYPE: cpu
-        COMPUTE_ENVIRONMENT: local
-    volumes:
-      - ./models/n-synth/artifacts:/code/artifacts
-    networks:
-      - sound_network
-    ports:
-     - "${GENERATE_PORT}:${GENERATE_PORT}"
-    command: sh -c "python generate.py"
-  
-  generate-test-local:
-    env_file: .env
-    build:
-      context: ./models/n-synth
-      args: 
-        TENSORFLOW_IMAGE: tensorflow/tensorflow:1.13.1-py3
-        TEST: standard
+        DATASET_TYPE: real
         COMPUTE_TYPE: cpu
         COMPUTE_ENVIRONMENT: local
     volumes:
@@ -98,7 +81,7 @@ services:
       context: ./models/n-synth
       args: 
         TENSORFLOW_IMAGE: tensorflow/tensorflow:1.13.1-gpu-py3
-        TEST: none
+        DATASET_TYPE: real
         COMPUTE_TYPE: gpu
         COMPUTE_ENVIRONMENT: paperspace
     volumes:
@@ -109,13 +92,13 @@ services:
      - "${GENERATE_PORT}:${GENERATE_PORT}"
     command: sh -c "python generate.py"
   
-  generate-test-paperspace:
+  generate-test:
     env_file: .env
     build:
       context: ./models/n-synth
       args: 
         TENSORFLOW_IMAGE: tensorflow/tensorflow:1.13.1-gpu-py3
-        TEST: standard
+        DATASET_TYPE: test
         COMPUTE_TYPE: gpu
         COMPUTE_ENVIRONMENT: paperspace
     volumes:

@@ -19,32 +19,20 @@ import concurrent.futures
 from multiprocessing.dummy import Pool as ThreadPool
 
 COMPUTE_ENVIRONMENT = os.environ['COMPUTE_ENVIRONMENT']
+DATASET_TYPE = os.environ['DATASET_TYPE']
 
-CONFIG_WORKFLOW_FILE = 'config-workflow-%s.json' %(COMPUTE_ENVIRONMENT)
-with open(CONFIG_WORKFLOW_FILE, 'r') as infile:
-  config_workflow = json.load(infile)
-
-TEST = os.environ['TEST']
-print("TEST: " + TEST)
-if TEST == 'standard':
-  with open('config-workflow-test.json', 'r') as infile:
-    config_override = json.load(infile)
-    config_workflow['jobs']['encode-interpolate']['batch_size'] = config_override['jobs']['encode-interpolate']['batch_size']
-    config_workflow['jobs']['encode-interpolate']['concurrent_jobs'] = config_override['jobs']['encode-interpolate']['concurrent_jobs']
-    config_workflow['jobs']['decode']['gpus'] = config_override['jobs']['decode']['gpus']
-    config_workflow['jobs']['decode']['batch_size'] = config_override['jobs']['decode']['batch_size']
-    config_workflow['jobs']['decode']['sample_length'] = config_override['jobs']['decode']['sample_length']
-    config_workflow['jobs']['decode']['concurrent_jobs'] = config_override['jobs']['decode']['concurrent_jobs']
-       
+if DATASET_TYPE == 'test':
+  CONFIG_WORKFLOW_FILE = 'config-workflow-test.json'
   CONFIG_SOUND_FILE = 'config-sound-test.json'
-  GOOGLE_STORAGE_UPLOAD_PATH = os.environ['GOOGLE_STORAGE_UPLOAD_PATH_TEST']
 else:
+  CONFIG_WORKFLOW_FILE = 'config-workflow-%s.json' %(COMPUTE_ENVIRONMENT)
   CONFIG_SOUND_FILE = 'config-sound.json'
-  GOOGLE_STORAGE_UPLOAD_PATH = os.environ['GOOGLE_STORAGE_UPLOAD_PATH_REAL']
+
 with open(CONFIG_SOUND_FILE, 'r') as infile:
   config_sound = json.load(infile)
-
-print(config_workflow)
+  
+with open(CONFIG_WORKFLOW_FILE, 'r') as infile:
+  config_workflow = json.load(infile)
 
 if os.environ['HTTPS'] == True:
   HTTP = 'https://'
@@ -53,6 +41,7 @@ else:
 
 API = HTTP + os.environ['HOST_ALIAS'] + ':' + os.environ['SERVER_PORT'] + '/api'
 
+GOOGLE_STORAGE_UPLOAD_PATH = os.environ['GOOGLE_STORAGE_UPLOAD_PATH']
 UTILS_COMMON_FILE = 'utils_common.py'
 UTILS_JOB_FILE = 'utils_job.py'
 ARTIFACT_ID = unique_id()
@@ -293,23 +282,9 @@ def job_config(job, data_batch, i):
     create_dir(config['job_artifacts'])
   
   if (COMPUTE_ENVIRONMENT == 'paperspace'):
-    # zip job directory
     print('zipping job...')
     config['job_zip_path'] = zip_job(config['job_path'], DIR_ZIP)
     print('zipped like a fresh coat zipper')
-  
-  # print('job')
-  # job_dir = get_only_directories(config['job_path'])
-  # files = get_only_files(config['job_path'])
-  # print(job_dir)
-  # print(files)
-  # for folder in job_dir:
-  #   print(folder)
-  #   if folder == 'data':
-  #     files = get_only_files(config['job_path'] + '/' + folder + '/input')
-  #   else:
-  #     files = get_only_files(config['job_path'] + '/' + folder)
-  #   print(files)
 
   return(config)
   
@@ -336,8 +311,6 @@ def job_schedule(job, dataset):
   
   # run jobs in parallel
   Parallel(n_jobs=int(concurrent_jobs), verbose=10)(delayed(job_run)(config[i]) for i in range(int(concurrent_jobs)))
-
-  time.sleep(1)
 
 def run_workflow():
 

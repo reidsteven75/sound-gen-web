@@ -86,6 +86,9 @@ $ gsutil cors set google-storage-cors.json gs://augmented-music-generation-dev
 $ gsutil cors get gs://augmented-music-generation-dev
 ```
 
+Service Key Creation
+https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-console
+
 Python SDK Docs
 https://googleapis.github.io/google-cloud-python/latest/storage/blobs.html#google.cloud.storage.blob.Blob.upload_from_file
 

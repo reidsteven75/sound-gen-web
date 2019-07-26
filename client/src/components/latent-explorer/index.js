@@ -97,7 +97,7 @@ class LatentExplorer extends Component {
 	loadPlayer() {
 
 		const { sounds, selectedSoundSpace } = this.state
-		const baseUrl = 'https://storage.googleapis.com/sound-gen-dev'
+		const baseUrl = 'https://storage.googleapis.com/sound-gen-files-dev'
 
 		let latentSpaces = []
 		this.soundUrls = {}

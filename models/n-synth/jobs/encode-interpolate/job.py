@@ -117,7 +117,7 @@ def interpolate_embeddings():
 		return embeddings_lookup[instrument]
 
 	def parse_weight(weight):
-		return str(round(weight, 1))
+		return str(round(weight, 3))
 
 	done = set()
 	all_names = []

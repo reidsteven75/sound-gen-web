@@ -12,6 +12,7 @@
 
 # specific directories
 **/.ps_project/
+**/sounds/
 
 # specific files
 **/google-storage-auth.json

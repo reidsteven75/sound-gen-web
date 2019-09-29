@@ -39,8 +39,8 @@ Deploy - Web
 ```
 $ ./deploy.sh
 ```
-- uses 'server/app.yml' for Google Apps Engine config
-- uses 'server/Dockerfile' for Google Apps Engine container
+- 'server/app.yml' = Google Apps Engine config
+- 'server/Dockerfile' = Google Apps Engine container
 
 
 Deploy - Sound Generation
@@ -55,6 +55,12 @@ Checkpoints are accessed through the Paperspace 'storage' directory, which can b
 
 3) Deploy Job
 $ ./deploy-job.sh
+
+Logs
+----
+```
+$ gcloud app logs tail
+```
 
 Node Modules
 ------------
@@ -82,8 +88,8 @@ Google Storage
 --------------
 Cloud Cors
 ```
-$ gsutil cors set google-storage-cors.json gs://augmented-music-generation-dev
-$ gsutil cors get gs://augmented-music-generation-dev
+$ gsutil cors set google-storage-cors.json gs://[bucket]
+$ gsutil cors get gs://[bucket]
 ```
 
 Service Key Creation

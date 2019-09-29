@@ -6,7 +6,8 @@ const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
 const mongoose = require('mongoose')
-const winston = require('winston');
+const winston = require('winston')
+const Multer = require('multer')
 const {Storage} = require('@google-cloud/storage')
 
 const path = require('path')
@@ -96,6 +97,14 @@ const storage = new Storage({
 })
 const bucket = storage.bucket(GOOGLE_STORAGE_BUCKET)
 
+const multer = Multer({
+	storage: Multer.memoryStorage(),
+	dest: 'upload/',
+  limits: {
+    fileSize: 50 * 1024 * 1024, // 50 mb max
+  },
+})
+
 app.get(API_ROUTE + '/test', (req, res) => {
 	res.send({test:'works!'})
 })
@@ -173,25 +182,40 @@ app.get(API_ROUTE + '/sound-spaces/:id/files/:type', (req, res) => {
 	})
 })
 
-app.post(API_ROUTE + '/files', (req, res) => {
+app.post(API_ROUTE + '/files', multer.single('file'), (req, res) => {
+
+	if (!req.file) {
+		res.status(400).send({err: true});
+		console.log('no file uploaded')
+    return;
+	}
 
 	const data = req.body
+	const file = req.file
+
 	const options = {
 		destination: data.uploadPath + '/' + data.file,
 		resumable: true,
 	}
 
-	bucket.upload(data.filePath + '/' + data.file, options, function(err, file) {
-		if (err) {
-			logger.error('upload Google Storage error: files')
-			logger.info(err)
-			return res.send({err: true})
-		}
+	const blob = bucket.file(data.uploadPath + '/' + file.originalname);
+	const blobStream = blob.createWriteStream();
+	
+	blobStream.on('error', err => {
+    next(err);
+  })
+
+  blobStream.on('finish', () => {
 		
 		const record = new Files({
 			soundSpace: data.soundSpace,
-			latentSpace: data.latentSpace,
-			file: data.file,
+			latentSpace: {
+				NW: data.latentSpaceNW,
+				NE: data.latentSpaceNE,
+				SW: data.latentSpaceSW,
+				SE: data.latentSpaceSE,
+			},
+			file: data.fileName,
 			type: data.type,
 			bucket: GOOGLE_STORAGE_BUCKET,
 			path: data.uploadPath
@@ -204,7 +228,10 @@ app.post(API_ROUTE + '/files', (req, res) => {
 			}
 			res.send(record)
 		})
-	})
+
+  })
+
+  blobStream.end(req.file.buffer)
 
 })
 

@@ -259,7 +259,7 @@ class LatentSelector extends Component {
 	
 	componentWillUnmount() {
 		window.removeEventListener("resize", this.redrawCanvas)
-		window.addEveremoveEventListenerntListener("touchend", this.handleMouseUp)
+		window.removeEventListener("touchend", this.handleMouseUp)
 		window.removeEventListener("mouseup", this.handleMouseUp)
 	}	
 

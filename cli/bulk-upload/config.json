@@ -12,7 +12,7 @@
 		"api": {
 			"http": "http://",
 			"host": "0.0.0.0",
-			"port": "4001"
+			"port": ":4001"
 		},
 		"googleStorage": {
 			"bucket": "sound-gen-files-dev",
@@ -22,7 +22,7 @@
 	"prod": {
 		"api": {
 			"http": "https://",
-			"host": "",
+			"host": "sound-gen.appspot.com",
 			"port": ""
 		},
 		"googleStorage": {

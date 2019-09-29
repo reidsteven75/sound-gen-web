@@ -5,13 +5,15 @@ import re
 import uuid 
 import datetime
 
+ENV = 'dev'  # dev or prod
+
 JOB_NAME = 'BULK-SOUND-UPLOAD'
 CONFIG_FILE = 'config.json'
 with open(CONFIG_FILE, 'r') as infile:
   config = json.load(infile)
 
-API = config['dev']['api']['http'] + config['dev']['api']['host'] + ':' + config['dev']['api']['port'] + '/api'
-GOOGLE_STORAGE_UPLOAD_PATH = config['dev']['googleStorage']['uploadPath']
+API = config[ENV]['api']['http'] + config[ENV]['api']['host'] + config[ENV]['api']['port'] + '/api'
+GOOGLE_STORAGE_UPLOAD_PATH = config[ENV]['googleStorage']['uploadPath']
 FILE_PATH = './sounds'
 
 def unique_id():
@@ -26,21 +28,21 @@ def parse_latent_space(string, vector):
   else:
     return None
 
-def get_filetype(file):
-  return os.path.splitext(file)[1].replace('.', '')
+def get_filetype(file_name):
+  return os.path.splitext(file_name)[1].replace('.', '')
 
-def upload_sound(file, sound_space_id):
+def upload_sound(file_path, file_name, sound_space_id):
   latent_space = {
     'NW': None,
     'NE': None,
     'SW': None,
     'SE': None
   }
-  latent_space['NW'] = parse_latent_space(file, 'NW')
-  latent_space['NE'] = parse_latent_space(file, 'NE')
-  latent_space['SW'] = parse_latent_space(file, 'SW')
-  latent_space['SE'] = parse_latent_space(file, 'SE')
-  file_type = get_filetype(file)
+  latent_space['NW'] = parse_latent_space(file_name, 'NW')
+  latent_space['NE'] = parse_latent_space(file_name, 'NE')
+  latent_space['SW'] = parse_latent_space(file_name, 'SW')
+  latent_space['SE'] = parse_latent_space(file_name, 'SE')
+  file_type = get_filetype(file_name)
   parse_success = True
   for key in latent_space:
     if latent_space[key] == None:
@@ -50,17 +52,23 @@ def upload_sound(file, sound_space_id):
     print('parse result: %s' %(latent_space))
   else:
     print('success')
-    uuid = unique_id()
     record = {
       'soundSpace': sound_space_id,
       'uploadPath': GOOGLE_STORAGE_UPLOAD_PATH + '/' + sound_space_id,
-      'filePath': FILE_PATH,
-      'file': file,
+      'fileName': file_name,
       'type': file_type,
-      'latentSpace': latent_space
+      'latentSpaceNW': latent_space['NW'],
+      'latentSpaceNE': latent_space['NE'],
+      'latentSpaceSW': latent_space['SW'],
+      'latentSpaceSE': latent_space['SE']
     }
     print('uploading...')
-    res = requests.post(API + '/files', json=record)
+
+    file = {
+      'file': open(file_path + '/' + file_name, 'rb')
+    }
+
+    res = requests.post(API + '/files', files=file, data=record)
     return(res.json())
 
 def bulk_upload():
@@ -85,9 +93,9 @@ def bulk_upload():
 		sound_space_id = res_data['_id']
 		print('sound-space created with ID: %s' %(sound_space_id))
 		num_errors = 0
-		for file in os.listdir(FILE_PATH):
-			print('file: %s' %(file))
-			res = upload_sound(file, sound_space_id)
+		for file_name in os.listdir(FILE_PATH):
+			print('file_name: %s' %(file_name))
+			res = upload_sound(FILE_PATH, file_name, sound_space_id)
 			if 'err' in res:
 				print('error')
 				num_errors += 1

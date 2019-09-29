@@ -36,9 +36,14 @@ class Header extends Component {
 		this.state = {
 		}
 		this.handleBackNav = this.handleBackNav.bind(this)
+		this.handleHomeNav = this.handleHomeNav.bind(this)
 	}
 	
 	handleBackNav() {
+		this.props.history.push('/dashboard')
+	}
+
+	handleHomeNav() {
 		this.props.history.push('/dashboard')
 	}
 
@@ -66,8 +71,13 @@ class Header extends Component {
 							>
 							<NavigateBefore />
 						</IconButton>
-						<Typography variant='h6' color='inherit' className={classes.grow}>
-							Sound Gen
+						<Typography 
+							variant='h6' 
+							color='inherit' 
+							className={classes.grow}
+							onClick={this.handleHomeNav}
+						>
+								Sound Gen
 						</Typography>
 						<IconButton className={classes.helpButton} color='inherit' aria-label='Menu'>
 							<Help />

@@ -5,7 +5,7 @@ import re
 import uuid 
 import datetime
 
-ENV = 'dev'  # dev or prod
+ENV = 'prod'  # dev, prod
 
 JOB_NAME = 'BULK-SOUND-UPLOAD'
 CONFIG_FILE = 'config.json'

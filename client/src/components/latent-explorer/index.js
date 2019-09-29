@@ -97,14 +97,15 @@ class LatentExplorer extends Component {
 	loadPlayer() {
 
 		const { sounds, selectedSoundSpace } = this.state
-		const baseUrl = 'https://storage.googleapis.com/sound-gen-files-dev'
+		// TODO: put this in global config
+		const baseUrl = 'https://storage.googleapis.com'
 
 		let latentSpaces = []
 		this.soundUrls = {}
 
 		sounds.forEach((sound) => {
 			// get urls for each sound
-			const fileLocation = `${baseUrl}/${sound.path}/${sound.file}`
+			const fileLocation = `${baseUrl}/${sound.bucket}/${sound.path}/${sound.file}`
 			this.soundUrls[sound._id] = fileLocation
 
 			// get latent space arrays for each sound

@@ -34,7 +34,7 @@ echo 'moved:' $CLIENT_BUILD_DIR '->' $SERVER_BUILD_DIR
 echo ''
 echo 'committing new build...'
 echo '-----------------------'
-git commit -m 'client re-build' $SERVER_BUILD_DIR 
+git commit -m 'client re-build' $SERVER_BUILD_DIR/client
 
 echo '~~~~~~~~~~~~~~~~~~~~~~'
 echo '~= Sound Web: Built =~'

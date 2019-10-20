@@ -1,7 +1,8 @@
 {
   "name": "sound-genertion-web",
   "version": "0.0.1",
-  "description": "",
+  "description": "augmenting sound generation to create unique sounds no-one has ever heard",
+  "repository": "https://github.com/reidsteven75/sound-gen-web",
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js --ignore node_modules",

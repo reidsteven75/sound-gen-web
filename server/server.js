@@ -240,7 +240,7 @@ server.listen(SERVER_PORT, () => {
 	logger.info('~= Sound Server Ready =~')
   logger.info('')
 	logger.info('ENV: ' + ENVIRONMENT)
-	logger.info('PORT:' + SERVER_PORT)
+	logger.info('PORT: ' + SERVER_PORT)
 	logger.info('API: ' + API_ROUTE)
 
 	mongoose.connect(MONGO_URL, { useNewUrlParser: true })

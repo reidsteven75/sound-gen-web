@@ -1,7 +1,7 @@
 #!/bin/bash
 
-CLIENT_BUILD_DIR=client/build
-SERVER_BUILD_DIR=server/build
+CLIENT_BUILD_DIR=./client/build
+SERVER_BUILD_DIR=./server/build
 
 # set env from .env file
 ENV_FILE=$1
@@ -30,9 +30,11 @@ mkdir -p $SERVER_BUILD_DIR
 # client build
 cp -r $CLIENT_BUILD_DIR $SERVER_BUILD_DIR/client
 echo 'moved:' $CLIENT_BUILD_DIR '->' $SERVER_BUILD_DIR 
-# production env files
-cp $ENV_FILE $SERVER_BUILD_DIR/.env
-echo 'moved:' $ENV_FILE '->' $SERVER_BUILD_DIR 
+
+echo ''
+echo 'committing new build...'
+echo '-----------------------'
+git commit -m 'client re-build' $SERVER_BUILD_DIR 
 
 echo '~~~~~~~~~~~~~~~~~~~~~~'
 echo '~= Sound Web: Built =~'

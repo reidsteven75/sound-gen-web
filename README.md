@@ -31,7 +31,7 @@ $ ./build.sh .env
 
 prod
 ```
-$ ./build.sh
+$ ./build.sh .env.prod
 ```
 
 Deploy
@@ -40,7 +40,7 @@ Deploy
 $ ./deploy.sh
 ```
 - 'heroku.yml' = heroku config
-- env variables are set in heroku
+- server ENV variables set in Heroku
 
 Logs
 ----

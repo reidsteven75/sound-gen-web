@@ -3,11 +3,6 @@
 CLIENT_BUILD_DIR=client/build
 SERVER_BUILD_DIR=server/build
 
-# production ENV
-NODE_ENV=production
-HTTPS=true
-HOST=https://sound-gen-prod.herokuapp.com/
-
 # set env from .env file
 ENV_FILE=$1
 source $ENV_FILE

@@ -25,7 +25,7 @@ const {
 const ENVIRONMENT = process.env.NODE_ENV || 'development'
 const HTTPS = (process.env.HTTPS === 'true')
 const HOST = (HTTPS ? 'https://' : 'http://') + process.env.HOST
-const SERVER_PORT = process.env.SERVER_PORT
+const SERVER_PORT = process.env.SERVER_PORT || process.env.PORT
 const MONGO_PORT = process.env.MONGO_PORT
 const GOOGLE_STORAGE_SERVICE = 'https://storage.googleapis.com'
 const GOOGLE_STORAGE_BUCKET = process.env.GOOGLE_STORAGE_BUCKET

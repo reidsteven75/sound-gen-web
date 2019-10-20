@@ -1,13 +1,3 @@
 build:
   docker:
     web: server/Dockerfile
-    config: 
-      NODE_ENV: production
-      HOST: sound-gen-prod.herokuapp.com
-      HOST_ALIAS: sound-gen-prod.herokuapp.com
-      HTTPS: true
-      MONGO_URL: mongodb+srv://api_user_prod:Nhhai3YgpVB0DGjv@sound-gen-prod-osehf.gcp.mongodb.net/sound-gen?retryWrites=true&w=majority
-      DB_PASS: UPTDysd8dYQnuDMO
-      DB_USER: api_user
-      GOOGLE_STORAGE_BUCKET: sound-gen-files-prod
-      GOOGLE_STORAGE_UPLOAD_PATH: sounds

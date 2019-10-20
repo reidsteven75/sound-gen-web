@@ -24,7 +24,7 @@ const {
 
 const ENVIRONMENT = process.env.NODE_ENV || 'development'
 const HTTPS = (process.env.HTTPS === 'true')
-const HOST = (HTTPS ? 'https://' : 'http://') + process.env.HOST
+// const HOST = (HTTPS ? 'https://' : 'http://') + process.env.HOST
 const SERVER_PORT = process.env.SERVER_PORT || process.env.PORT
 const MONGO_PORT = process.env.MONGO_PORT
 const GOOGLE_STORAGE_SERVICE = 'https://storage.googleapis.com'
@@ -240,7 +240,7 @@ server.listen(SERVER_PORT, () => {
 	logger.info('~= Sound Server Ready =~')
   logger.info('')
 	logger.info('ENV: ' + ENVIRONMENT)
-	logger.info('API: ' + HOST + ':' + SERVER_PORT + API_ROUTE)
+	logger.info('API: [HOST]:' + SERVER_PORT + API_ROUTE)
 
 	mongoose.connect(MONGO_URL, { useNewUrlParser: true })
 

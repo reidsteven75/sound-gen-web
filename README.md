@@ -31,7 +31,7 @@ $ ./build.sh .env
 
 prod
 ```
-$ ./build.sh .env.prod
+$ ./build.sh
 ```
 
 Deploy

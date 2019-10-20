@@ -3,6 +3,10 @@
 CLIENT_BUILD_DIR=client/build
 SERVER_BUILD_DIR=server/build
 
+NODE_ENV=production
+HTTPS=true
+HOST=sound-gen-files-prod
+
 # set env from .env file
 ENV_FILE=$1
 source $ENV_FILE
@@ -18,7 +22,6 @@ cd client
 env NODE_ENV=$NODE_ENV \
     HTTPS=$HTTPS \
     HOST=$HOST \
-    HOST_ALIAS=$HOST_ALIAS \
     SERVER_PORT=$SERVER_PORT \
     npm run build
 cd ..

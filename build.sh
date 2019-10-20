@@ -1,5 +1,8 @@
 #!/bin/bash
 
+CLIENT_BUILD_DIR=client/build
+SERVER_BUILD_DIR=server/build
+
 # set env from .env file
 ENV_FILE=$1
 source $ENV_FILE

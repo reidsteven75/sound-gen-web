@@ -30,8 +30,6 @@ services:
     volumes:
       - ./server:/code
       - /code/node_modules
-      - ./models/n-synth/artifacts:/code/artifacts
-      - ./cli/bulk-upload/sounds:/code/sounds
     networks:
       sound_network:
         aliases:

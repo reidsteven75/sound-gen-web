@@ -1,20 +1,15 @@
 #!/bin/bash
 
-# set env from .env file
-ENV_FILE=.env.prod
-source $ENV_FILE
-
-echo '~~~~~~~~~~~~~~~~~~~~~~~'
-echo '~= Sound Web: Deploy =~'
-echo '~~~~~~~~~~~~~~~~~~~~~~~'
+echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+echo '~= Sound Gen Web: Deploy =~'
+echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 
 echo ''
 echo 'deploying...'
 echo '------------'
-cd server
-gcloud app deploy --quiet --project $GOOGLE_APP_PROJECT_ID
+git push heroku master
 
-echo '~~~~~~~~~~~~~~~~~~~~~~~~~'
-echo '~= Sound Web: Deployed =~'
-echo '~~~~~~~~~~~~~~~~~~~~~~~~~'
-echo 'http://'$GOOGLE_APP_PROJECT_ID'.appspot.com'
+echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+echo '~= Sound Gen Web: Deployed =~'
+echo '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+echo 'https://sound-gen-prod.herokuapp.com/'

@@ -17,7 +17,7 @@
 # specific files
 **/google-storage-auth.json
 **/.env
-**/.env.prod
+**/heroku.yml
 
 
 

@@ -217,18 +217,14 @@ class LatentExplorer extends Component {
 		// SE = [1,1]
 		// SW = [0,1]
 
-		console.log('------------')
-		console.log(NW, NE, SE, SW)
+		let x = Math.round( 10 * ( 0.5 + (NE + SE)/2 - (NW + SW)/2 )) / 10
+		let y = Math.round( 10 * ( 0.5 + (SE + SW)/2 - (NW + NE)/2 )) / 10
 
-		console.log(
-			Math.round( 10 * ( 0.5 + (NE + SE)/2 - (NW + SW)/2 )) / 10,
-			Math.round( 10 * ( 0.5 + (SE + SW)/2 - (NW + NE)/2 )) / 10
-		)
+		// console.log('------------')
+		// console.log(NW, NE, SE, SW)
+		// console.log( x , y )
 
-		return [
-			Math.round( 10 * ( 0.5 + (NE + SE)/2 - (NW + SW)/2 )) / 10,
-			Math.round( 10 * ( 0.5 + (SE + SW)/2 - (NW + NE)/2 )) / 10
-		]
+		return [ x , y ]
 	}
 
 

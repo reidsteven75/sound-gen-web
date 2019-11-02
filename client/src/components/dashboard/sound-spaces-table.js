@@ -17,6 +17,9 @@ const style = {
   content: {
 		padding: 20,
 		width: '100%'
+	},
+	title: {
+		textAlign:'left'
 	}
 }
 
@@ -139,6 +142,7 @@ class SoundSpacesTable extends Component {
 
     let content = 
 				<React.Fragment>
+					<h4 style={style.title}>Sound Spaces</h4> 
 					<Table aria-labelledby="table-sound-spaces">
 					<EnhancedTableHead
 							headers={headers}

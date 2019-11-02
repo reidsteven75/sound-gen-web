@@ -198,11 +198,11 @@ app.post(API_ROUTE + '/files', multer.single('file'), (req, res) => {
 		resumable: true,
 	}
 
-	const blob = bucket.file(data.uploadPath + '/' + file.originalname);
-	const blobStream = blob.createWriteStream();
+	const blob = bucket.file(data.uploadPath + '/' + file.originalname)
+	const blobStream = blob.createWriteStream()
 	
 	blobStream.on('error', err => {
-    next(err);
+    res.send({err:true})
   })
 
   blobStream.on('finish', () => {

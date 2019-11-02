@@ -17,11 +17,6 @@ server
 $ docker-compose up --build server
 ```
 
-generate sound
-```
-$ docker-compose up --build generate
-```
-
 Build
 -----
 dev

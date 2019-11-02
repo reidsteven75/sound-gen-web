@@ -170,15 +170,17 @@ class LatentSelector extends Component {
 			})
 
 			// draw latent spaces
-			this.sk.stroke(220,20,60)
-			this.sk.strokeWeight(1)
-			latentSpaces.forEach( (_xy) => {
-				this.sk.circle(
-					_xy[0] * this.state.canvasWidth,
-					_xy[1] * this.state.canvasHeight,
-					10
-				)
-			})
+			if (process.env.NODE_ENV !== 'production') {
+				this.sk.stroke(220,20,60)
+				this.sk.strokeWeight(1)
+				latentSpaces.forEach( (_xy) => {
+					this.sk.circle(
+						_xy[0] * this.state.canvasWidth,
+						_xy[1] * this.state.canvasHeight,
+						10
+					)
+				})
+			}
 
 			// determine if moving
 			if (Math.abs(dy) > 0.5 || Math.abs(dx) > 0.5) {

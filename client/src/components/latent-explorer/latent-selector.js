@@ -7,6 +7,7 @@ import Grid from '@material-ui/core/Grid'
 
 const style = {
 	wrapper: {
+		padding: 5,
 		maxWidth: 700,
 		margin: 'auto'
 	},

@@ -6,6 +6,7 @@ import compose from 'recompose/compose'
 import withWidth from '@material-ui/core/withWidth'
 import { withStyles } from '@material-ui/core/styles'
 import Hidden from '@material-ui/core/Hidden'
+import Typography from '@material-ui/core/Typography'
 
 import PitchSlider from './pitch-slider'
 import Keyboard from './keyboard'
@@ -18,6 +19,9 @@ const style = {
   content: {
 		padding: 20,
 		width: '100%'
+	},
+	maxHeight: {
+		height: '100vh'
 	}
 }
 
@@ -33,6 +37,7 @@ class LatentExplorer extends Component {
 			latentRatioNE: 0,
 			latentRatioSW: 0,
 			latentRatioSE: 0,
+			name: '',
 			labelNW: '',
 			labelNE: '',
 			labelSW: '',
@@ -84,6 +89,7 @@ class LatentExplorer extends Component {
 
 		if (selectedSoundSpace) {
 			this.setState({
+				name: selectedSoundSpace.name,
 				labelNW: selectedSoundSpace.labels.NW,
 				labelNE: selectedSoundSpace.labels.NE,
 				labelSW: selectedSoundSpace.labels.SW,
@@ -286,10 +292,15 @@ class LatentExplorer extends Component {
     }
     else {
       content = 
-				<div>
-					<DownloadSound 
-						downloadSound={this.downloadSound.bind(this)}
-					/>
+				<div
+					style={style.maxHeight}
+				>
+					<Typography 
+						align='left'
+						variant='subheading' 
+					>
+						{this.state.name}
+					</Typography>
 					<br/>
 					{
 						this.props.features.gridSelector ?
@@ -333,6 +344,10 @@ class LatentExplorer extends Component {
 					<PlaySound 
 						playSound={this.playSound.bind(this)}
 						playTimeout={500}
+					/>
+					<br/>
+					<DownloadSound 
+						downloadSound={this.downloadSound.bind(this)}
 					/>
 					<br/>
 					{

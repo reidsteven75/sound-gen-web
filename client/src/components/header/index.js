@@ -73,14 +73,14 @@ class Header extends Component {
 						</IconButton>
 						<Typography 
 							variant='h6' 
-							color='inherit' 
+							color='white' 
 							className={classes.grow}
 							onClick={this.handleHomeNav}
 						>
-								Sound Gen
+								{/* Sound Generation */}
 						</Typography>
 						<IconButton className={classes.helpButton} color='inherit' aria-label='Menu'>
-							<Help />
+							{/* <Help /> */}
 						</IconButton>
 					</Toolbar>
 				</AppBar>

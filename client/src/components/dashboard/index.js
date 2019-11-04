@@ -11,7 +11,10 @@ import SoundSpacesTable from './sound-spaces-table'
 const style = {
   content: {
 		padding: 20,
-		width: '100%'
+		width: '100%',
+	},
+	maxHeight: {
+		height: '100vh'
 	}
 }
 
@@ -23,14 +26,14 @@ class Dashboard extends Component {
 			loading: true,
 			redirect: null,
 			order: 'desc',
-			orderBy: 'createdAt'
+			orderBy: 'name'
 		}
 		this.tableHeaders = [
-			{ id: 'createdAt', numeric: false, disablePadding: false, label: 'Created' },
 			{ id: 'name', numeric: false, disablePadding: false, label: 'Name' },
-			{ id: 'user', numeric: false, disablePadding: false, label: 'User' },
 			{ id: 'dimensions', numeric: true, disablePadding: false, label: 'Dim.' },
 			{ id: 'resolution', numeric: true, disablePadding: false, label: 'Res.' },
+			{ id: 'createdAt', numeric: false, disablePadding: false, label: 'Created' },
+			{ id: 'user', numeric: false, disablePadding: false, label: 'User' }
 		]
 		this.soundSpaces = []
 	}
@@ -61,13 +64,15 @@ class Dashboard extends Component {
 		}
     else {
       content = 
-				<React.Fragment>
+				<div
+					style={style.maxHeight}
+				>
 					<SoundSpacesTable 
 						headers={this.tableHeaders}
 						redirect={this.routeTo}
 						data={this.soundSpaces}
 					/>
-				</React.Fragment>
+				</div>
     }
     return (
 			<div style={style.content}>

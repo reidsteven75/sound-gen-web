@@ -12,6 +12,7 @@ import TableRow from '@material-ui/core/TableRow'
 import TableSortLabel from '@material-ui/core/TableSortLabel'
 import Tooltip from '@material-ui/core/Tooltip'
 import { withBreakpoints } from 'react-breakpoints'
+import Typography from '@material-ui/core/Typography'
 
 const style = {
   content: {
@@ -142,7 +143,13 @@ class SoundSpacesTable extends Component {
 
     let content = 
 				<React.Fragment>
-					<h4 style={style.title}>Sound Spaces</h4> 
+					<Typography 
+						align='left'
+						variant='subheading' 
+					>
+						Sound Spaces
+					</Typography>
+					{/* <div style={style.title}>Sound Spaces</div>  */}
 					<Table aria-labelledby="table-sound-spaces">
 					<EnhancedTableHead
 							headers={headers}
@@ -163,13 +170,13 @@ class SoundSpacesTable extends Component {
 										tabIndex={-1}
 										key={n._id}
 									>
-										<TableCell align="left">{moment(n.createdAt).fromNow()}</TableCell>
 										<TableCell align="left">{n.name}</TableCell>
+										<TableCell align="right">{n.dimensions}</TableCell> 
                     { !isMobile ?
                       <React.Fragment>
+												<TableCell align="right">{n.resolution}</TableCell>
+												<TableCell align="left">{moment(n.createdAt).fromNow()}</TableCell>
                         <TableCell align="left">{n.user}</TableCell>
-                        <TableCell align="right">{n.dimensions}</TableCell>
-                        <TableCell align="right">{n.resolution}</TableCell>	
                       </React.Fragment>
                     :
                     null
